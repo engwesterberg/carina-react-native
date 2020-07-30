@@ -10,6 +10,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "axios": "^0.19.2",
+    "moments": "0.0.2",
     "react": "16.13.1",
     "react-native": "0.63.2",
     "react-native-hr-component": "^2.0.3",

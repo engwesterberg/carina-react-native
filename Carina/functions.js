@@ -103,24 +103,14 @@ export const incPomo = async (user_id, todo_id) => {
 
 export const newTodo = async (
   user_id,
-  title,
-  note,
-  due_date,
-  has_time,
-  pomo_estimate,
+  query,
   list_id,
-  recurring,
 ) => {
   let results = await axios
     .post('http://192.168.0.100:5000/api/todo', {
       user_id: user_id,
-      title: title,
-      note: note,
-      due_date: due_date,
-      has_time: has_time,
-      pomo_estimate: pomo_estimate,
+      query: query,
       list_id: list_id,
-      recurring: recurring,
     })
     .then((res) => res.data)
     .catch((e) => console.error(e));

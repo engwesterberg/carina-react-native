@@ -1,16 +1,46 @@
 import {COLORS} from '../colors.js';
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, TextInput} from 'react-native';
-import AppButton from './AppButton.js';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableHighlight,
+} from 'react-native';
+import Swipeable from 'react-native-swipeable-row';
+import {newTodo} from '../functions.js';
+
+const leftContent = <Text />;
+
+const rightButtons = [
+  <TouchableHighlight>
+    <Text />
+  </TouchableHighlight>,
+];
 
 const CarinaBar = (props) => {
   const [planningMode, setPlanningMode] = useState(false);
+  const [query, setQuery] = useState('');
+  const [planningAttributes, setPlanningAttributes] = useState('');
+
   return (
     <View style={styles.container}>
       <TextInput
+        value={query}
         style={styles.bar}
         placeholder="Add task to Carina"
         placeholderTextColor={COLORS.lightPurple}
+        onSubmitEditing={(text) => {
+          newTodo(
+            props.user_id,
+            planningMode ? query + planningAttributes : query,
+            null,
+          );
+          setQuery("");
+        }}
+        onChangeText={(text) => {
+          setQuery(text);
+        }}
       />
       {!planningMode && (
         <Text
@@ -23,11 +53,24 @@ const CarinaBar = (props) => {
       )}
       {planningMode && (
         <View>
-          <TextInput
-            style={styles.planningModeBar}
-            placeholder="Enter todo attributes"
-            placeholderTextColor={COLORS.lightPurple}
-          />
+          <Swipeable
+            leftContent={leftContent}
+            rightButtons={rightButtons}
+            onLeftActionRelease={() => {
+              setPlanningMode(false);
+            }}
+            onRightActionRelease={() => {
+              setPlanningMode(false);
+            }}>
+            <TextInput
+              style={styles.planningModeBar}
+              placeholder="Enter todo attributes"
+              placeholderTextColor={COLORS.lightPurple}
+              onChangeText={(text) => {
+                setPlanningAttributes(text);
+              }}
+            />
+          </Swipeable>
         </View>
       )}
     </View>

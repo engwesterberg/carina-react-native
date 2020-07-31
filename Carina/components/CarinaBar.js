@@ -36,7 +36,7 @@ const CarinaBar = (props) => {
             planningMode ? query + planningAttributes : query,
             null,
           );
-          setQuery("");
+          setQuery('');
         }}
         onChangeText={(text) => {
           setQuery(text);
@@ -79,7 +79,6 @@ const CarinaBar = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: COLORS.darkPurple,
   },
   bar: {
@@ -95,6 +94,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '95%',
     borderRadius: 5,
+    marginBottom: 20,
     fontSize: 16,
     height: 40,
     textAlignVertical: 'center',
@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
   text: {
     color: 'white',
     marginTop: 5,
+    marginBottom: 20,
     marginLeft: 20,
   },
 });

@@ -1,6 +1,7 @@
 import {COLORS} from '../colors.js';
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, TextInput} from 'react-native';
+import AppButton from './AppButton.js';
 
 const CarinaBar = (props) => {
   const [planningMode, setPlanningMode] = useState(false);
@@ -25,6 +26,7 @@ const CarinaBar = (props) => {
           <TextInput
             style={styles.planningModeBar}
             placeholder="Enter todo attributes"
+            placeholderTextColor={COLORS.lightPurple}
           />
         </View>
       )}
@@ -50,8 +52,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: '95%',
     borderRadius: 5,
-    fontSize: 20,
+    fontSize: 16,
     height: 40,
+    textAlignVertical: 'center',
     backgroundColor: 'white',
   },
   text: {

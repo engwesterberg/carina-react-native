@@ -35,7 +35,9 @@ const CarinaBar = (props) => {
             props.user_id,
             planningMode ? query + planningAttributes : query,
             null,
-          );
+          ).then(() => {
+            props.todoListUpdater();
+          });
           setQuery('');
         }}
         onChangeText={(text) => {

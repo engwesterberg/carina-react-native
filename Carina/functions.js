@@ -143,7 +143,7 @@ export const updateTodo = async (todo) => {
 
 export const deleteTodo = async (todo_id) => {
   let results = await axios
-    .delete(`/api/todo/${todo_id}`)
+    .delete(`http://192.168.0.100:5000/api/todo/${todo_id}`)
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);

@@ -7,7 +7,7 @@ const TodoList = (props) => {
   return (
     <View style={styles.todoListContainer}>
       {props.todos.map((item, index) => {
-        return item.state === props.state ? (<Todo todo={item} todoListUpdater={props.todoListUpdater}/>) : null
+        return item.state === props.state ? (<Todo todo={item} todoListUpdater={props.todoListUpdater} removeFromList={props.removeFromList}/>) : null
       })}
     </View>
   );

@@ -10,6 +10,8 @@ target 'Carina' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+  pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'
+
   target 'CarinaTests' do
     inherit! :complete
     # Pods for testing

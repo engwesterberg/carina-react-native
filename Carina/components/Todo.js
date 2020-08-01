@@ -2,79 +2,134 @@
 import moment from 'moment';
 import {COLORS} from '../colors.js';
 import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableHighlight,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, StyleSheet, Image, TouchableOpacity, Button} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import {updateTodo, deleteTodo} from '../functions';
 import Swipeable from 'react-native-swipeable-row';
+import Modal from 'react-native-modal';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const Todo = (props) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    console.warn('A date has been picked: ', date);
+    hideDatePicker();
+  };
+
   return (
-    <Swipeable
-      rightContent={
-        <View style={styles.swipeRight}>
-          <Image
-            style={styles.noteImg}
-            source={require('../assets/trash-white.png')}
-          />
-        </View>
-      }
-            onRightActionRelease={() => {
-              console.log("delete the shit")
-            }}
-      leftContent={
-        <View>
-          <Text>Pull action</Text>
-        </View>
-      }>
-      <View style={styles.todoContainer} key={props.id}>
-        <View style={styles.radioButtonContainer}>
-          <RadioButton
-            status={props.todo.state === 0 ? 'unchecked' : 'checked'}
-            color={COLORS.darkPurple}
-            onPress={() => {
-              let updatedTodo = props.todo;
-              updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
-              console.log('Radio clicked');
-              updateTodo(updatedTodo).then(props.todoListUpdater());
-            }}
-          />
-        </View>
-        <View style={styles.todoInfoContainer}>
-          <View style={styles.row1}>
-            <Text
-              style={[
-                styles.text,
-                {
-                  textDecorationLine:
-                    props.todo.state === 1 ? 'line-through' : 'none',
-                },
-              ]}>
-              {props.todo.title}
-            </Text>
+    <View>
+      <Modal
+        useNativeDriver={true}
+        style={styles.modal}
+        isVisible={modalVisible}
+        coverScreen={true}
+        backdropOpacity={0.8}
+        onBackButtonPress={() => {
+          setModalVisible(false);
+        }}
+        onBackdropPress={() => {
+          setModalVisible(false);
+        }}>
+        <View style={styles.modalView}>
+          {/*-------------------------------------Expanded tools start-------------------------*/}
+          <View style={styles.expandedTools}>
+            <Text>Okay</Text>
+            <Button title="Show Date Picker" onPress={showDatePicker} />
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+            />
           </View>
-          <View style={styles.row2}>
-            {props.todo.due_date &&
-              props.todo.state != 1 &&
-              dateLabel(props.todo.due_date)}
-          </View>
+          {/*-------------------------------------Expanded tools start-------------------------*/}
         </View>
-        <View style={styles.noteContainer}>
-          {props.todo.note && (
+      </Modal>
+      <Swipeable
+        rightContent={
+          <View style={styles.swipeRight}>
             <Image
               style={styles.noteImg}
-              source={require('../assets/note-added.png')}
+              source={require('../assets/trash-white.png')}
             />
-          )}
+          </View>
+        }
+        leftContent={
+          <View style={styles.swipeLeft}>
+            <Image
+              style={styles.noteImg}
+              source={require('../assets/trash-white.png')}
+            />
+          </View>
+        }
+        onRightActionRelease={() => {
+          deleteTodo(props.todo.id);
+          props.removeFromList(props.todo.id);
+        }}
+        onLeftActionRelease={() => {
+          deleteTodo(props.todo.id);
+          props.removeFromList(props.todo.id);
+        }}>
+        <View style={styles.todoContainer} key={props.id}>
+          <View style={styles.radioButtonContainer}>
+            <RadioButton
+              status={props.todo.state === 0 ? 'unchecked' : 'checked'}
+              color={COLORS.darkPurple}
+              onPress={() => {
+                let updatedTodo = props.todo;
+                updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
+                console.log('Radio clicked');
+                updateTodo(updatedTodo).then(props.todoListUpdater());
+              }}
+            />
+          </View>
+          <TouchableOpacity
+            style={{flex: 1}}
+            activeOpacity={1}
+            onPress={() => {
+              setModalVisible(true);
+            }}>
+            <View style={styles.todoInfoContainer}>
+              <View style={styles.row1}>
+                <Text
+                  style={[
+                    styles.text,
+                    {
+                      textDecorationLine:
+                        props.todo.state === 1 ? 'line-through' : 'none',
+                    },
+                  ]}>
+                  {props.todo.title}
+                </Text>
+              </View>
+              <View style={styles.row2}>
+                {props.todo.due_date &&
+                  props.todo.state != 1 &&
+                  dateLabel(props.todo.due_date)}
+              </View>
+            </View>
+          </TouchableOpacity>
+          <View style={styles.noteContainer}>
+            {props.todo.note && (
+              <Image
+                style={styles.noteImg}
+                source={require('../assets/note-added.png')}
+              />
+            )}
+          </View>
         </View>
-      </View>
-    </Swipeable>
+      </Swipeable>
+    </View>
   );
 };
 
@@ -108,6 +163,7 @@ const dateLabel = (date) => {
     </Text>
   );
 };
+
 const styles = StyleSheet.create({
   todoContainer: {
     flexDirection: 'row',
@@ -144,9 +200,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  swipeLeft: {
+    backgroundColor: COLORS.red,
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
   swipeText: {
     color: 'white',
     fontSize: 24,
+  },
+  modal: {
+    backgroundColor: 'white',
+  },
+  modalView: {
+    backgroundColor: 'blue',
+    flex: 1,
+  },
+  expandedTools: {
+    height: 40,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
 });
 

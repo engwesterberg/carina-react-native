@@ -66,6 +66,10 @@ const App = () => {
     });
   };
 
+  const removeFromList = (todo_id) => {
+    setTodos(todos.filter(item => item.id !== todo_id));
+  };
+
   return (
     <View style={styles.container}>
       {!loggedIn && <LoginScreen parentUpdater={loginUpdater} />}
@@ -78,6 +82,7 @@ const App = () => {
               todos={todos}
               state={NOT_DONE}
               todoListUpdater={todoListUpdater}
+              removeFromList={removeFromList}
             />
             <Text
               style={styles.showDoneText}
@@ -91,6 +96,7 @@ const App = () => {
                 todos={todos}
                 state={DONE}
                 todoListUpdater={todoListUpdater}
+                removeFromList={removeFromList}
               />
             )}
           </ScrollView>

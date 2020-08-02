@@ -136,6 +136,10 @@ const Todo = (props) => {
               <DateTimePickerModal
                 isVisible={isDatePickerVisible}
                 mode="date"
+                onChange={(event) => {
+                  setDatePickerVisibility(false);
+                  console.warn("Date changed");
+                }}
                 onConfirm={handleDateConfirm}
                 onCancel={hideDatePicker}
               />

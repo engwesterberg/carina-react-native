@@ -8,15 +8,69 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  Button,
+  TextInput,
 } from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import {updateTodo, deleteTodo} from '../functions';
 import Swipeable from 'react-native-swipeable-row';
 import Modal from 'react-native-modal';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import {Button} from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Todo = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  //For updating todos
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [newTitle, setNewTitle] = useState('');
+  const [newNote, setNewNote] = useState('');
+  const [newPomoEstimate, setNewPomoEstimate] = useState(
+    props.todo.pomo_estimate,
+  );
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleDateConfirm = (date) => {
+    console.warn('A date has been picked: ', date);
+    setSelectedDate(moment(date));
+    hideDatePicker();
+  };
+
+  const showTimePicker = () => {
+    setTimePickerVisibility(true);
+  };
+
+  const hideTimePicker = () => {
+    setTimePickerVisibility(false);
+  };
+
+  const handleTimeConfirm = (time) => {
+    console.warn('A time has been picked: ', moment(time));
+    setSelectedTime(time);
+    hideTimePicker();
+  };
+
+  const onModalClose = () => {
+    let updated = props.todo;
+    updated.title = newTitle ? newTitle : updated.title;
+    updated.note = newNote ? newNote : updated.note;
+    updated.pomo_estimate = newPomoEstimate
+      ? newPomoEstimate
+      : updated.pomo_estimate;
+
+    updated.due_date = selectedDate ? selectedDate : updated.due_date;
+    updateTodo(updated);
+    props.todoListUpdater();
+  };
 
   const expandedTodo = () => {
     return (
@@ -27,15 +81,89 @@ const Todo = (props) => {
         coverScreen={true}
         backdropOpacity={0.8}
         onBackButtonPress={() => {
+          onModalClose();
           setModalVisible(false);
         }}
         onBackdropPress={() => {
+          onModalClose();
           setModalVisible(false);
         }}>
         <View style={styles.modalView}>
-          <View style={styles.expandedTools}>
-            <Text>Okay</Text>
+          <View style={styles.modalHeader}>
+            <TextInput
+              style={styles.todoTitle}
+              defaultValue={props.todo.title}
+              onChange={(event) => {
+                if (event.nativeEvent.text) {
+                  setNewTitle(event.nativeEvent.text);
+                } else {
+                  setNewTitle(props.todo.title);
+                }
+              }}
+            />
+            <View style={styles.expandedTools}>
+              <View style={styles.pomoContainer}>
+                <Button
+                  icon={<Icon name="play" size={10} color="white" />}
+                  buttonStyle={{
+                    backgroundColor: COLORS.lightPurple,
+                    height: 20,
+                    marginLeft: 5,
+                  }}
+                />
+                <TextInput
+                  style={styles.pomoTools}
+                  value={String(props.todo.pomo_done)}
+                  editable={false}
+                />
+                <TextInput style={styles.pomoSeparator} value={'/'} />
+                <TextInput
+                  style={styles.pomoTools}
+                  value={String(newPomoEstimate)}
+                  keyboardType="number-pad"
+                  onChange={(event) => {
+                    setNewPomoEstimate(Number(event.nativeEvent.text));
+                  }}
+                />
+              </View>
+              <Button
+                onPress={showDatePicker}
+                icon={
+                  <Icon name="calendar" size={15} color={COLORS.lightPurple} />
+                }
+                buttonStyle={styles.button}
+              />
+              <DateTimePickerModal
+                isVisible={isDatePickerVisible}
+                mode="date"
+                onConfirm={handleDateConfirm}
+                onCancel={hideDatePicker}
+              />
+              <Button
+                onPress={showTimePicker}
+                buttonStyle={styles.button}
+                icon={
+                  <Icon name="clock-o" size={15} color={COLORS.lightPurple} />
+                }
+              />
+              <DateTimePickerModal
+                isVisible={isTimePickerVisible}
+                mode="time"
+                onConfirm={handleTimeConfirm}
+                onCancel={hideTimePicker}
+              />
+            </View>
           </View>
+          <TextInput
+            style={styles.note}
+            placeholder="Write a note"
+            defaultValue={props.todo.note}
+            placeholderTextColor="gray"
+            multiline={true}
+            onChange={(event) => {
+              setNewNote(event.nativeEvent.text);
+            }}
+          />
         </View>
       </Modal>
     );
@@ -203,14 +331,51 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   modalView: {
-    backgroundColor: 'blue',
+    backgroundColor: 'white',
     flex: 1,
   },
+  modalHeader: {},
   expandedTools: {
     height: 40,
     backgroundColor: 'white',
     alignItems: 'center',
+    justifyContent: 'flex-start',
     flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.lightPurple,
+  },
+  todoTitle: {
+    marginLeft: 5,
+    marginRight: 25,
+    fontSize: 30,
+    textAlignVertical: 'center',
+    color: COLORS.lightPurple,
+  },
+  button: {
+    backgroundColor: 'white',
+  },
+  pomoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pomoTools: {
+    color: COLORS.lightPurple,
+    marginLeft: 1,
+    maxWidth: 20,
+    textAlign: 'center',
+    padding: 0,
+  },
+  pomoSeparator: {
+    color: COLORS.lightPurple,
+    marginLeft: 1,
+    maxWidth: 5,
+    textAlign: 'center',
+    padding: 0,
+  },
+  note: {
+    backgroundColor: 'white',
+    height: '80%',
+    textAlignVertical: 'top',
   },
 });
 

@@ -2,32 +2,24 @@
 import moment from 'moment';
 import {COLORS} from '../colors.js';
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Image, TouchableOpacity, Button} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Button,
+} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import {updateTodo, deleteTodo} from '../functions';
 import Swipeable from 'react-native-swipeable-row';
 import Modal from 'react-native-modal';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const Todo = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  const handleConfirm = (date) => {
-    console.warn('A date has been picked: ', date);
-    hideDatePicker();
-  };
-
-  return (
-    <View>
+  const expandedTodo = () => {
+    return (
       <Modal
         useNativeDriver={true}
         style={styles.modal}
@@ -41,20 +33,17 @@ const Todo = (props) => {
           setModalVisible(false);
         }}>
         <View style={styles.modalView}>
-          {/*-------------------------------------Expanded tools start-------------------------*/}
           <View style={styles.expandedTools}>
             <Text>Okay</Text>
-            <Button title="Show Date Picker" onPress={showDatePicker} />
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="date"
-              onConfirm={handleConfirm}
-              onCancel={hideDatePicker}
-            />
           </View>
-          {/*-------------------------------------Expanded tools start-------------------------*/}
         </View>
       </Modal>
+    );
+  };
+
+  return (
+    <View>
+      {expandedTodo()}
       <Swipeable
         rightContent={
           <View style={styles.swipeRight}>

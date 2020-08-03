@@ -11,7 +11,7 @@ import {
   TextInput,
 } from 'react-native';
 import {RadioButton} from 'react-native-paper';
-import {updateTodo, deleteTodo} from '../functions';
+import {updateTodo, deleteTodo, } from '../functions';
 import Swipeable from 'react-native-swipeable-row';
 import Modal from 'react-native-modal';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -20,55 +20,18 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Todo = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   //For updating todos
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
+  const [newDate, setNewDate] = useState(null);
+  const [newTime, setNewTime] = useState(null);
   const [newTitle, setNewTitle] = useState('');
   const [newNote, setNewNote] = useState('');
   const [newPomoEstimate, setNewPomoEstimate] = useState(
     props.todo.pomo_estimate,
   );
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  const handleDateConfirm = (date) => {
-    console.warn('A date has been picked: ', date);
-    setSelectedDate(moment(date));
-    hideDatePicker();
-  };
-
-  const showTimePicker = () => {
-    setTimePickerVisibility(true);
-  };
-
-  const hideTimePicker = () => {
-    setTimePickerVisibility(false);
-  };
-
-  const handleTimeConfirm = (time) => {
-    console.warn('A time has been picked: ', moment(time));
-    setSelectedTime(time);
-    hideTimePicker();
-  };
-
   const onModalClose = () => {
-    let updated = props.todo;
-    updated.title = newTitle ? newTitle : updated.title;
-    updated.note = newNote ? newNote : updated.note;
-    updated.pomo_estimate = newPomoEstimate
-      ? newPomoEstimate
-      : updated.pomo_estimate;
-
-    updated.due_date = selectedDate ? selectedDate : updated.due_date;
-    updateTodo(updated);
     props.todoListUpdater();
   };
 
@@ -100,6 +63,11 @@ const Todo = (props) => {
                   setNewTitle(props.todo.title);
                 }
               }}
+              onEndEditing={() => {
+                let updated = props.todo;
+                updated.title = newTitle;
+                updateTodo(updated);
+              }}
             />
             <View style={styles.expandedTools}>
               <View style={styles.pomoContainer}>
@@ -124,37 +92,58 @@ const Todo = (props) => {
                   onChange={(event) => {
                     setNewPomoEstimate(Number(event.nativeEvent.text));
                   }}
+                  onEndEditing={() => {
+                    let updated = props.todo;
+                    updated.pomo_estimate = newPomoEstimate;
+                    updateTodo(updated);
+                  }}
                 />
               </View>
               <Button
-                onPress={showDatePicker}
+                onPress={() => {
+                  setShowDatePicker(true);
+                }}
                 icon={
                   <Icon name="calendar" size={15} color={COLORS.lightPurple} />
                 }
                 buttonStyle={styles.button}
               />
               <DateTimePickerModal
-                isVisible={isDatePickerVisible}
+                isVisible={showDatePicker}
                 mode="date"
-                onChange={(event) => {
-                  setDatePickerVisibility(false);
-                  console.warn("Date changed");
+                onConfirm={(date) => {
+                  setShowDatePicker(false);
+                  setNewDate(date);
+                  let updated = props.todo;
+                  updated.due_date = date;
+                  updateTodo(updated).then(() => {
+                    props.todoListUpdater();
+                  });
+                  console.warn(date);
                 }}
-                onConfirm={handleDateConfirm}
-                onCancel={hideDatePicker}
+                onCancel={() => {
+                  setShowDatePicker(false);
+                }}
               />
               <Button
-                onPress={showTimePicker}
+                onPress={() => {
+                  setShowTimePicker(true);
+                }}
                 buttonStyle={styles.button}
                 icon={
                   <Icon name="clock-o" size={15} color={COLORS.lightPurple} />
                 }
               />
               <DateTimePickerModal
-                isVisible={isTimePickerVisible}
+                isVisible={showTimePicker}
                 mode="time"
-                onConfirm={handleTimeConfirm}
-                onCancel={hideTimePicker}
+                onConfirm={(date) => {
+                  setShowTimePicker(false);
+                  setNewTime(date);
+                }}
+                onCancel={() => {
+                  setShowTimePicker(false);
+                }}
               />
             </View>
           </View>
@@ -166,6 +155,11 @@ const Todo = (props) => {
             multiline={true}
             onChange={(event) => {
               setNewNote(event.nativeEvent.text);
+            }}
+            onEndEditing={() => {
+              let updated = props.todo;
+              updated.note = newNote;
+              updateTodo(updated);
             }}
           />
         </View>
@@ -236,7 +230,7 @@ const Todo = (props) => {
               <View style={styles.row2}>
                 {props.todo.due_date &&
                   props.todo.state != 1 &&
-                  dateLabel(props.todo.due_date)}
+                  dateLabel(props.todo.due_date, props.todo.has_time)}
               </View>
             </View>
           </TouchableOpacity>
@@ -254,7 +248,7 @@ const Todo = (props) => {
   );
 };
 
-const dateLabel = (date) => {
+const dateLabel = (date, hasTime) => {
   const one_day = 1000 * 60 * 60 * 24;
   let color;
   let days;
@@ -267,9 +261,15 @@ const dateLabel = (date) => {
   } else if (moment(date) >= moment() + 2) {
     color = COLORS.green;
     days = `Due in ${Math.floor((moment(date) - moment()) / one_day)} days`;
-  } else if (moment(date) < moment()) {
+  } else if (moment(date) < moment().set('hour', 0)) {
     color = COLORS.red;
     days = `${Math.floor((moment() - moment(date)) / one_day)} days overdue`;
+  }
+  if (hasTime) {
+    days = days + ' at ' + moment(date).hour() + ':' + moment(date).minute();
+    if (moment(date).minute() === 0) {
+      days = days + '0';
+    }
   }
   return (
     <Text

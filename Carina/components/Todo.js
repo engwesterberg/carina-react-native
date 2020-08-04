@@ -105,9 +105,9 @@ const Todo = (props) => {
                   onChangeText={(text) => {
                     setNewPomoEstimate(Number(text));
                   }}
-              onEndEditing={() => {
-                syncTodoToDatabase(newDate || props.todo.due_date);
-              }}
+                  onEndEditing={() => {
+                    syncTodoToDatabase(newDate || props.todo.due_date);
+                  }}
                 />
               </View>
               <Button

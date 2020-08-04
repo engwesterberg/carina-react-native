@@ -5,7 +5,7 @@ import Header from './components/Header';
 import LoginScreen from './components/LoginScreen';
 import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
-import {getTodos} from './functions';
+import {getTodos, getLists} from './functions';
 
 const NOT_DONE = 0;
 const DONE = 1;
@@ -16,35 +16,8 @@ const App = () => {
   const [name, setName] = useState(null);
   const [email, setEmail] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [todos, setTodos] = useState([
-    {
-      id: 1,
-      user_id: 11,
-      title: 'Lets doit bros',
-      note: 'Very fast',
-      list_id: null,
-      due_date: null,
-      hasTime: false,
-      pomo_estimate: 2,
-      pomo_done: 0,
-      priority: null,
-      state: 0,
-      recurring: 1,
-    },
-    {
-      id: 2,
-      user_id: 11,
-      title: 'Buy books',
-      list_id: null,
-      due_date: null,
-      hasTime: false,
-      pomo_estimate: 2,
-      pomo_done: 0,
-      priority: null,
-      state: 1,
-      recurring: 1,
-    },
-  ]);
+  const [todos, setTodos] = useState([]);
+  const [lists, setLists] = useState([]);
 
   //gui state
   const [showDone, setShowDone] = useState(false);
@@ -58,6 +31,10 @@ const App = () => {
       setTodos(res);
       console.log(res);
     });
+    getLists(aId).then((res) => {
+      setLists(res);
+      console.log('lists: ', res);
+    });
   };
 
   const todoListUpdater = () => {
@@ -65,9 +42,14 @@ const App = () => {
       setTodos(res);
     });
   };
+  const listUpdater = () => {
+    getLists(userId).then((res) => {
+      setLists(res);
+    });
+  };
 
   const removeFromList = (todo_id) => {
-    setTodos(todos.filter(item => item.id !== todo_id));
+    setTodos(todos.filter((item) => item.id !== todo_id));
   };
 
   return (
@@ -75,7 +57,7 @@ const App = () => {
       {!loggedIn && <LoginScreen parentUpdater={loginUpdater} />}
       {loggedIn && (
         <View>
-          <Header title={name + "'s Carina"} />
+          <Header title={name + "'s Carina"} lists={lists} userId={userId} listUpdater={listUpdater} />
           <CarinaBar user_id={userId} todoListUpdater={todoListUpdater} />
           <ScrollView style={styles.scrollViewContainer}>
             <TodoList

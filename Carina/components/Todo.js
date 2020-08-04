@@ -11,7 +11,7 @@ import {
   TextInput,
 } from 'react-native';
 import {RadioButton} from 'react-native-paper';
-import {updateTodo, deleteTodo, } from '../functions';
+import {updateTodo, deleteTodo} from '../functions';
 import Swipeable from 'react-native-swipeable-row';
 import Modal from 'react-native-modal';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -19,20 +19,37 @@ import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Todo = (props) => {
+  //gui
   const [modalVisible, setModalVisible] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   //For updating todos
-  const [newDate, setNewDate] = useState(null);
-  const [newTime, setNewTime] = useState(null);
-  const [newTitle, setNewTitle] = useState('');
-  const [newNote, setNewNote] = useState('');
+  const [newTitle, setNewTitle] = useState(null);
+  const [newNote, setNewNote] = useState(null);
   const [newPomoEstimate, setNewPomoEstimate] = useState(
     props.todo.pomo_estimate,
   );
+  const [newDate, setNewDate] = useState();
+  const [hasTime, setHasTime] = useState(null);
+  const [hour, setHour] = useState(null);
+  const [minute, setMinute] = useState(null);
 
   const onModalClose = () => {
     props.todoListUpdater();
+  };
+
+  const syncTodoToDatabase = (date, addTime) => {
+    let updated = props.todo;
+    updated.title = newTitle || updated.title;
+    updated.note = newNote || updated.note;
+    updated.pomo_estimate = newPomoEstimate || updated.pomo_estimate;
+    if (date) {
+      updated.due_date = date;
+    }
+    updated.has_time = addTime || updated.has_time;
+
+    updateTodo(updated);
+    return updated;
   };
 
   const expandedTodo = () => {
@@ -55,18 +72,14 @@ const Todo = (props) => {
           <View style={styles.modalHeader}>
             <TextInput
               style={styles.todoTitle}
-              defaultValue={props.todo.title}
-              onChange={(event) => {
-                if (event.nativeEvent.text) {
-                  setNewTitle(event.nativeEvent.text);
-                } else {
-                  setNewTitle(props.todo.title);
+              defaultValue={newTitle || props.todo.title}
+              onChangeText={(text) => {
+                if (text) {
+                  setNewTitle(text);
                 }
               }}
               onEndEditing={() => {
-                let updated = props.todo;
-                updated.title = newTitle;
-                updateTodo(updated);
+                syncTodoToDatabase(newDate || props.todo.due_date);
               }}
             />
             <View style={styles.expandedTools}>
@@ -89,14 +102,12 @@ const Todo = (props) => {
                   style={styles.pomoTools}
                   value={String(newPomoEstimate)}
                   keyboardType="number-pad"
-                  onChange={(event) => {
-                    setNewPomoEstimate(Number(event.nativeEvent.text));
+                  onChangeText={(text) => {
+                    setNewPomoEstimate(Number(text));
                   }}
-                  onEndEditing={() => {
-                    let updated = props.todo;
-                    updated.pomo_estimate = newPomoEstimate;
-                    updateTodo(updated);
-                  }}
+              onEndEditing={() => {
+                syncTodoToDatabase(newDate || props.todo.due_date);
+              }}
                 />
               </View>
               <Button
@@ -113,13 +124,21 @@ const Todo = (props) => {
                 mode="date"
                 onConfirm={(date) => {
                   setShowDatePicker(false);
-                  setNewDate(date);
-                  let updated = props.todo;
-                  updated.due_date = date;
-                  updateTodo(updated).then(() => {
-                    props.todoListUpdater();
-                  });
-                  console.warn(date);
+                  let yy = moment(date).year();
+                  let mm = moment(date).month();
+                  let dd = moment(date).date();
+                  let deadline;
+                  if (props.todo.due_date === null) {
+                    deadline = moment([yy, mm, dd, hour || 18, minute || 0]);
+                  } else if (props.todo.due_date || newDate) {
+                    deadline = moment(props.todo.due_date || newDate).set({
+                      year: yy,
+                      month: mm,
+                      date: dd,
+                    });
+                  }
+                  setNewDate(deadline);
+                  syncTodoToDatabase(deadline);
                 }}
                 onCancel={() => {
                   setShowDatePicker(false);
@@ -139,7 +158,17 @@ const Todo = (props) => {
                 mode="time"
                 onConfirm={(date) => {
                   setShowTimePicker(false);
-                  setNewTime(date);
+                  let deadline;
+                  if (props.todo.due_date || newDate) {
+                    let h = moment(date).hour();
+                    let m = moment(date).minute();
+                    deadline = moment(props.todo.due_date || newDate)
+                      .set('hour', h)
+                      .set('minute', m);
+                    setNewDate(deadline);
+                    syncTodoToDatabase(deadline, true);
+                    setHasTime(true);
+                  }
                 }}
                 onCancel={() => {
                   setShowTimePicker(false);
@@ -153,13 +182,11 @@ const Todo = (props) => {
             defaultValue={props.todo.note}
             placeholderTextColor="gray"
             multiline={true}
-            onChange={(event) => {
-              setNewNote(event.nativeEvent.text);
+            onChangeText={(text) => {
+              setNewNote(text);
             }}
             onEndEditing={() => {
-              let updated = props.todo;
-              updated.note = newNote;
-              updateTodo(updated);
+              syncTodoToDatabase(newDate || props.todo.due_date);
             }}
           />
         </View>
@@ -203,7 +230,6 @@ const Todo = (props) => {
               onPress={() => {
                 let updatedTodo = props.todo;
                 updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
-                console.log('Radio clicked');
                 updateTodo(updatedTodo).then(props.todoListUpdater());
               }}
             />

@@ -131,6 +131,7 @@ export const updateTodo = async (todo) => {
     has_time: todo.has_time,
     recurring: todo.recurring,
   };
+  console.log("body", body);
   let results = await axios
     .put('http://192.168.0.100:5000/api/todo/', body)
     .then((res) => {

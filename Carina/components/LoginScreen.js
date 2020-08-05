@@ -39,16 +39,15 @@ const LoginScreen = (props) => {
             placeholder="Username"
             placeholderTextColor="black"
             onChangeText={(text) => {
-              console.log(text);
               setEmail(text);
             }}
           />
           <TextInput
             style={styles.textInput}
+                    secureTextEntry={true}
             placeholder="Password"
             placeholderTextColor="black"
             onChangeText={(text) => {
-              console.log(text);
               setSecret(text);
             }}
           />
@@ -65,11 +64,9 @@ const LoginScreen = (props) => {
           <AppButton
             title="Sign In"
             onPress={() => {
-              console.log('Clicked');
               signIn(email, secret)
                 .then((res) => {
                   let result = res[0][0];
-                  console.log('Login Success', result);
                   props.parentUpdater(result.fullname, result.email, result.id);
                 })
                 .catch((e) => {
@@ -88,7 +85,6 @@ const LoginScreen = (props) => {
                   <Text style={styles.text}> Join Carina </Text>
                   <TextInput
                     onChangeText={(text) => {
-                      console.log(text);
                       setName(text);
                     }}
                     style={styles.textInput}
@@ -97,7 +93,6 @@ const LoginScreen = (props) => {
                   />
                   <TextInput
                     onChangeText={(text) => {
-                      console.log(text);
                       setEmail(text);
                     }}
                     style={styles.textInput}
@@ -107,7 +102,6 @@ const LoginScreen = (props) => {
                   <TextInput
                     secureTextEntry={true}
                     onChangeText={(text) => {
-                      console.log(text);
                       setSecret(text);
                     }}
                     style={styles.textInput}
@@ -117,7 +111,6 @@ const LoginScreen = (props) => {
                   <TextInput
                     secureTextEntry={true}
                     onChangeText={(text) => {
-                      console.log(text);
                       setRepeatSecret(text);
                     }}
                     style={styles.textInput}
@@ -131,7 +124,6 @@ const LoginScreen = (props) => {
                     <AppButton
                       title="Sign Up"
                       onPress={() => {
-                        console.log('Clicked');
                         if (secret === repeatSecret) {
                           signUp(null, email, name, secret);
                           setSignupSuccess(true);
@@ -143,7 +135,6 @@ const LoginScreen = (props) => {
                       onPress={() => {
                         setSignupOpen(false);
                         setSignupSuccess(false);
-                        console.log('Cancel signup');
                       }}
                     />
                   </View>

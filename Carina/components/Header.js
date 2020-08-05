@@ -36,7 +36,6 @@ const Header = (props) => {
           setNewListName(text);
         }}
         onSubmit={(text) => {
-          console.log(text);
           createList(props.userId, newListName).then(() => {
             props.listUpdater();
           });
@@ -55,10 +54,25 @@ const Header = (props) => {
               buttonStyle={styles.menu}
             />
           }>
-          <MenuItem onPress={hideMenu}>Carina (default)</MenuItem>
+          <MenuItem
+            onPress={() => {
+              props.selectedListUpdater(null);
+              hideMenu();
+            }}>
+            Carina (default)
+          </MenuItem>
           <MenuDivider />
           {props.lists.map((item, index) => {
-            return <MenuItem key={item.id}>{item.title}</MenuItem>;
+            return (
+              <MenuItem
+                key={item.id}
+                onPress={() => {
+                  props.selectedListUpdater(item);
+              hideMenu();
+                }}>
+                {item.title}
+              </MenuItem>
+            );
           })}
           <MenuDivider />
           <MenuItem

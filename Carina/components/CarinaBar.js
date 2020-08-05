@@ -34,7 +34,7 @@ const CarinaBar = (props) => {
           newTodo(
             props.user_id,
             planningMode ? query + planningAttributes : query,
-            null,
+            props.listId,
           ).then(() => {
             props.todoListUpdater();
           });

@@ -18,6 +18,7 @@ const App = () => {
   const [userId, setUserId] = useState(null);
   const [todos, setTodos] = useState([]);
   const [lists, setLists] = useState([]);
+  const [selectedList, setSelectedList] = useState(null);
 
   //gui state
   const [showDone, setShowDone] = useState(false);
@@ -29,11 +30,9 @@ const App = () => {
     setEmail(aEmail);
     getTodos(aId).then((res) => {
       setTodos(res);
-      console.log(res);
     });
     getLists(aId).then((res) => {
       setLists(res);
-      console.log('lists: ', res);
     });
   };
 
@@ -57,14 +56,27 @@ const App = () => {
       {!loggedIn && <LoginScreen parentUpdater={loginUpdater} />}
       {loggedIn && (
         <View>
-          <Header title={name + "'s Carina"} lists={lists} userId={userId} listUpdater={listUpdater} />
-          <CarinaBar user_id={userId} todoListUpdater={todoListUpdater} />
+          <Header
+            title={selectedList ? selectedList.title : name + 's Carina'}
+            lists={lists}
+            userId={userId}
+            listUpdater={listUpdater}
+            selectedListUpdater={(list) => {
+              setSelectedList(list);
+            }}
+          />
+          <CarinaBar
+            user_id={userId}
+            todoListUpdater={todoListUpdater}
+            listId={selectedList ? selectedList.id : null}
+          />
           <ScrollView style={styles.scrollViewContainer}>
             <TodoList
               todos={todos}
               state={NOT_DONE}
               todoListUpdater={todoListUpdater}
               removeFromList={removeFromList}
+              listId={selectedList ? selectedList.id : null}
             />
             <Text
               style={styles.showDoneText}
@@ -79,6 +91,7 @@ const App = () => {
                 state={DONE}
                 todoListUpdater={todoListUpdater}
                 removeFromList={removeFromList}
+                listId={selectedList ? selectedList.id : null}
               />
             )}
           </ScrollView>

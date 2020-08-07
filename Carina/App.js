@@ -18,7 +18,7 @@ const App = () => {
   const [userId, setUserId] = useState(null);
   const [todos, setTodos] = useState([]);
   const [lists, setLists] = useState([]);
-  const [selectedList, setSelectedList] = useState(null);
+  const [selectedList, setSelectedList] = useState({id: null, title: 'Carina'});
 
   //gui state
   const [showDone, setShowDone] = useState(false);
@@ -57,7 +57,7 @@ const App = () => {
       {loggedIn && (
         <View>
           <Header
-            title={selectedList ? selectedList.title : name + 's Carina'}
+            title={selectedList.title}
             lists={lists}
             userId={userId}
             listUpdater={listUpdater}
@@ -72,7 +72,10 @@ const App = () => {
           />
           <ScrollView style={styles.scrollViewContainer}>
             <TodoList
-              todos={todos}
+              todos={todos.filter(
+                (obj) =>
+                  obj.state === NOT_DONE && obj.list_id === selectedList.id,
+              )}
               state={NOT_DONE}
               todoListUpdater={todoListUpdater}
               removeFromList={removeFromList}
@@ -87,7 +90,10 @@ const App = () => {
             </Text>
             {showDone && (
               <TodoList
-                todos={todos}
+              todos={todos.filter(
+                (obj) =>
+                  obj.state === DONE && obj.list_id === selectedList.id,
+              )}
                 state={DONE}
                 todoListUpdater={todoListUpdater}
                 removeFromList={removeFromList}

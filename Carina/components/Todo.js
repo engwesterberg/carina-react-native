@@ -11,7 +11,7 @@ import {
   TextInput,
 } from 'react-native';
 import {RadioButton} from 'react-native-paper';
-import {updateTodo, deleteTodo} from '../functions';
+import {updateTodo, deleteTodo, copyTodo} from '../functions';
 import Swipeable from 'react-native-swipeable-row';
 import Modal from 'react-native-modal';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -231,6 +231,13 @@ const Todo = (props) => {
                 let updatedTodo = props.todo;
                 updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
                 updateTodo(updatedTodo).then(props.todoListUpdater());
+                if (props.todo.recurring) {
+                  let copy = props.todo;
+                  copy.due_date = moment(copy.due_date).add(props.todo.recurring, 'days');
+                  copyTodo(props.todo).then(() => {
+                    updateTodo(updatedTodo).then(props.todoListUpdater());
+                  });
+                }
               }}
             />
           </View>
@@ -256,7 +263,7 @@ const Todo = (props) => {
               <View style={styles.row2}>
                 {props.todo.due_date &&
                   props.todo.state != 1 &&
-                  dateLabel(props.todo.due_date, props.todo.has_time)}
+                  dateLabel(props.todo)}
               </View>
             </View>
           </TouchableOpacity>
@@ -274,40 +281,65 @@ const Todo = (props) => {
   );
 };
 
-const dateLabel = (date, hasTime) => {
+const dateLabel = (todo) => {
   const one_day = 1000 * 60 * 60 * 24;
   let color;
   let days;
-  if (moment(date).date() === moment().date()) {
+  if (moment(todo.due_date).date() === moment().date()) {
     color = COLORS.orange;
     days = 'Today';
-  } else if (moment(date).date() == moment().date() + 1) {
+  } else if (moment(todo.due_date).date() == moment().date() + 1) {
     color = COLORS.yellow;
     days = 'Tomorrow';
-  } else if (moment(date) >= moment() + 2) {
+  } else if (moment(todo.due_date) >= moment() + 2) {
     color = COLORS.green;
-    days = `Due in ${Math.floor((moment(date) - moment()) / one_day)} days`;
-  } else if (moment(date) < moment().set('hour', 0)) {
+    days = `Due in ${Math.floor(
+      (moment(todo.due_date) - moment()) / one_day,
+    )} days`;
+  } else if (moment(todo.due_date) < moment().set('hour', 0)) {
     color = COLORS.red;
-    days = `${Math.floor((moment() - moment(date)) / one_day)} days overdue`;
+    days = `${Math.floor(
+      (moment() - moment(todo.due_date)) / one_day,
+    )} days overdue`;
   }
-  if (hasTime) {
-    days = days + ' at ' + moment(date).hour() + ':' + moment(date).minute();
-    if (moment(date).minute() === 0) {
+  if (todo.has_time) {
+    days =
+      days +
+      ' at ' +
+      moment(todo.due_date).hour() +
+      ':' +
+      moment(todo.due_date).minute();
+    if (moment(todo.due_date).minute() === 0) {
       days = days + '0';
     }
   }
+
   return (
-    <Text
-      style={{
-        backgroundColor: color,
-        color: color === COLORS.yellow ? 'black' : 'white',
-        alignSelf: 'flex-start',
-        borderRadius: 3,
-        padding: 1,
-      }}>
-      {days}
-    </Text>
+    <View style={styles.todoLabelContainer}>
+      <Text
+        style={{
+          backgroundColor: color,
+          color: color === COLORS.yellow ? 'black' : 'white',
+          alignSelf: 'flex-start',
+          borderRadius: 3,
+          padding: 1,
+        }}>
+        {days}
+      </Text>
+      {todo.pomo_estimate !== 0 ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginLeft: 5,
+          }}>
+          <Text style={{color: COLORS.darkPurple}}>
+            {' '}
+            {`${todo.pomo_done}/${todo.pomo_estimate}🍅`}
+          </Text>
+        </View>
+      ) : null}
+    </View>
   );
 };
 
@@ -315,6 +347,8 @@ const styles = StyleSheet.create({
   todoContainer: {
     flexDirection: 'row',
     height: 55,
+    width: '98%',
+    alignItems: 'center',
     backgroundColor: 'white',
     marginBottom: 1,
   },
@@ -340,7 +374,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 18,
-    color: 'black',
+    color: COLORS.darkPurple,
   },
   swipeRight: {
     backgroundColor: COLORS.red,
@@ -406,6 +440,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     height: '80%',
     textAlignVertical: 'top',
+  },
+  todoLabelContainer: {
+    flexDirection: 'row',
   },
 });
 

@@ -37,7 +37,7 @@ export const signUp = async (userId, email, fullname, secret) => {
   return results;
 };
 
-export const signIn = async ( email,  secret) => {
+export const signIn = async (email, secret) => {
   let body = {
     email: email,
     secret: secret,
@@ -101,16 +101,29 @@ export const incPomo = async (user_id, todo_id) => {
   return results[0];
 };
 
-export const newTodo = async (
-  user_id,
-  query,
-  list_id,
-) => {
+export const newTodo = async (user_id, query, list_id) => {
   let results = await axios
     .post('http://192.168.0.100:5000/api/todo', {
       user_id: user_id,
       query: query,
       list_id: list_id,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+  return results[0];
+};
+
+export const copyTodo = async (todo) => {
+  let results = await axios
+    .post('http://192.168.0.100:5000/api/todocopy', {
+      user_id: todo.user_id,
+      list_id: todo.list_id,
+      title: todo.title,
+      note: todo.note,
+      due_date: todo.due_date,
+      hasTime: todo.has_time,
+      pomo_estimate: todo.pomo_estimate,
+      recurring: todo.recurring,
     })
     .then((res) => res.data)
     .catch((e) => console.error(e));

@@ -56,7 +56,7 @@ const Header = (props) => {
           }>
           <MenuItem
             onPress={() => {
-              props.selectedListUpdater(null);
+              props.selectedListUpdater({id: null, title: 'Carina'});
               hideMenu();
             }}>
             Carina (default)

@@ -1,16 +1,16 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-platform :ios, '10.0'
+platform :ios, '13.0'
 
 target 'Carina' do
   config = use_native_modules!
 
   use_react_native!(:path => config["reactNativePath"])
 
-  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
-  pod 'RNDateTimePicker', :path => '../node_modules/@react-native-community/datetimepicker'
+
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
   target 'CarinaTests' do
     inherit! :complete
@@ -24,6 +24,7 @@ target 'Carina' do
   use_flipper!
   post_install do |installer|
     flipper_post_install(installer)
+      
   end
 end
 
@@ -35,3 +36,4 @@ target 'Carina-tvOS' do
     # Pods for testing
   end
 end
+

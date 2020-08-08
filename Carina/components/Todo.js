@@ -87,7 +87,7 @@ const Todo = (props) => {
                 <Button
                   icon={<Icon name="play" size={10} color="white" />}
                   buttonStyle={{
-                    backgroundColor: COLORS.lightPurple,
+                    backgroundColor: COLORS.mainLight,
                     height: 20,
                     marginLeft: 5,
                   }}
@@ -115,7 +115,7 @@ const Todo = (props) => {
                   setShowDatePicker(true);
                 }}
                 icon={
-                  <Icon name="calendar" size={15} color={COLORS.lightPurple} />
+                  <Icon name="calendar" size={15} color={COLORS.mainLight} />
                 }
                 buttonStyle={styles.button}
               />
@@ -150,7 +150,7 @@ const Todo = (props) => {
                 }}
                 buttonStyle={styles.button}
                 icon={
-                  <Icon name="clock-o" size={15} color={COLORS.lightPurple} />
+                  <Icon name="clock-o" size={15} color={COLORS.mainLight} />
                 }
               />
               <DateTimePickerModal
@@ -226,7 +226,7 @@ const Todo = (props) => {
           <View style={styles.radioButtonContainer}>
             <RadioButton
               status={props.todo.state === 0 ? 'unchecked' : 'checked'}
-              color={COLORS.darkPurple}
+              color={COLORS.mainDark}
               onPress={() => {
                 let updatedTodo = props.todo;
                 updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
@@ -333,7 +333,7 @@ const dateLabel = (todo) => {
             alignItems: 'center',
             marginLeft: 5,
           }}>
-          <Text style={{color: COLORS.darkPurple}}>
+          <Text style={{color: COLORS.mainDark}}>
             {' '}
             {`${todo.pomo_done}/${todo.pomo_estimate}🍅`}
           </Text>
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 18,
-    color: COLORS.darkPurple,
+    color: COLORS.mainDark,
   },
   swipeRight: {
     backgroundColor: COLORS.red,
@@ -406,14 +406,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.lightPurple,
+    borderBottomColor: COLORS.mainLight,
   },
   todoTitle: {
     marginLeft: 5,
     marginRight: 25,
     fontSize: 30,
     textAlignVertical: 'center',
-    color: COLORS.lightPurple,
+    color: COLORS.mainLight,
   },
   button: {
     backgroundColor: 'white',
@@ -423,14 +423,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pomoTools: {
-    color: COLORS.lightPurple,
+    color: COLORS.mainLight,
     marginLeft: 1,
     maxWidth: 20,
     textAlign: 'center',
     padding: 0,
   },
   pomoSeparator: {
-    color: COLORS.lightPurple,
+    color: COLORS.mainLight,
     marginLeft: 1,
     maxWidth: 5,
     textAlign: 'center',

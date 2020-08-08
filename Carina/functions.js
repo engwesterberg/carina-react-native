@@ -175,6 +175,7 @@ export const createList = async (user_id, listName) => {
     .catch((e) => console.error(e));
   return results[0];
 };
+
 export const shareList = async (list_id, share_email, owner_id) => {
   let results = await axios
     .post('http://192.168.0.100:5000/api/shared_list/', {
@@ -184,6 +185,41 @@ export const shareList = async (list_id, share_email, owner_id) => {
     })
     .then((res) => res.data)
     .catch((e) => console.error(e));
+  return results[0];
+};
+
+export const stopSharingList = async (list_id, shared_with) => {
+  let results = await axios
+    .post('http://192.168.0.100:5000/api/stopsharinglist/', {
+      list_id: list_id,
+      shared_with: shared_with,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+  console.log('ye, ', results[0]);
+  return results[0];
+};
+
+export const getSharedWith = async (list_id) => {
+  let results = await axios
+    .get(`http://192.168.0.100:5000/api/sharedwith/${list_id}`)
+    .then((res) => res.data)
+    .catch((e) => {
+      console.error(e);
+    });
+
+  return results[0];
+};
+
+export const updateList = async (list_id, title) => {
+  let results = axios
+    .put('http://192.168.0.100:5000/api/list/', {
+      list_id: list_id,
+      title: title,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
   return results[0];
 };
 

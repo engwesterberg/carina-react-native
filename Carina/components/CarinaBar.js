@@ -29,7 +29,7 @@ const CarinaBar = (props) => {
         value={query}
         style={styles.bar}
         placeholder="Add task to Carina"
-        placeholderTextColor={COLORS.lightPurple}
+        placeholderTextColor={COLORS.mainLight}
         onSubmitEditing={(text) => {
           newTodo(
             props.user_id,
@@ -67,7 +67,7 @@ const CarinaBar = (props) => {
             <TextInput
               style={styles.planningModeBar}
               placeholder="Enter todo attributes"
-              placeholderTextColor={COLORS.lightPurple}
+              placeholderTextColor={COLORS.mainLight}
               onChangeText={(text) => {
                 setPlanningAttributes(text);
               }}
@@ -81,7 +81,7 @@ const CarinaBar = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.darkPurple,
+    backgroundColor: COLORS.mainDark,
   },
   bar: {
     marginTop: 10,

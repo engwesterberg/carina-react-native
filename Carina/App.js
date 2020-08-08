@@ -9,7 +9,7 @@ import {getTodos, getLists} from './functions';
 
 const NOT_DONE = 0;
 const DONE = 1;
-const DELETE = 2;
+const DELETED = 2;
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -58,6 +58,7 @@ const App = () => {
         <View>
           <Header
             title={selectedList.title}
+            listId={selectedList.id}
             lists={lists}
             userId={userId}
             listUpdater={listUpdater}
@@ -90,11 +91,20 @@ const App = () => {
             </Text>
             {showDone && (
               <TodoList
-              todos={todos.filter(
-                (obj) =>
-                  obj.state === DONE && obj.list_id === selectedList.id,
-              )}
+                todos={todos.filter(
+                  (obj) =>
+                    obj.state === DONE && obj.list_id === selectedList.id,
+                )}
                 state={DONE}
+                todoListUpdater={todoListUpdater}
+                removeFromList={removeFromList}
+                listId={selectedList ? selectedList.id : null}
+              />
+            )}
+            {selectedList.id !== -1 && (
+              <TodoList
+                todos={todos.filter((obj) => obj.state === DELETED)}
+                state={DELETED}
                 todoListUpdater={todoListUpdater}
                 removeFromList={removeFromList}
                 listId={selectedList ? selectedList.id : null}
@@ -110,7 +120,7 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.darkPurple,
+    backgroundColor: COLORS.mainDark,
   },
   scrollViewContainer: {marginBottom: 185},
   showDoneText: {

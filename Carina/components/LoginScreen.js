@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   loginContainer: {
     width: windowWidth * 0.8,
     height: windowHeight * 0.5,
-    backgroundColor: COLORS.lightPurple,
+    backgroundColor: COLORS.mainLight,
     alignItems: 'center',
     borderRadius: 10,
   },

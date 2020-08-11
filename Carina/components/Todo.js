@@ -91,6 +91,10 @@ const Todo = (props) => {
                     height: 20,
                     marginLeft: 5,
                   }}
+                  onPress={() => {
+                  props.updatePomoActive(props.todo);
+                    setModalVisible(false);
+                  }}
                 />
                 <TextInput
                   style={styles.pomoTools}

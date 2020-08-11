@@ -76,6 +76,10 @@ const App = () => {
     setTodos(todos.filter((item) => item.id !== todo_id));
   };
 
+  const updatePomoActive = (todo) => {
+    setPomoActive(todo);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       {!loggedIn && <LoginScreen parentUpdater={loginUpdater} />}
@@ -93,12 +97,12 @@ const App = () => {
           />
           {selectedList.id !== DELETED_LIST_ID && (
             <CarinaBar
-              user_id={userId}
+             userId={userId}
               todoListUpdater={todoListUpdater}
               listId={selectedList ? selectedList.id : null}
             />
           )}
-          <View style={{flex: 1}}>
+          <View style={{flex: 1, marginBottom: pomoActive ? 60 : 0}}>
             <ScrollView>
               <TodoList
                 todos={todos.filter(
@@ -109,6 +113,7 @@ const App = () => {
                 todoListUpdater={todoListUpdater}
                 removeFromList={removeFromList}
                 listId={selectedList ? selectedList.id : null}
+                updatePomoActive={updatePomoActive}
               />
               {selectedList.id !== DELETED_LIST_ID && (
                 <Text
@@ -144,7 +149,9 @@ const App = () => {
           </View>
         </View>
       )}
-      {pomoActive && <PomodoroBar />}
+      {pomoActive && (
+        <PomodoroBar todo={pomoActive} updatePomoActive={updatePomoActive} userId={userId}/>
+      )}
     </SafeAreaView>
   );
 };

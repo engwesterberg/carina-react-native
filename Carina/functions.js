@@ -101,6 +101,15 @@ export const incPomo = async (user_id, todo_id) => {
   return results[0];
 };
 
+export const getPomosToday = async (user_id) => {
+  let results = await axios
+    .put(`http://192.168.0.100:5000/api/pomotoday/${user_id}`)
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};
+
 export const newTodo = async (user_id, query, list_id) => {
   let results = await axios
     .post('http://192.168.0.100:5000/api/todo', {

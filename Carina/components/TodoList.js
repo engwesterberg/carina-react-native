@@ -25,6 +25,7 @@ const TodoList = (props) => {
               todo={item}
               todoListUpdater={props.todoListUpdater}
               removeFromList={props.removeFromList}
+              updatePomoActive={props.updatePomoActive || null}
             />
           </View>
         );
@@ -56,7 +57,7 @@ const daySeparator = (curr, prev) => {
 const styles = StyleSheet.create({
   todoListContainer: {},
   firstSeparatorText: {color: 'white', fontSize: 18, marginLeft: 10},
-  separatorText: {color: 'white', fontSize: 18, marginTop: 10,marginLeft: 10},
+  separatorText: {color: 'white', fontSize: 18, marginTop: 10, marginLeft: 10},
 });
 
 export default TodoList;

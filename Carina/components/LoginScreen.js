@@ -4,6 +4,7 @@ import AppButton from './AppButton.js';
 import Header from './Header';
 import Hr from 'react-native-hr-component';
 import {signUp, signIn} from '../functions.js';
+import {TextInput as PaperTextInput} from 'react-native-paper';
 
 import {
   View,
@@ -34,17 +35,19 @@ const LoginScreen = (props) => {
       <View style={styles.container}>
         <View style={styles.loginContainer}>
           <Text style={styles.text}> Carina </Text>
-          <TextInput
-            style={styles.textInput}
+          <PaperTextInput
+            dense={true}
+            style={styles.input}
             placeholder="Username"
             placeholderTextColor="black"
             onChangeText={(text) => {
               setEmail(text);
             }}
           />
-          <TextInput
-            style={styles.textInput}
-                    secureTextEntry={true}
+          <PaperTextInput
+            dense={true}
+            style={styles.input}
+            secureTextEntry={true}
             placeholder="Password"
             placeholderTextColor="black"
             onChangeText={(text) => {
@@ -83,37 +86,41 @@ const LoginScreen = (props) => {
               <View style={styles.container}>
                 <View style={styles.loginContainer}>
                   <Text style={styles.text}> Join Carina </Text>
-                  <TextInput
+                  <PaperTextInput
+            dense={true}
                     onChangeText={(text) => {
                       setName(text);
                     }}
-                    style={styles.textInput}
+                    style={styles.input}
                     placeholder="Name"
                     placeholderTextColor="black"
                   />
-                  <TextInput
+                  <PaperTextInput
+            dense={true}
                     onChangeText={(text) => {
                       setEmail(text);
                     }}
-                    style={styles.textInput}
+                    style={styles.input}
                     placeholder="Email"
                     placeholderTextColor="black"
                   />
-                  <TextInput
+                  <PaperTextInput
+            dense={true}
                     secureTextEntry={true}
                     onChangeText={(text) => {
                       setSecret(text);
                     }}
-                    style={styles.textInput}
+                    style={styles.input}
                     placeholder="Password"
                     placeholderTextColor="black"
                   />
-                  <TextInput
+                  <PaperTextInput
+            dense={true}
                     secureTextEntry={true}
                     onChangeText={(text) => {
                       setRepeatSecret(text);
                     }}
-                    style={styles.textInput}
+                    style={styles.input}
                     placeholder="Repeat Password"
                     placeholderTextColor="black"
                   />
@@ -193,6 +200,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
   },
+  input: {width: '90%', marginLeft: 5, marginBottom: 10},
 });
 
 export default LoginScreen;

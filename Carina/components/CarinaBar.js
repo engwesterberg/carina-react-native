@@ -84,7 +84,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mainDark,
   },
   bar: {
-    marginTop: 10,
     alignSelf: 'center',
     width: '95%',
     borderRadius: 5,

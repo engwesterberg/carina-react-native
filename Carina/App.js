@@ -1,15 +1,25 @@
 import {COLORS} from './colors.js';
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  FlatList,
+} from 'react-native';
 import Header from './components/Header';
 import LoginScreen from './components/LoginScreen';
 import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
+import PomodoroBar from './components/PomodoroBar';
+
 import {getTodos, getLists} from './functions';
 
 const NOT_DONE = 0;
 const DONE = 1;
 const DELETED = 2;
+const DELETED_LIST_ID = -1;
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -19,9 +29,24 @@ const App = () => {
   const [todos, setTodos] = useState([]);
   const [lists, setLists] = useState([]);
   const [selectedList, setSelectedList] = useState({id: null, title: 'Carina'});
-
   //gui state
   const [showDone, setShowDone] = useState(false);
+  const [pomoActive, setPomoActive] = useState(false);
+
+  useEffect(() => {
+    setDevelopmentUserState();
+  }, []);
+
+  const setDevelopmentUserState = () => {
+    setUserId(1);
+    getTodos(1).then((res) => {
+      setTodos(res);
+    });
+    getLists(1).then((res) => {
+      setLists(res);
+    });
+    setLoggedIn(true);
+  };
 
   const loginUpdater = (aName, aEmail, aId) => {
     setLoggedIn(true);
@@ -52,10 +77,10 @@ const App = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       {!loggedIn && <LoginScreen parentUpdater={loginUpdater} />}
       {loggedIn && (
-        <View>
+        <View style={styles.container}>
           <Header
             title={selectedList.title}
             listId={selectedList.id}
@@ -66,63 +91,71 @@ const App = () => {
               setSelectedList(list);
             }}
           />
-          <CarinaBar
-            user_id={userId}
-            todoListUpdater={todoListUpdater}
-            listId={selectedList ? selectedList.id : null}
-          />
-          <ScrollView style={styles.scrollViewContainer}>
-            <TodoList
-              todos={todos.filter(
-                (obj) =>
-                  obj.state === NOT_DONE && obj.list_id === selectedList.id,
-              )}
-              state={NOT_DONE}
+          {selectedList.id !== DELETED_LIST_ID && (
+            <CarinaBar
+              user_id={userId}
               todoListUpdater={todoListUpdater}
-              removeFromList={removeFromList}
               listId={selectedList ? selectedList.id : null}
             />
-            <Text
-              style={styles.showDoneText}
-              onPress={() => {
-                setShowDone(!showDone);
-              }}>
-              {showDone ? 'Hide Done' : 'Show Done'}
-            </Text>
-            {showDone && (
+          )}
+          <View style={{flex: 1}}>
+            <ScrollView>
               <TodoList
                 todos={todos.filter(
                   (obj) =>
-                    obj.state === DONE && obj.list_id === selectedList.id,
+                    obj.state === NOT_DONE && obj.list_id === selectedList.id,
                 )}
-                state={DONE}
+                state={NOT_DONE}
                 todoListUpdater={todoListUpdater}
                 removeFromList={removeFromList}
                 listId={selectedList ? selectedList.id : null}
               />
-            )}
-            {selectedList.id !== -1 && (
-              <TodoList
-                todos={todos.filter((obj) => obj.state === DELETED)}
-                state={DELETED}
-                todoListUpdater={todoListUpdater}
-                removeFromList={removeFromList}
-                listId={selectedList ? selectedList.id : null}
-              />
-            )}
-          </ScrollView>
+              {selectedList.id !== DELETED_LIST_ID && (
+                <Text
+                  style={styles.showDoneText}
+                  onPress={() => {
+                    setShowDone(!showDone);
+                  }}>
+                  {showDone ? 'Hide Done' : 'Show Done'}
+                </Text>
+              )}
+              {showDone && (
+                <TodoList
+                  todos={todos.filter(
+                    (obj) =>
+                      obj.state === DONE && obj.list_id === selectedList.id,
+                  )}
+                  state={DONE}
+                  todoListUpdater={todoListUpdater}
+                  removeFromList={removeFromList}
+                  listId={selectedList ? selectedList.id : null}
+                />
+              )}
+              {selectedList.id == DELETED_LIST_ID && (
+                <TodoList
+                  todos={todos.filter((obj) => obj.state === DELETED)}
+                  state={DELETED}
+                  todoListUpdater={todoListUpdater}
+                  removeFromList={removeFromList}
+                  listId={selectedList ? selectedList.id : null}
+                />
+              )}
+            </ScrollView>
+          </View>
         </View>
       )}
-    </View>
+      {pomoActive && <PomodoroBar />}
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  safeArea: {
     backgroundColor: COLORS.mainDark,
+    flexGrow: 1,
   },
-  scrollViewContainer: {marginBottom: 185},
+  container: {flexGrow: 1, backgroundColor: COLORS.mainDark},
+  scrollContainer: {backgroundColor: 'red'},
   showDoneText: {
     color: 'white',
     fontSize: 18,

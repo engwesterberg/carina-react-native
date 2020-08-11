@@ -40,6 +40,11 @@ const Header = (props) => {
     props.listUpdater();
   };
 
+  const displayPrompt = () => {
+    setShowPrompt(true);
+    hideMenu();
+  }
+
   const listSettings = () => {
     return (
       <Modal
@@ -164,27 +169,24 @@ const Header = (props) => {
           })}
           <MenuDivider />
           <MenuItem
-            onPress={() => {
-              console.warn('gogo');
-              setShowPrompt(true);
-              console.warn('show, ', showPrompt);
-              hideMenu();
-            }}>
-            New List
+            onPress={displayPrompt}>
+            <Icon name="add" size={18} color={COLORS.mainLight} />
+            <Text>New List </Text>
           </MenuItem>
           <MenuDivider />
           <MenuItem
             onPress={() => {
-              props.selectedListUpdater({id: -1, title: 'Archive'});
               hideMenu();
+              props.selectedListUpdater({id: -1, title: 'Archive'});
             }}>
-            Archive
+            <Icon name="trash" size={18} color={COLORS.mainLight} />
+            <Text>Archive</Text>
           </MenuItem>
         </Menu>
       )}
       <View style={styles.listNameContainer}>
         <Text style={styles.text}> {props.title}</Text>
-        {props.title !== 'Carina' && (
+        {props.title !== 'Carina' && props.title !== 'Archive' && (
           <Button
             icon={
               <Icon
@@ -211,10 +213,11 @@ const Header = (props) => {
 
 const styles = StyleSheet.create({
   header: {
-    height: Platform.OS === 'ios' ? 80 : 60,
+    height: 60,
     backgroundColor: COLORS.mainLight,
     flexDirection: 'row',
-    alignItems: Platform.OS === 'ios' ? 'flex-end' : 'center',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   menu: {
     backgroundColor: COLORS.mainLight,
@@ -227,7 +230,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 23,
     color: '#fff',
-    marginBottom: Platform.OS === 'ios' ? 10 : 0,
   },
   modalView: {
     backgroundColor: 'white',

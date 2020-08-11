@@ -224,22 +224,38 @@ const Todo = (props) => {
         }}>
         <View style={styles.todoContainer} key={props.id}>
           <View style={styles.radioButtonContainer}>
-            <RadioButton
-              status={props.todo.state === 0 ? 'unchecked' : 'checked'}
-              color={COLORS.mainDark}
-              onPress={() => {
-                let updatedTodo = props.todo;
-                updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
-                updateTodo(updatedTodo).then(props.todoListUpdater());
-                if (props.todo.recurring) {
-                  let copy = props.todo;
-                  copy.due_date = moment(copy.due_date).add(props.todo.recurring, 'days');
-                  copyTodo(props.todo).then(() => {
-                    updateTodo(updatedTodo).then(props.todoListUpdater());
-                  });
-                }
-              }}
-            />
+            {props.todo.state !== 2 ? (
+              <RadioButton
+                status={props.todo.state === 0 ? 'unchecked' : 'checked'}
+                color={COLORS.mainDark}
+                onPress={() => {
+                  let updatedTodo = props.todo;
+                  updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
+                  updateTodo(updatedTodo).then(props.todoListUpdater());
+                  if (props.todo.recurring) {
+                    let copy = props.todo;
+                    copy.due_date = moment(copy.due_date).add(
+                      props.todo.recurring,
+                      'days',
+                    );
+                    copyTodo(props.todo).then(() => {
+                      updateTodo(updatedTodo).then(props.todoListUpdater());
+                    });
+                  }
+                }}
+              />
+            ) : (
+              <Icon
+                name="recycle"
+                size={30}
+                color={COLORS.mainLight}
+                onPress={() => {
+                  let updatedTodo = props.todo;
+                  updatedTodo.state = 0;
+                  updateTodo(updatedTodo).then(props.todoListUpdater());
+                }}
+              />
+            )}
           </View>
           <TouchableOpacity
             style={{flex: 1}}

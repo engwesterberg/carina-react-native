@@ -22,10 +22,10 @@ const DELETED = 2;
 const DELETED_LIST_ID = -1;
 
 const App = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
   const [name, setName] = useState(null);
   const [email, setEmail] = useState(null);
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState(1);
   const [todos, setTodos] = useState([]);
   const [lists, setLists] = useState([]);
   const [selectedList, setSelectedList] = useState({id: null, title: 'Carina'});
@@ -97,7 +97,7 @@ const App = () => {
           />
           {selectedList.id !== DELETED_LIST_ID && (
             <CarinaBar
-             userId={userId}
+              userId={userId}
               todoListUpdater={todoListUpdater}
               listId={selectedList ? selectedList.id : null}
             />
@@ -150,7 +150,11 @@ const App = () => {
         </View>
       )}
       {pomoActive && (
-        <PomodoroBar todo={pomoActive} updatePomoActive={updatePomoActive} userId={userId}/>
+        <PomodoroBar
+          todo={pomoActive}
+          updatePomoActive={updatePomoActive}
+          userId={userId}
+        />
       )}
     </SafeAreaView>
   );

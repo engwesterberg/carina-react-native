@@ -78,6 +78,17 @@ export const getTodos = async (user_id) => {
   return results;
 };
 
+export const getSubTasks = async (todo_id) => {
+  let results = await axios
+    .get(`http://192.168.0.100:5000/api/subtask/${todo_id}`)
+    .then((results) => {
+      console.log(results.data[0]);
+      return results.data[0];
+    })
+    .catch((error) => console.error(error));
+  return results;
+};
+
 export const getLists = async (user_id) => {
   let results = await axios
     .get(`http://192.168.0.100:5000/api/list/${user_id}`)
@@ -110,12 +121,36 @@ export const getPomosToday = async (user_id) => {
   return results[0];
 };
 
-export const newTodo = async (user_id, query, list_id) => {
+export const addTodo = async (user_id, query, list_id) => {
   let results = await axios
     .post('http://192.168.0.100:5000/api/todo', {
       user_id: user_id,
       query: query,
       list_id: list_id,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+  return results[0];
+};
+
+export const addSubTask = async (todo_id, title) => {
+  let results = await axios
+    .post('http://192.168.0.100:5000/api/subtask', {
+      todo_id: todo_id,
+      title: title,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+  return results[0];
+};
+
+export const editSubTask = async (subtask_id, title, state) => {
+  console.log(subtask_id, title, state);
+  let results = await axios
+    .put('http://192.168.0.100:5000/api/subtask', {
+      subtask_id: subtask_id,
+      title: title,
+      state: state,
     })
     .then((res) => res.data)
     .catch((e) => console.error(e));

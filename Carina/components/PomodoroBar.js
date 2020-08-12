@@ -4,6 +4,7 @@ import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import CountDown from 'react-native-countdown-component';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import moment from 'moment';
+import {Button} from 'react-native-elements';
 import {incPomo, getPomosToday} from '../functions';
 const POMO_TIME = 1500;
 const POMO_PAUSE = 300;
@@ -38,11 +39,13 @@ const PomodoroBar = (props) => {
         />
       </View>
       <View style={styles.col2}>
-        <Text style={styles.text}>Stop</Text>
-        <Icon
-          name="stop"
-          size={50}
-          color={COLORS.red}
+        <Button
+          icon={<Icon name="stop" size={30} color={COLORS.red} />}
+          buttonStyle={{
+            backgroundColor: 'white',
+            height: 35,
+            marginLeft: 5,
+          }}
           onPress={() => {
             props.updatePomoActive(null);
             setPause(false);
@@ -58,8 +61,7 @@ const PomodoroBar = (props) => {
             return (
               <Text>
                 {item.task}
-                {moment(item.completed).hour()}
-                :
+                {moment(item.completed).hour()}:
                 {moment(item.completed).minute()}
               </Text>
             );
@@ -87,7 +89,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
   },
-  col2: {alignItems: 'center'},
+  col2: {alignItems: 'center', justifyContent: 'center'},
   col3: {flex: 1},
 });
 

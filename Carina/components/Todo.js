@@ -1,7 +1,7 @@
 /* eslint react-native/no-inline-styles: 0 */
 import moment from 'moment';
 import {COLORS} from '../colors.js';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import {updateTodo, deleteTodo, copyTodo} from '../functions';
@@ -17,6 +18,8 @@ import Modal from 'react-native-modal';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {TextInput as PaperTextInput} from 'react-native-paper';
+import {getSubTasks, addSubTask, editSubTask} from '../functions';
 
 const Todo = (props) => {
   //gui
@@ -33,6 +36,8 @@ const Todo = (props) => {
   const [hasTime, setHasTime] = useState(null);
   const [hour, setHour] = useState(null);
   const [minute, setMinute] = useState(null);
+  const [subTasks, setSubTasks] = useState([]);
+  const [newSubTask, setNewSubTask] = useState('');
 
   const onModalClose = () => {
     props.todoListUpdater();
@@ -92,7 +97,7 @@ const Todo = (props) => {
                     marginLeft: 5,
                   }}
                   onPress={() => {
-                  props.updatePomoActive(props.todo);
+                    props.updatePomoActive(props.todo);
                     setModalVisible(false);
                   }}
                 />
@@ -180,6 +185,55 @@ const Todo = (props) => {
               />
             </View>
           </View>
+
+          <PaperTextInput
+            dense={true}
+            value={newSubTask}
+            style={styles.input}
+            placeholder="Add Subtask"
+            placeholderTextColor="black"
+            onChangeText={(text) => {
+              setNewSubTask(text);
+            }}
+            onBlur={() => {
+              addSubTask(props.todo.id, newSubTask).then(() => {
+                getSubTasks(props.todo.id).then((res) => {
+                  setSubTasks(res);
+                });
+              });
+              console.warn(props.todo.id, newSubTask);
+              setNewSubTask('');
+            }}
+          />
+          {subTasks.length > 0 &&
+            subTasks.map((item) => {
+              return (
+                <View style={[styles.subTaskContainer]}>
+                  <RadioButton
+                    status={item.state === 0 ? 'unchecked' : 'checked'}
+                    color={COLORS.mainDark}
+                    onPress={() => {
+                      editSubTask(
+                        item.id,
+                        item.title,
+                        item.state === 0 ? 1 : 0,
+                      ).then(() => {
+                        getSubTasks(props.todo.id).then(res => {
+                          setSubTasks(res);
+                        })
+                      });
+                    }}
+                  />
+                  <Text
+                    style={{
+                      textDecorationLine:
+                        item.state === 0 ? null : 'line-through',
+                    }}>
+                    {item.title}{' '}
+                  </Text>
+                </View>
+              );
+            })}
           <TextInput
             style={styles.note}
             placeholder="Write a note"
@@ -266,6 +320,10 @@ const Todo = (props) => {
             activeOpacity={1}
             onPress={() => {
               setModalVisible(true);
+              getSubTasks(props.todo.id).then((res) => {
+                console.log(res);
+                setSubTasks(res);
+              });
             }}>
             <View style={styles.todoInfoContainer}>
               <View style={styles.row1}>
@@ -456,6 +514,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 0,
   },
+  subTaskContainer: {flexDirection: 'row', alignItems: 'center'},
   note: {
     backgroundColor: 'white',
     height: '80%',

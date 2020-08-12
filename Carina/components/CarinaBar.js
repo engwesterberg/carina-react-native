@@ -8,7 +8,7 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import Swipeable from 'react-native-swipeable-row';
-import {newTodo} from '../functions.js';
+import {addTodo} from '../functions.js';
 
 const leftContent = <Text />;
 
@@ -31,8 +31,8 @@ const CarinaBar = (props) => {
         placeholder="Add task to Carina"
         placeholderTextColor={COLORS.mainLight}
         onSubmitEditing={(text) => {
-          newTodo(
-            props.user_id,
+          addTodo(
+            props.userId,
             planningMode ? query + planningAttributes : query,
             props.listId,
           ).then(() => {

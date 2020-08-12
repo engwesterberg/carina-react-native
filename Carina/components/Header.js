@@ -18,6 +18,7 @@ import {
 
 const Header = (props) => {
   const [menu, setMenu] = useState(null);
+  const [settingsMenu, setSettingsMenu] = useState(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [newListName, setNewListName] = useState(null);
@@ -36,6 +37,18 @@ const Header = (props) => {
     menu.show();
   };
 
+  const setSettingsMenuRef = (ref) => {
+    setSettingsMenu(ref);
+  };
+
+  const hideSettingsMenu = () => {
+    settingsMenu.hide();
+  };
+
+  const showSettingsMenu = () => {
+    settingsMenu.show();
+  };
+
   const onModalClose = () => {
     props.listUpdater();
   };
@@ -43,7 +56,7 @@ const Header = (props) => {
   const displayPrompt = () => {
     setShowPrompt(true);
     hideMenu();
-  }
+  };
 
   const listSettings = () => {
     return (
@@ -65,22 +78,22 @@ const Header = (props) => {
           <View style={styles.modalHeader}>
             <TextInput
               style={styles.listTitle}
-              defaultValue={props.title}
+              defaultValue={props.selectedList.title}
               onChangeText={(text) => {
                 if (text) {
                   setNewListName(text);
                 }
               }}
               onEndEditing={() => {
-                updateList(props.listId, newListName).then(() => {
+                updateList(props.selectedList.id, newListName).then(() => {
                   props.listUpdater();
                 });
               }}
             />
           </View>
           <Text style={styles.guide}>
-            Share <Text style={styles.bold}>{props.title} </Text>with other
-            people
+            Share <Text style={styles.bold}>{props.selectedList.title} </Text>
+            with other people
           </Text>
           <PaperTextInput
             style={styles.input}
@@ -94,9 +107,11 @@ const Header = (props) => {
             }}
             onBlur={() => {
               console.warn(shareWith);
-              shareList(props.listId, shareWith, props.userId).then((res) => {
-                setSharedWithUsers(res);
-              });
+              shareList(props.selectedList.id, shareWith, props.userId).then(
+                (res) => {
+                  setSharedWithUsers(res);
+                },
+              );
             }}
           />
           <Text style={styles.guide}>Currenltly shared with</Text>
@@ -104,11 +119,13 @@ const Header = (props) => {
             return (
               <Chip
                 icon="delete"
+                key={item.id}
                 onPress={() => {
-                  stopSharingList(props.listId, item.id).then((res) => {
-                    console.log('bolkapr:', res);
-                    setSharedWithUsers(res);
-                  });
+                  stopSharingList(props.selectedList.id, item.id).then(
+                    (res) => {
+                      setSharedWithUsers(res);
+                    },
+                  );
                 }}>
                 {item.fullname}
               </Chip>
@@ -168,8 +185,7 @@ const Header = (props) => {
             );
           })}
           <MenuDivider />
-          <MenuItem
-            onPress={displayPrompt}>
+          <MenuItem onPress={displayPrompt}>
             <Icon name="add" size={18} color={COLORS.mainLight} />
             <Text>New List </Text>
           </MenuItem>
@@ -185,28 +201,57 @@ const Header = (props) => {
         </Menu>
       )}
       <View style={styles.listNameContainer}>
-        <Text style={styles.text}> {props.title}</Text>
-        {props.title !== 'Carina' && props.title !== 'Archive' && (
-          <Button
-            icon={
-              <Icon
-                name="settings"
-                size={18}
-                color="white"
-                onPress={() => {
-                  setModalVisible(true);
-                  getSharedWith(props.listId).then((res) => {
-                    setSharedWithUsers(res);
-                    console.warn(res);
-                  });
-                }}
-              />
-            }
-            buttonStyle={styles.settingButton}
-          />
-        )}
+        <Text style={styles.text}> {props.selectedList.title}</Text>
+        {props.selectedList.title !== 'Carina' &&
+          props.selectedList.title !== 'Archive' &&
+          props.selectedList.title !== 'Sign Up' &&
+          props.selectedList.title !== 'Login' && (
+            <Button
+              icon={
+                <Icon
+                  name="expand"
+                  size={18}
+                  color="white"
+                  onPress={() => {
+                    setModalVisible(true);
+                    getSharedWith(props.selectedList.id).then((res) => {
+                      setSharedWithUsers(res);
+                      console.warn(res);
+                    });
+                  }}
+                />
+              }
+              buttonStyle={styles.listSettingsButton}
+            />
+          )}
         {listSettings()}
       </View>
+      {props.selectedList.title !== 'Login' && props.selectedList.title !== 'Sign Up' && (
+        <Menu
+          ref={setSettingsMenuRef}
+          button={
+            <Button
+              icon={
+                <Icon
+                  name="settings"
+                  size={30}
+                  color="white"
+                  onPress={showSettingsMenu}
+                />
+              }
+              buttonStyle={styles.settingsButton}
+            />
+          }>
+          <MenuItem
+            onPress={() => {
+              hideSettingsMenu();
+              props.signOutHandler();
+            }}>
+            <Icon name="ios-log-out" size={20} color={COLORS.mainLight} />
+            <Text>Sign Out</Text>
+          </MenuItem>
+        </Menu>
+      )}
     </View>
   );
 };
@@ -216,8 +261,8 @@ const styles = StyleSheet.create({
     height: 60,
     backgroundColor: COLORS.mainLight,
     flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 10,
+    alignItems: 'center',
   },
   menu: {
     backgroundColor: COLORS.mainLight,
@@ -225,11 +270,19 @@ const styles = StyleSheet.create({
   listNameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
-  settingButton: {marginTop: 5, backgroundColor: COLORS.mainLight},
+  listSettingsButton: {
+    marginTop: 5,
+    backgroundColor: COLORS.mainLight,
+  },
   text: {
     fontSize: 23,
     color: '#fff',
+  },
+  settingsButton: {
+    marginTop: 5,
+    backgroundColor: COLORS.mainLight,
   },
   modalView: {
     backgroundColor: 'white',

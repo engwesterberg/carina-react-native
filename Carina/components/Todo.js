@@ -19,7 +19,12 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {TextInput as PaperTextInput} from 'react-native-paper';
-import {getSubTasks, addSubTask, editSubTask} from '../functions';
+import {
+  getSubTasks,
+  addSubTask,
+  editSubTask,
+  deleteSubTask,
+} from '../functions';
 
 const Todo = (props) => {
   //gui
@@ -185,13 +190,12 @@ const Todo = (props) => {
               />
             </View>
           </View>
-
           <PaperTextInput
             dense={true}
             value={newSubTask}
             style={styles.input}
             placeholder="Add Subtask"
-            placeholderTextColor="black"
+            placeholderTextColor={COLORS.mainLight}
             onChangeText={(text) => {
               setNewSubTask(text);
             }}
@@ -205,48 +209,73 @@ const Todo = (props) => {
               setNewSubTask('');
             }}
           />
-          {subTasks.length > 0 &&
-            subTasks.map((item) => {
-              return (
-                <View style={[styles.subTaskContainer]}>
-                  <RadioButton
-                    status={item.state === 0 ? 'unchecked' : 'checked'}
-                    color={COLORS.mainDark}
-                    onPress={() => {
-                      editSubTask(
-                        item.id,
-                        item.title,
-                        item.state === 0 ? 1 : 0,
-                      ).then(() => {
-                        getSubTasks(props.todo.id).then(res => {
-                          setSubTasks(res);
-                        })
-                      });
-                    }}
-                  />
-                  <Text
-                    style={{
-                      textDecorationLine:
-                        item.state === 0 ? null : 'line-through',
-                    }}>
-                    {item.title}{' '}
-                  </Text>
-                </View>
-              );
-            })}
-          <TextInput
-            style={styles.note}
-            placeholder="Write a note"
-            defaultValue={props.todo.note}
-            placeholderTextColor="gray"
-            multiline={true}
-            onChangeText={(text) => {
-              setNewNote(text);
-            }}
-            onEndEditing={() => {
-              syncTodoToDatabase(newDate || props.todo.due_date);
-            }}
-          />
+          {subTasks.length > 0 && (
+            <View
+              style={{
+                maxHeight: 150,
+                borderBottomWidth: 1,
+                borderBottomColor: COLORS.mainLight,
+              }}>
+              <ScrollView>
+                {subTasks.map((item) => {
+                  return (
+                    <View style={styles.subTaskContainer}>
+                      <RadioButton
+                        status={item.state === 0 ? 'unchecked' : 'checked'}
+                        color={COLORS.mainDark}
+                        onPress={() => {
+                          editSubTask(
+                            item.id,
+                            item.title,
+                            item.state === 0 ? 1 : 0,
+                          ).then(() => {
+                            getSubTasks(props.todo.id).then((res) => {
+                              setSubTasks(res);
+                            });
+                          });
+                        }}
+                      />
+                      <Text
+                        style={{
+                          textDecorationLine:
+                            item.state === 0 ? null : 'line-through',
+                        }}>
+                        {item.title}{' '}
+                      </Text>
+                      <Icon
+                        style={{marginLeft: 'auto', marginRight: 10}}
+                        name="trash"
+                        size={20}
+                        color={COLORS.mainLight}
+                        onPress={() => {
+                          deleteSubTask(item.id).then(() => {
+                            getSubTasks(props.todo.id).then((res) => {
+                              setSubTasks(res);
+                            });
+                          });
+                        }}
+                      />
+                    </View>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
+          <View style={{flex: 2}}>
+            <TextInput
+              style={styles.note}
+              placeholder="Write a note"
+              defaultValue={props.todo.note}
+              placeholderTextColor="gray"
+              multiline={true}
+              onChangeText={(text) => {
+                setNewNote(text);
+              }}
+              onEndEditing={() => {
+                syncTodoToDatabase(newDate || props.todo.due_date);
+              }}
+            />
+          </View>
         </View>
       </Modal>
     );
@@ -273,11 +302,13 @@ const Todo = (props) => {
           </View>
         }
         onRightActionRelease={() => {
-          deleteTodo(props.todo.id);
+          deleteTodo(props.todo.id).then(() => {
+            props.todoListUpdater();
+          });
           props.removeFromList(props.todo.id);
         }}
         onLeftActionRelease={() => {
-          deleteTodo(props.todo.id);
+          deleteTodo(props.todo.id).then(props.todoListUpdater());
           props.removeFromList(props.todo.id);
         }}>
         <View style={styles.todoContainer} key={props.id}>
@@ -321,7 +352,6 @@ const Todo = (props) => {
             onPress={() => {
               setModalVisible(true);
               getSubTasks(props.todo.id).then((res) => {
-                console.log(res);
                 setSubTasks(res);
               });
             }}>

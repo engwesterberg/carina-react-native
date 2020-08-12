@@ -31,7 +31,7 @@ const LoginScreen = (props) => {
       style={styles.imgBackground}
       resizeMode="cover"
       source={require('../assets/note.jpg')}>
-      <Header title="Login" />
+      <Header selectedList={{id: null, title: 'Login'}} />
       <View style={styles.container}>
         <View style={styles.loginContainer}>
           <Text style={styles.text}> Carina </Text>
@@ -82,12 +82,12 @@ const LoginScreen = (props) => {
               style={styles.imgBackground}
               resizeMode="cover"
               source={require('../assets/note.jpg')}>
-              <Header title="Sign Up" />
+              <Header selectedList={{id: null, title: 'Sign Up'}} />
               <View style={styles.container}>
                 <View style={styles.loginContainer}>
                   <Text style={styles.text}> Join Carina </Text>
                   <PaperTextInput
-            dense={true}
+                    dense={true}
                     onChangeText={(text) => {
                       setName(text);
                     }}
@@ -96,7 +96,7 @@ const LoginScreen = (props) => {
                     placeholderTextColor="black"
                   />
                   <PaperTextInput
-            dense={true}
+                    dense={true}
                     onChangeText={(text) => {
                       setEmail(text);
                     }}
@@ -105,7 +105,7 @@ const LoginScreen = (props) => {
                     placeholderTextColor="black"
                   />
                   <PaperTextInput
-            dense={true}
+                    dense={true}
                     secureTextEntry={true}
                     onChangeText={(text) => {
                       setSecret(text);
@@ -115,7 +115,7 @@ const LoginScreen = (props) => {
                     placeholderTextColor="black"
                   />
                   <PaperTextInput
-            dense={true}
+                    dense={true}
                     secureTextEntry={true}
                     onChangeText={(text) => {
                       setRepeatSecret(text);

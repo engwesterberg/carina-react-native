@@ -37,6 +37,18 @@ const App = () => {
     setDevelopmentUserState();
   }, []);
 
+  const signOut = () => {
+    setLoggedIn(false);
+    setName(null);
+    setEmail(null);
+    setUserId(null);
+    setTodos([]);
+    setLists([]);
+    setSelectedList({id: null, title: 'Carina'});
+    setShowDone(false);
+    setPomoActive(false);
+  };
+
   const setDevelopmentUserState = () => {
     setUserId(1);
     getTodos(1).then((res) => {
@@ -86,14 +98,14 @@ const App = () => {
       {loggedIn && (
         <View style={styles.container}>
           <Header
-            title={selectedList.title}
-            listId={selectedList.id}
+            selectedList={selectedList}
             lists={lists}
             userId={userId}
             listUpdater={listUpdater}
             selectedListUpdater={(list) => {
               setSelectedList(list);
             }}
+            signOutHandler={signOut}
           />
           {selectedList.id !== DELETED_LIST_ID && (
             <CarinaBar
@@ -136,7 +148,7 @@ const App = () => {
                   listId={selectedList ? selectedList.id : null}
                 />
               )}
-              {selectedList.id == DELETED_LIST_ID && (
+              {selectedList.id === DELETED_LIST_ID && (
                 <TodoList
                   todos={todos.filter((obj) => obj.state === DELETED)}
                   state={DELETED}

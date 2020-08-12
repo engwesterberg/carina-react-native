@@ -82,7 +82,6 @@ export const getSubTasks = async (todo_id) => {
   let results = await axios
     .get(`http://192.168.0.100:5000/api/subtask/${todo_id}`)
     .then((results) => {
-      console.log(results.data[0]);
       return results.data[0];
     })
     .catch((error) => console.error(error));
@@ -144,8 +143,15 @@ export const addSubTask = async (todo_id, title) => {
   return results[0];
 };
 
+export const deleteSubTask = async (id) => {
+  let results = await axios
+    .delete(`http://192.168.0.100:5000/api/subtask/${id}`)
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+  return results[0];
+};
+
 export const editSubTask = async (subtask_id, title, state) => {
-  console.log(subtask_id, title, state);
   let results = await axios
     .put('http://192.168.0.100:5000/api/subtask', {
       subtask_id: subtask_id,
@@ -240,7 +246,6 @@ export const stopSharingList = async (list_id, shared_with) => {
     })
     .then((res) => res.data)
     .catch((e) => console.error(e));
-  console.log('ye, ', results[0]);
   return results[0];
 };
 

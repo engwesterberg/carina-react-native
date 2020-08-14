@@ -226,32 +226,33 @@ const Header = (props) => {
           )}
         {listSettings()}
       </View>
-      {props.selectedList.title !== 'Login' && props.selectedList.title !== 'Sign Up' && (
-        <Menu
-          ref={setSettingsMenuRef}
-          button={
-            <Button
-              icon={
-                <Icon
-                  name="settings"
-                  size={30}
-                  color="white"
-                  onPress={showSettingsMenu}
-                />
-              }
-              buttonStyle={styles.settingsButton}
-            />
-          }>
-          <MenuItem
-            onPress={() => {
-              hideSettingsMenu();
-              props.signOutHandler();
-            }}>
-            <Icon name="ios-log-out" size={20} color={COLORS.mainLight} />
-            <Text>Sign Out</Text>
-          </MenuItem>
-        </Menu>
-      )}
+      {props.selectedList.title !== 'Login' &&
+        props.selectedList.title !== 'Sign Up' && (
+          <Menu
+            ref={setSettingsMenuRef}
+            button={
+              <Button
+                icon={
+                  <Icon
+                    name="settings"
+                    size={25}
+                    color="white"
+                    onPress={showSettingsMenu}
+                  />
+                }
+                buttonStyle={styles.settingsButton}
+              />
+            }>
+            <MenuItem
+              onPress={() => {
+                hideSettingsMenu();
+                props.signOutHandler();
+              }}>
+              <Icon name="ios-log-out" size={20} color={COLORS.mainLight} />
+              <Text>Sign Out</Text>
+            </MenuItem>
+          </Menu>
+        )}
     </View>
   );
 };

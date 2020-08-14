@@ -14,6 +14,7 @@ import {
   Dimensions,
   ImageBackground,
   Modal,
+  KeyboardAvoidingView,
 } from 'react-native';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -31,133 +32,135 @@ const LoginScreen = (props) => {
       style={styles.imgBackground}
       resizeMode="cover"
       source={require('../assets/note.jpg')}>
-      <Header selectedList={{id: null, title: 'Login'}} />
-      <View style={styles.container}>
-        <View style={styles.loginContainer}>
-          <Text style={styles.text}> Carina </Text>
-          <PaperTextInput
-            dense={true}
-            style={styles.input}
-            placeholder="Username"
-            placeholderTextColor="black"
-            onChangeText={(text) => {
-              setEmail(text);
-            }}
-          />
-          <PaperTextInput
-            dense={true}
-            style={styles.input}
-            secureTextEntry={true}
-            placeholder="Password"
-            placeholderTextColor="black"
-            onChangeText={(text) => {
-              setSecret(text);
-            }}
-          />
-          <View style={styles.displayRow}>
-            <Text
-              style={styles.textButton}
+      <KeyboardAvoidingView style={styles.container} behavior="padding">
+        {!signupOpen ? (
+          <View style={styles.loginContainer}>
+            <Text style={styles.title}> Carina </Text>
+            <PaperTextInput
+              dense={true}
+              style={styles.input}
+              mode="outlined"
+              placeholder="Username"
+              placeholderTextColor="black"
+              onChangeText={(text) => {
+                setEmail(text);
+              }}
+            />
+            <PaperTextInput
+              dense={true}
+              style={styles.input}
+              mode="outlined"
+              secureTextEntry={true}
+              placeholder="Password"
+              placeholderTextColor="black"
+              onChangeText={(text) => {
+                setSecret(text);
+              }}
+            />
+            <View style={styles.displayRow}>
+              <Text
+                style={styles.textButton}
+                onPress={() => {
+                  setSignupOpen(!signupOpen);
+                }}>
+                Sign Up
+              </Text>
+              <Text style={styles.textButton}>Reset Password</Text>
+            </View>
+            <AppButton
+              title="Sign In"
               onPress={() => {
-                setSignupOpen(!signupOpen);
-              }}>
-              Sign Up
-            </Text>
-            <Text style={styles.textButton}>Reset Password</Text>
+                signIn(email, secret)
+                  .then((res) => {
+                    let result = res[0][0];
+                    props.parentUpdater(
+                      result.fullname,
+                      result.email,
+                      result.id,
+                    );
+                  })
+                  .catch((e) => {
+                    console.error(e);
+                  });
+              }}
+            />
           </View>
-          <AppButton
-            title="Sign In"
-            onPress={() => {
-              signIn(email, secret)
-                .then((res) => {
-                  let result = res[0][0];
-                  props.parentUpdater(result.fullname, result.email, result.id);
-                })
-                .catch((e) => {
-                  console.error(e);
-                });
-            }}
-          />
-          <Modal visible={signupOpen}>
-            <ImageBackground
-              style={styles.imgBackground}
-              resizeMode="cover"
-              source={require('../assets/note.jpg')}>
-              <Header selectedList={{id: null, title: 'Sign Up'}} />
-              <View style={styles.container}>
-                <View style={styles.loginContainer}>
-                  <Text style={styles.text}> Join Carina </Text>
-                  <PaperTextInput
-                    dense={true}
-                    onChangeText={(text) => {
-                      setName(text);
-                    }}
-                    style={styles.input}
-                    placeholder="Name"
-                    placeholderTextColor="black"
-                  />
-                  <PaperTextInput
-                    dense={true}
-                    onChangeText={(text) => {
-                      setEmail(text);
-                    }}
-                    style={styles.input}
-                    placeholder="Email"
-                    placeholderTextColor="black"
-                  />
-                  <PaperTextInput
-                    dense={true}
-                    secureTextEntry={true}
-                    onChangeText={(text) => {
-                      setSecret(text);
-                    }}
-                    style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor="black"
-                  />
-                  <PaperTextInput
-                    dense={true}
-                    secureTextEntry={true}
-                    onChangeText={(text) => {
-                      setRepeatSecret(text);
-                    }}
-                    style={styles.input}
-                    placeholder="Repeat Password"
-                    placeholderTextColor="black"
-                  />
-                  {signupSuccess && (
-                    <Text>Signup Successfull. Welcome to Carina {name}!</Text>
-                  )}
-                  <View style={styles.displayRow}>
-                    <AppButton
-                      title="Sign Up"
-                      onPress={() => {
-                        if (secret === repeatSecret) {
-                          signUp(null, email, name, secret);
-                          setSignupSuccess(true);
-                        }
-                      }}
-                    />
-                    <AppButton
-                      title="Abort"
-                      onPress={() => {
-                        setSignupOpen(false);
-                        setSignupSuccess(false);
-                      }}
-                    />
-                  </View>
-                </View>
-              </View>
-            </ImageBackground>
-          </Modal>
-          {/*<Hr
+        ) : (
+          <View style={styles.loginContainer}>
+            <Text style={styles.title}> Join </Text>
+            <PaperTextInput
+              mode="outlined"
+              dense={true}
+              onChangeText={(text) => {
+                setName(text);
+              }}
+              style={styles.input}
+              placeholder="Name"
+              placeholderTextColor="black"
+            />
+            <PaperTextInput
+              mode="outlined"
+              dense={true}
+              onChangeText={(text) => {
+                setEmail(text);
+              }}
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor="black"
+            />
+            <PaperTextInput
+              mode="outlined"
+              dense={true}
+              secureTextEntry={true}
+              onChangeText={(text) => {
+                setSecret(text);
+              }}
+              style={styles.input}
+              placeholder="Password"
+              placeholderTextColor="black"
+            />
+            <PaperTextInput
+              mode="outlined"
+              dense={true}
+              secureTextEntry={true}
+              onChangeText={(text) => {
+                setRepeatSecret(text);
+              }}
+              style={styles.input}
+              placeholder="Repeat Password"
+              placeholderTextColor="black"
+            />
+            {signupSuccess && (
+              <Text>Signup Successfull. Welcome to Carina {name}!</Text>
+            )}
+            <View style={styles.displayRow}>
+              <AppButton
+                title="Sign Up"
+                onPress={() => {
+                  if (secret === repeatSecret) {
+                    signUp(null, email, name, secret);
+                    setSignupSuccess(true);
+                  }
+                }}
+              />
+              <AppButton
+                title="Abort"
+                onPress={() => {
+                  setSignupOpen(false);
+                  setSignupSuccess(false);
+                }}
+              />
+            </View>
+          </View>
+        )}
+        {/*<Hr
           lineColor="#eee"
           width={1}
           hrPadding={20}
           text="Sign in with"
           textStyles={{color: 'white'}}
         />*/}
-        </View>
-      </View>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 };
@@ -169,28 +172,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imgBackground: {
-    width: '100%',
-    height: '100%',
-    flex: 1,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
   },
   loginContainer: {
-    width: windowWidth * 0.8,
-    height: windowHeight * 0.5,
     backgroundColor: COLORS.mainLight,
+    width: windowWidth * 0.7,
+    borderWidth: 0.5,
+    borderColor: COLORS.mainDark,
     alignItems: 'center',
     borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 12,
+    },
+    shadowOpacity: 0.58,
+    shadowRadius: 16.0,
+
+    elevation: 24,
   },
   text: {
     fontSize: 44,
     color: 'white',
   },
-  textInput: {
-    backgroundColor: 'white',
-    color: 'gray',
-    width: '80%',
-    height: 40,
-    marginBottom: 10,
+  title: {
+    fontSize: 50,
+    fontFamily: 'sans-serif-thin',
     marginTop: 10,
+    marginBottom: 10,
+    color: 'white',
   },
   displayRow: {
     flexDirection: 'row',

@@ -178,7 +178,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   container: {flexGrow: 1, backgroundColor: COLORS.mainDark},
-  scrollContainer: {backgroundColor: 'red'},
   showDoneText: {
     color: 'white',
     fontSize: 18,

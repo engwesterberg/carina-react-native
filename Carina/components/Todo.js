@@ -377,10 +377,7 @@ const Todo = (props) => {
           </TouchableOpacity>
           <View style={styles.noteContainer}>
             {props.todo.note && (
-              <Image
-                style={styles.noteImg}
-                source={require('../assets/note-added.png')}
-              />
+              <Icon name="file-o" size={25} color={COLORS.mainLight} />
             )}
           </View>
         </View>
@@ -552,6 +549,7 @@ const styles = StyleSheet.create({
   },
   todoLabelContainer: {
     flexDirection: 'row',
+    position: 'absolute',
   },
 });
 

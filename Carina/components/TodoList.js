@@ -39,41 +39,48 @@ const daySeparator = (curr, prev) => {
   let current = moment(curr);
   let previous = moment(prev);
   let separatorText = (
-    <Text
-      style={{
-        color: current.date() < moment().date() ? COLORS.red : 'white',
-        fontSize: 18,
-        marginTop: 10,
-        marginLeft: 10,
-      }}>
-      {current.format('MMMM Do ')}
-    </Text>
+    <View style={styles.daySeparatorContainer}>
+      <Text
+        style={[
+          {
+            color: current.date() < moment().date() ? COLORS.red : 'white',
+          },
+          styles.daySeparatorText,
+        ]}>
+        {current.format('MMMM Do ')}
+      </Text>
+    </View>
   );
   if (current.date() === previous.date()) {
     return null;
   }
   if (curr === 'No Date') {
     return (
-      <Text
-        style={{
-          color: 'white',
-          fontSize: 18,
-          marginLeft: 10,
-          marginTop: 10,
-        }}>
-        No Date
-      </Text>
+      <View style={styles.daySeparatorContainer}>
+        <Text
+          style={[
+            {
+              color: 'white',
+            },
+            styles.daySeparatorText,
+          ]}>
+          No Date
+        </Text>
+      </View>
     );
   } else if (!prev) {
     separatorText = (
-      <Text
-        style={{
-          color: current.date() < moment().date() ? COLORS.red : 'white',
-          fontSize: 18,
-          marginLeft: 10,
-        }}>
-        {current.format('MMMM Do ')}
-      </Text>
+      <View style={styles.daySeparatorContainer}>
+        <Text
+          style={[
+            {
+              color: current.date() < moment().date() ? COLORS.red : 'white',
+            },
+            styles.daySeparatorText,
+          ]}>
+          {current.format('MMMM Do ')}
+        </Text>
+      </View>
     );
   }
   return separatorText;
@@ -82,6 +89,19 @@ const daySeparator = (curr, prev) => {
 const styles = StyleSheet.create({
   todoListContainer: {},
   firstSeparatorText: {color: 'white', fontSize: 18, marginLeft: 10},
+  daySeparatorContainer: {
+    backgroundColor: COLORS.mainLight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 5,
+    borderWidth: 0.2,
+    borderColor: COLORS.mainDark,
+  },
+  daySeparatorText: {
+    fontSize: 12,
+    padding: 1,
+  },
 });
 
 export default TodoList;

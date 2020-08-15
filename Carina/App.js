@@ -184,10 +184,9 @@ const App = () => {
 
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: COLORS.mainDark,
     flexGrow: 1,
   },
-  container: {flexGrow: 1, backgroundColor: COLORS.mainDark},
+  container: {flexGrow: 1, backgroundColor: 'white'},
   showDoneText: {
     color: 'white',
     fontSize: 18,

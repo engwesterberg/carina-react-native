@@ -498,8 +498,6 @@ const styles = StyleSheet.create({
     width: '98%',
     alignItems: 'center',
     alignSelf: 'center',
-    backgroundColor: 'white',
-    marginBottom: 2,
   },
   radioButtonContainer: {
     justifyContent: 'center',

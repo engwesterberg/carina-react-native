@@ -25,25 +25,27 @@ const CarinaBar = (props) => {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        value={query}
-        style={styles.bar}
-        placeholder="Add task to Carina"
-        placeholderTextColor={COLORS.mainLight}
-        onSubmitEditing={(text) => {
-          addTodo(
-            props.userId,
-            planningMode ? query + planningAttributes : query,
-            props.listId,
-          ).then(() => {
-            props.todoListUpdater();
-          });
-          setQuery('');
-        }}
-        onChangeText={(text) => {
-          setQuery(text);
-        }}
-      />
+      <View elevavation={1} style={styles.boxShadow}>
+        <TextInput
+          value={query}
+          style={styles.bar}
+          placeholder="Add task to Carina"
+          placeholderTextColor={COLORS.mainLight}
+          onSubmitEditing={(text) => {
+            addTodo(
+              props.userId,
+              planningMode ? query + planningAttributes : query,
+              props.listId,
+            ).then(() => {
+              props.todoListUpdater();
+            });
+            setQuery('');
+          }}
+          onChangeText={(text) => {
+            setQuery(text);
+          }}
+        />
+      </View>
       {!planningMode && (
         <Text
           style={styles.text}
@@ -80,14 +82,15 @@ const CarinaBar = (props) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: COLORS.mainDark,
-  },
+  container: {},
   bar: {
     alignSelf: 'center',
-    width: '95%',
+    color: COLORS.mainDark,
+    width: '100%',
     borderRadius: 5,
     fontSize: 30,
+    borderWidth: 0.2,
+    borderColor: COLORS.mainDark,
     backgroundColor: 'white',
   },
   planningModeBar: {
@@ -102,10 +105,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   text: {
-    color: 'white',
+    color: COLORS.mainDark,
     marginTop: 5,
     marginBottom: 20,
     marginLeft: 20,
+  },
+  boxShadow: {
+    shadowColor: COLORS.mainDark,
+    shadowOffset: {
+      width: 20,
+      height: 20,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 13.97,
+
+    elevation: 20,
   },
 });
 

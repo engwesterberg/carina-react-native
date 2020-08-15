@@ -301,7 +301,7 @@ const Header = (props) => {
 
 const styles = StyleSheet.create({
   header: {
-    height: 60,
+    height: 50,
     backgroundColor: COLORS.mainLight,
     flexDirection: 'row',
     marginBottom: 10,

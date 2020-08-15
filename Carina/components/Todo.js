@@ -12,19 +12,24 @@ import {
   ScrollView,
 } from 'react-native';
 import {RadioButton} from 'react-native-paper';
-import {updateTodo, deleteTodo, copyTodo} from '../functions';
+import {
+  updateTodo,
+  deleteTodo,
+  copyTodo,
+  getSubTasks,
+  addSubTask,
+  editSubTask,
+  deleteSubTask,
+} from '../functions';
 import Swipeable from 'react-native-swipeable-row';
 import Modal from 'react-native-modal';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {TextInput as PaperTextInput} from 'react-native-paper';
-import {
-  getSubTasks,
-  addSubTask,
-  editSubTask,
-  deleteSubTask,
-} from '../functions';
+import {Picker} from 'react-native';
+
+const TOOLBAR_ICON_SIZE = 20;
 
 const Todo = (props) => {
   //gui
@@ -37,12 +42,13 @@ const Todo = (props) => {
   const [newPomoEstimate, setNewPomoEstimate] = useState(
     props.todo.pomo_estimate,
   );
-  const [newDate, setNewDate] = useState();
+  const [newDate, setNewDate] = useState(null);
   const [hasTime, setHasTime] = useState(null);
   const [hour, setHour] = useState(null);
   const [minute, setMinute] = useState(null);
   const [subTasks, setSubTasks] = useState([]);
   const [newSubTask, setNewSubTask] = useState('');
+  const [pickerValue, setPickerValue] = useState(0);
 
   const onModalClose = () => {
     props.todoListUpdater();
@@ -95,7 +101,7 @@ const Todo = (props) => {
             <View style={styles.expandedTools}>
               <View style={styles.pomoContainer}>
                 <Button
-                  icon={<Icon name="play" size={10} color="white" />}
+                  icon={<Icon name="play" size={15} color="white" />}
                   buttonStyle={{
                     backgroundColor: COLORS.mainLight,
                     height: 20,
@@ -129,7 +135,11 @@ const Todo = (props) => {
                   setShowDatePicker(true);
                 }}
                 icon={
-                  <Icon name="calendar" size={15} color={COLORS.mainLight} />
+                  <Icon
+                    name="calendar"
+                    size={TOOLBAR_ICON_SIZE}
+                    color={COLORS.mainLight}
+                  />
                 }
                 buttonStyle={styles.button}
               />
@@ -164,7 +174,11 @@ const Todo = (props) => {
                 }}
                 buttonStyle={styles.button}
                 icon={
-                  <Icon name="clock-o" size={15} color={COLORS.mainLight} />
+                  <Icon
+                    name="clock-o"
+                    size={TOOLBAR_ICON_SIZE}
+                    color={COLORS.mainLight}
+                  />
                 }
               />
               <DateTimePickerModal
@@ -188,6 +202,30 @@ const Todo = (props) => {
                   setShowTimePicker(false);
                 }}
               />
+              {(props.todo.due_date || newDate) && (
+                <Picker
+                  selectedValue={
+                    props.todo.recurring ? props.todo.recurring : pickerValue
+                  }
+                  style={{flex: 1, color: COLORS.mainDark}}
+                  onValueChange={(itemValue, itemIndex) => {
+                    setPickerValue(itemValue);
+                    let updated = props.todo;
+                    updated.recurring = itemValue;
+                    updateTodo(updated).then((res) => {});
+                  }}>
+                  <Picker.Item label="No Repetition" value={0} />
+                  <Picker.Item label="Every Day" value={1} />
+                  <Picker.Item label="Every second day" value={2} />
+                  <Picker.Item label="Every 3rd day" value={3} />
+                  <Picker.Item label="Every 4th day" value={4} />
+                  <Picker.Item label="Every 5th day" value={5} />
+                  <Picker.Item label="Every 6th day" value={6} />
+                  <Picker.Item label="Every week" value={7} />
+                  <Picker.Item label="Every month" value={30} />
+                  <Picker.Item label="Every year" value={365} />
+                </Picker>
+              )}
             </View>
           </View>
           <PaperTextInput
@@ -390,13 +428,17 @@ const dateLabel = (todo) => {
   const one_day = 1000 * 60 * 60 * 24;
   let color;
   let days;
-  if (moment(todo.due_date).date() === moment().date()) {
+  let diff = moment(todo.due_date).date() - moment().date();
+  if (diff === 0) {
     color = COLORS.orange;
     days = 'Today';
-  } else if (moment(todo.due_date).date() == moment().date() + 1) {
+  } else if (diff === 1) {
     color = COLORS.yellow;
     days = 'Tomorrow';
-  } else if (moment(todo.due_date) >= moment() + 2) {
+  } else if (diff === -1) {
+    color = COLORS.red;
+    days = 'Yesterday';
+  } else if (diff >= 2) {
     color = COLORS.green;
     days = `Due in ${Math.floor(
       (moment(todo.due_date) - moment()) / one_day,
@@ -427,6 +469,7 @@ const dateLabel = (todo) => {
           color: color === COLORS.yellow ? 'black' : 'white',
           alignSelf: 'flex-start',
           borderRadius: 3,
+          fontSize: 12,
           padding: 1,
         }}>
         {days}
@@ -454,8 +497,9 @@ const styles = StyleSheet.create({
     height: 55,
     width: '98%',
     alignItems: 'center',
+    alignSelf: 'center',
     backgroundColor: 'white',
-    marginBottom: 1,
+    marginBottom: 2,
   },
   radioButtonContainer: {
     justifyContent: 'center',
@@ -480,6 +524,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     color: COLORS.mainDark,
+    fontFamily: 'Roboto',
   },
   swipeRight: {
     backgroundColor: COLORS.red,
@@ -531,6 +576,7 @@ const styles = StyleSheet.create({
     color: COLORS.mainLight,
     marginLeft: 1,
     maxWidth: 20,
+    fontSize: 15,
     textAlign: 'center',
     padding: 0,
   },

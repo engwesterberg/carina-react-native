@@ -215,6 +215,17 @@ export const deleteTodo = async (todo_id) => {
   return results[0];
 };
 
+export const emptyTrash = async (user_id) => {
+  let results = await axios
+    .delete(`http://192.168.0.100:5000/api/emptytrash/${user_id}`)
+    .then((res) => res.data)
+    .catch((e) => {
+      console.error(e);
+    });
+
+  return results[0];
+};
+
 export const createList = async (user_id, listName) => {
   let results = await axios
     .post('http://192.168.0.100:5000/api/list/', {

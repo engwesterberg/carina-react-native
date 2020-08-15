@@ -1,3 +1,4 @@
+/* eslint react-native/no-inline-styles: 0 */
 import {COLORS} from '../colors.js';
 import React, {useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
@@ -30,6 +31,7 @@ const TodoList = (props) => {
           </View>
         );
       })}
+      {props.listSpecificButton}
     </View>
   );
 };
@@ -37,16 +39,39 @@ const daySeparator = (curr, prev) => {
   let current = moment(curr);
   let previous = moment(prev);
   let separatorText = (
-    <Text style={styles.separatorText}>{current.format('MMMM Do ')}</Text>
+    <Text
+      style={{
+        color: current.date() < moment().date() ? COLORS.red : 'white',
+        fontSize: 18,
+        marginTop: 10,
+        marginLeft: 10,
+      }}>
+      {current.format('MMMM Do ')}
+    </Text>
   );
   if (current.date() === previous.date()) {
     return null;
   }
   if (curr === 'No Date') {
-    return <Text style={styles.separatorText}>No Date</Text>;
+    return (
+      <Text
+        style={{
+          color: 'white',
+          fontSize: 18,
+          marginLeft: 10,
+          marginTop: 10,
+        }}>
+        No Date
+      </Text>
+    );
   } else if (!prev) {
     separatorText = (
-      <Text style={styles.firstSeparatorText}>
+      <Text
+        style={{
+          color: current.date() < moment().date() ? COLORS.red : 'white',
+          fontSize: 18,
+          marginLeft: 10,
+        }}>
         {current.format('MMMM Do ')}
       </Text>
     );
@@ -57,7 +82,6 @@ const daySeparator = (curr, prev) => {
 const styles = StyleSheet.create({
   todoListContainer: {},
   firstSeparatorText: {color: 'white', fontSize: 18, marginLeft: 10},
-  separatorText: {color: 'white', fontSize: 18, marginTop: 10, marginLeft: 10},
 });
 
 export default TodoList;

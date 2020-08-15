@@ -7,6 +7,7 @@ import {Button} from 'react-native-elements';
 import DialogInput from 'react-native-dialog-input';
 import Modal from 'react-native-modal';
 import {TextInput as PaperTextInput, Chip} from 'react-native-paper';
+import {ConfirmDialog} from 'react-native-simple-dialogs';
 
 import {
   createList,
@@ -14,6 +15,7 @@ import {
   shareList,
   getSharedWith,
   stopSharingList,
+  deleteList,
 } from '../functions';
 
 const Header = (props) => {
@@ -24,6 +26,7 @@ const Header = (props) => {
   const [newListName, setNewListName] = useState(null);
   const [shareWith, setShareWith] = useState('');
   const [sharedWithUsers, setSharedWithUsers] = useState([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const setMenuRef = (ref) => {
     setMenu(ref);
@@ -76,20 +79,59 @@ const Header = (props) => {
         }}>
         <View style={styles.modalView}>
           <View style={styles.modalHeader}>
-            <TextInput
-              style={styles.listTitle}
-              defaultValue={props.selectedList.title}
-              onChangeText={(text) => {
-                if (text) {
-                  setNewListName(text);
-                }
-              }}
-              onEndEditing={() => {
-                updateList(props.selectedList.id, newListName).then(() => {
-                  props.listUpdater();
-                });
-              }}
-            />
+            <View style={{flex: 1}}>
+              <TextInput
+                style={styles.listTitle}
+                defaultValue={props.selectedList.title}
+                onChangeText={(text) => {
+                  if (text) {
+                    setNewListName(text);
+                  }
+                }}
+                onEndEditing={() => {
+                  updateList(props.selectedList.id, newListName).then(() => {
+                    props.listUpdater();
+                  });
+                }}
+              />
+            </View>
+            <View>
+              <Button
+                icon={<Icon name="trash" size={30} color={COLORS.mainLight} />}
+                buttonStyle={{
+                  height: 35,
+                  backgroundColor: 'white',
+                  alignSelf: 'flex-start',
+                }}
+                onPress={() => {
+                  setShowDeleteDialog(true);
+                }}
+              />
+              <ConfirmDialog
+                title="Confirm Dialog"
+                message={'Are you sure you want to delete this list?'}
+                visible={showDeleteDialog}
+                onTouchOutside={() => {
+                  setShowDeleteDialog(false);
+                }}
+                positiveButton={{
+                  title: 'YES',
+                  onPress: () => {
+                    setShowDeleteDialog(false);
+                    deleteList(props.selectedList.id).then(() => {
+                      setModalVisible(false);
+                      props.listUpdater();
+                    });
+                  },
+                }}
+                negativeButton={{
+                  title: 'NO',
+                  onPress: () => {
+                    setShowDeleteDialog(false);
+                  },
+                }}
+              />
+            </View>
           </View>
           <Text style={styles.guide}>
             Share <Text style={styles.bold}>{props.selectedList.title} </Text>
@@ -289,7 +331,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flex: 1,
   },
-  modalHeader: {borderBottomColor: COLORS.mainLight, borderBottomWidth: 1},
+  modalHeader: {
+    borderBottomColor: COLORS.mainLight,
+    borderBottomWidth: 1,
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
   listTitle: {
     marginLeft: 5,
     marginRight: 25,

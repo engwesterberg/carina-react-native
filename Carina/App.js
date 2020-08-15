@@ -1,20 +1,14 @@
 import {COLORS} from './colors.js';
 import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  FlatList,
-} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, SafeAreaView} from 'react-native';
 import Header from './components/Header';
 import LoginScreen from './components/LoginScreen';
 import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
 import PomodoroBar from './components/PomodoroBar';
+import Icon from 'react-native-vector-icons/dist/Ionicons';
 
-import {getTodos, getLists} from './functions';
+import {getTodos, getLists, emptyTrash} from './functions';
 
 const NOT_DONE = 0;
 const DONE = 1;
@@ -81,6 +75,7 @@ const App = () => {
   const listUpdater = () => {
     getLists(userId).then((res) => {
       setLists(res);
+      todoListUpdater();
     });
   };
 
@@ -155,6 +150,21 @@ const App = () => {
                   todoListUpdater={todoListUpdater}
                   removeFromList={removeFromList}
                   listId={selectedList ? selectedList.id : null}
+                  listSpecificButton={
+                    <View style={styles.listSpecificButton}>
+                      <Icon
+                        name="trash"
+                        size={75}
+                        color="white"
+                        onPress={() => {
+                          emptyTrash(userId).then(() => {
+                            todoListUpdater();
+                          });
+                        }}
+                      />
+                      <Text style={styles.specificButtonText}>Empty Trash</Text>
+                    </View>
+                  }
                 />
               )}
             </ScrollView>
@@ -183,6 +193,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     alignSelf: 'center',
     padding: 10,
+  },
+  listSpecificButton: {
+    alignSelf: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  specificButtonText: {
+    color: 'white',
   },
 });
 

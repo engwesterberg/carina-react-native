@@ -251,7 +251,7 @@ const Header = (props) => {
             <Button
               icon={
                 <Icon
-                  name="expand"
+                  name="settings"
                   size={18}
                   color="white"
                   onPress={() => {
@@ -276,7 +276,7 @@ const Header = (props) => {
               <Button
                 icon={
                   <Icon
-                    name="settings"
+                    name="person-circle-sharp"
                     size={25}
                     color="white"
                     onPress={showSettingsMenu}

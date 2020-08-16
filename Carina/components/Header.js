@@ -304,7 +304,6 @@ const styles = StyleSheet.create({
     height: 50,
     backgroundColor: COLORS.mainLight,
     flexDirection: 'row',
-    marginBottom: 10,
     alignItems: 'center',
   },
   menu: {

@@ -8,6 +8,7 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import Swipeable from 'react-native-swipeable-row';
+import Icon from 'react-native-vector-icons/dist/Ionicons';
 import {addTodo} from '../functions.js';
 
 const leftContent = <Text />;
@@ -25,35 +26,36 @@ const CarinaBar = (props) => {
 
   return (
     <View style={styles.container}>
-      <View elevavation={1} style={styles.boxShadow}>
-        <TextInput
-          value={query}
-          style={styles.bar}
-          placeholder="Add task to Carina"
-          placeholderTextColor={COLORS.mainLight}
-          onSubmitEditing={(text) => {
-            addTodo(
-              props.userId,
-              planningMode ? query + planningAttributes : query,
-              props.listId,
-            ).then(() => {
-              props.todoListUpdater();
-            });
-            setQuery('');
-          }}
-          onChangeText={(text) => {
-            setQuery(text);
-          }}
-        />
-      </View>
+      <TextInput
+        value={query}
+        style={styles.bar}
+        placeholder="Add task to Carina"
+        placeholderTextColor={COLORS.mainLight}
+        onSubmitEditing={(text) => {
+          addTodo(
+            props.userId,
+            planningMode ? query + planningAttributes : query,
+            props.listId,
+          ).then(() => {
+            props.todoListUpdater();
+          });
+          setQuery('');
+        }}
+        onChangeText={(text) => {
+          setQuery(text);
+        }}
+      />
       {!planningMode && (
-        <Text
-          style={styles.text}
-          onPress={() => {
-            setPlanningMode(true);
-          }}>
-          Planning Mode
-        </Text>
+        <View style={styles.planningModContainer}>
+          <Icon name="calendar-outline" size={15} color={COLORS.mainDark} />
+          <Text
+            style={styles.planningModeText}
+            onPress={() => {
+              setPlanningMode(true);
+            }}>
+            Planning Mode
+          </Text>
+        </View>
       )}
       {planningMode && (
         <View>
@@ -82,33 +84,62 @@ const CarinaBar = (props) => {
 };
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    backgroundColor: COLORS.mainDark,
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
   bar: {
     alignSelf: 'center',
     color: COLORS.mainDark,
-    width: '100%',
-    borderRadius: 5,
+    width: '95%',
+    borderRadius: 10,
     fontSize: 30,
-    borderWidth: 0.2,
-    borderColor: COLORS.mainDark,
+    borderColor: COLORS.mainLight,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 9,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 12.35,
+
+    elevation: 19,
+  },
+  planningModContainer: {
+    marginTop: 10,
+    marginLeft: 15,
+    borderRadius: 3,
+    width: 130,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
     backgroundColor: 'white',
   },
+  planningModeText: {color: COLORS.mainDark, marginLeft: 3},
   planningModeBar: {
     marginTop: 10,
     alignSelf: 'center',
     width: '95%',
     borderRadius: 5,
-    marginBottom: 20,
     fontSize: 16,
     height: 40,
     textAlignVertical: 'center',
     backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 9,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 12.35,
+
+    elevation: 19,
   },
   text: {
-    color: COLORS.mainDark,
-    marginTop: 5,
-    marginBottom: 20,
-    marginLeft: 20,
+    color: 'black',
+    backgroundColor: 'white',
   },
   boxShadow: {
     shadowColor: COLORS.mainDark,

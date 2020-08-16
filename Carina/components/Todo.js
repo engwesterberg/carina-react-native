@@ -26,6 +26,8 @@ import Modal from 'react-native-modal';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import {TextInput as PaperTextInput} from 'react-native-paper';
 import {Picker} from 'react-native';
 
@@ -415,7 +417,11 @@ const Todo = (props) => {
           </TouchableOpacity>
           <View style={styles.noteContainer}>
             {props.todo.note && (
-              <Icon name="file-o" size={25} color={COLORS.mainLight} />
+              <MaterialCommunityIconsI
+                name="tooltip-text"
+                size={25}
+                color={COLORS.mainDark}
+              />
             )}
           </View>
         </View>
@@ -465,8 +471,7 @@ const dateLabel = (todo) => {
     <View style={styles.todoLabelContainer}>
       <Text
         style={{
-          backgroundColor: color,
-          color: color === COLORS.yellow ? 'black' : 'white',
+          color: color,
           alignSelf: 'flex-start',
           borderRadius: 3,
           fontSize: 12,
@@ -498,6 +503,8 @@ const styles = StyleSheet.create({
     width: '98%',
     alignItems: 'center',
     alignSelf: 'center',
+    paddingBottom: 5,
+    paddingTop: 5,
   },
   radioButtonContainer: {
     justifyContent: 'center',

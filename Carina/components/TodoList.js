@@ -4,6 +4,7 @@ import React, {useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Todo from './Todo';
 import moment from 'moment';
+import Hr from 'react-native-hr-component';
 
 const TodoList = (props) => {
   return (
@@ -27,6 +28,7 @@ const TodoList = (props) => {
               todoListUpdater={props.todoListUpdater}
               removeFromList={props.removeFromList}
               updatePomoActive={props.updatePomoActive || null}
+              showBorder={index !== props.todos.length}
             />
           </View>
         );
@@ -43,7 +45,8 @@ const daySeparator = (curr, prev) => {
       <Text
         style={[
           {
-            color: current.date() < moment().date() ? COLORS.red : 'white',
+            color:
+              current.date() < moment().date() ? COLORS.red : COLORS.mainDark,
           },
           styles.daySeparatorText,
         ]}>
@@ -60,7 +63,7 @@ const daySeparator = (curr, prev) => {
         <Text
           style={[
             {
-              color: 'white',
+              color: COLORS.mainDark,
             },
             styles.daySeparatorText,
           ]}>
@@ -74,7 +77,8 @@ const daySeparator = (curr, prev) => {
         <Text
           style={[
             {
-              color: current.date() < moment().date() ? COLORS.red : 'white',
+              color:
+                current.date() < moment().date() ? COLORS.red : COLORS.mainDark,
             },
             styles.daySeparatorText,
           ]}>
@@ -90,17 +94,16 @@ const styles = StyleSheet.create({
   todoListContainer: {},
   firstSeparatorText: {color: 'white', fontSize: 18, marginLeft: 10},
   daySeparatorContainer: {
-    backgroundColor: COLORS.mainLight,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 5,
-    borderWidth: 0.2,
-    borderColor: COLORS.mainDark,
+    marginTop: 10,
   },
   daySeparatorText: {
-    fontSize: 12,
+    fontSize: 20,
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
     padding: 1,
+    marginLeft: 15,
   },
 });
 

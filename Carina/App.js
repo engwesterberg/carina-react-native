@@ -154,8 +154,8 @@ const App = () => {
                     <View style={styles.listSpecificButton}>
                       <Icon
                         name="trash"
-                        size={75}
-                        color="white"
+                        size={50}
+                        color={COLORS.mainLight}
                         onPress={() => {
                           emptyTrash(userId).then(() => {
                             todoListUpdater();
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   container: {flexGrow: 1, backgroundColor: 'white'},
   showDoneText: {
-    color: 'white',
+    color: COLORS.mainDark,
     fontSize: 18,
     alignSelf: 'center',
     padding: 10,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   specificButtonText: {
-    color: 'white',
+    color: COLORS.mainLight,
   },
 });
 

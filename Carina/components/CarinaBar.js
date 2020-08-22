@@ -21,6 +21,7 @@ const rightButtons = [
 
 const CarinaBar = (props) => {
   const [planningMode, setPlanningMode] = useState(false);
+  const [planningModeButton, setPlanningModeButton] = useState(false);
   const [query, setQuery] = useState('');
   const [planningAttributes, setPlanningAttributes] = useState('');
 
@@ -30,6 +31,17 @@ const CarinaBar = (props) => {
         value={query}
         style={styles.bar}
         placeholder="Add task to Carina"
+        onFocus={() => {
+          if (!planningMode) {
+          setPlanningModeButton(true);
+          }
+        }}
+        onBlur={() => {
+          if (planningModeButton) {
+            setPlanningMode(false);
+          }
+          setPlanningModeButton(false);
+        }}
         placeholderTextColor={COLORS.mainLight}
         onSubmitEditing={(text) => {
           addTodo(
@@ -45,13 +57,14 @@ const CarinaBar = (props) => {
           setQuery(text);
         }}
       />
-      {!planningMode && (
+      {planningModeButton && (
         <View style={styles.planningModContainer}>
           <Icon name="calendar-outline" size={15} color={COLORS.mainDark} />
           <Text
             style={styles.planningModeText}
             onPress={() => {
               setPlanningMode(true);
+              setPlanningModeButton(false);
             }}>
             Planning Mode
           </Text>
@@ -64,9 +77,11 @@ const CarinaBar = (props) => {
             rightButtons={rightButtons}
             onLeftActionRelease={() => {
               setPlanningMode(false);
+              setPlanningModeButton(true);
             }}
             onRightActionRelease={() => {
               setPlanningMode(false);
+              setPlanningModeButton(true);
             }}>
             <TextInput
               style={styles.planningModeBar}
@@ -85,27 +100,18 @@ const CarinaBar = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.mainDark,
-    paddingTop: 20,
-    paddingBottom: 20,
+    backgroundColor: 'white',
   },
   bar: {
     alignSelf: 'center',
     color: COLORS.mainDark,
-    width: '95%',
-    borderRadius: 10,
+    backgroundColor: COLORS.mainSuperLight,
+    width: '100%',
+    paddingLeft: 10,
+    borderBottomWidth: 0.2,
+    borderBottomColor: COLORS.mainLight,
     fontSize: 30,
     borderColor: COLORS.mainLight,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 9,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 12.35,
-
-    elevation: 19,
   },
   planningModContainer: {
     marginTop: 10,
@@ -116,26 +122,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     backgroundColor: 'white',
-  },
-  planningModeText: {color: COLORS.mainDark, marginLeft: 3},
-  planningModeBar: {
-    marginTop: 10,
-    alignSelf: 'center',
-    width: '95%',
-    borderRadius: 5,
-    fontSize: 16,
-    height: 40,
-    textAlignVertical: 'center',
-    backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 9,
+      height: 1,
     },
-    shadowOpacity: 0.5,
-    shadowRadius: 12.35,
+    shadowOpacity: 0.58,
+    shadowRadius: 16.0,
 
-    elevation: 19,
+    elevation: 3,
+  },
+  planningModeText: {color: COLORS.mainDark, marginLeft: 3},
+  planningModeBar: {
+    alignSelf: 'center',
+    color: COLORS.mainDark,
+    backgroundColor: COLORS.mainSuperLight,
+    width: '100%',
+    paddingLeft: 10,
+    borderBottomWidth: 0.2,
+    borderBottomColor: COLORS.mainLight,
+    fontSize: 16,
+    borderColor: COLORS.mainLight,
   },
   text: {
     color: 'black',

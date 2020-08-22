@@ -45,8 +45,7 @@ const daySeparator = (curr, prev) => {
       <Text
         style={[
           {
-            color:
-              current.date() < moment().date() ? COLORS.red : COLORS.mainDark,
+            color: current.date() < moment().date() ? COLORS.red : 'black',
           },
           styles.daySeparatorText,
         ]}>
@@ -63,7 +62,7 @@ const daySeparator = (curr, prev) => {
         <Text
           style={[
             {
-              color: COLORS.mainDark,
+              color: 'black',
             },
             styles.daySeparatorText,
           ]}>
@@ -78,7 +77,7 @@ const daySeparator = (curr, prev) => {
           style={[
             {
               color:
-                current.date() < moment().date() ? COLORS.red : COLORS.mainDark,
+                current.date() < moment().date() ? COLORS.red : 'black',
             },
             styles.daySeparatorText,
           ]}>
@@ -100,8 +99,8 @@ const styles = StyleSheet.create({
   },
   daySeparatorText: {
     fontSize: 20,
-    fontWeight: 'bold',
     padding: 1,
+    fontFamily: 'Helvetica-Bold',
     marginLeft: 15,
   },
 });

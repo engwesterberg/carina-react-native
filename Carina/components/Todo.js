@@ -240,6 +240,7 @@ const Todo = (props) => {
               setNewSubTask(text);
             }}
             onBlur={() => {
+              if (newSubTask !== ''){  
               addSubTask(props.todo.id, newSubTask).then(() => {
                 getSubTasks(props.todo.id).then((res) => {
                   setSubTasks(res);
@@ -247,7 +248,7 @@ const Todo = (props) => {
               });
               console.warn(props.todo.id, newSubTask);
               setNewSubTask('');
-            }}
+            }}}
           />
           {subTasks.length > 0 && (
             <View
@@ -473,9 +474,8 @@ const dateLabel = (todo) => {
         style={{
           color: color,
           alignSelf: 'flex-start',
-          borderRadius: 3,
           fontSize: 12,
-          padding: 1,
+          fontFamily: 'Helvetica-Bold',
         }}>
         {days}
       </Text>
@@ -515,8 +515,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexGrow: 1,
   },
-  row1: {flex: 7, justifyContent: 'flex-end'},
-  row2: {flex: 3, justifyContent: 'center'},
+  row1: {flex: 10, justifyContent: 'flex-end'},
+  row2: {flex: 2, justifyContent: 'center'},
   noteContainer: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -527,9 +527,9 @@ const styles = StyleSheet.create({
     height: 30,
   },
   text: {
-    fontSize: 30,
-    color: COLORS.mainDark,
-    fontFamily: '3Dumb',
+    fontSize: 18,
+    color: 'black',
+    fontFamily: 'Helvetica',
   },
   swipeRight: {
     backgroundColor: COLORS.red,
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
   todoTitle: {
     marginLeft: 5,
     marginRight: 25,
-    fontSize: 18,
+    fontSize: 30,
     textAlignVertical: 'center',
     color: COLORS.mainLight,
   },

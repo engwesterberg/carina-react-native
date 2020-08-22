@@ -7,6 +7,7 @@ import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
 import PomodoroBar from './components/PomodoroBar';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
+import moment from 'moment';
 
 import {getTodos, getLists, emptyTrash} from './functions';
 
@@ -30,6 +31,7 @@ const App = () => {
   useEffect(() => {
     setDevelopmentUserState();
   }, []);
+
 
   const signOut = () => {
     setLoggedIn(false);

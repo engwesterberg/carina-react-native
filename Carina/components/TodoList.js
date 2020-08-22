@@ -101,7 +101,6 @@ const styles = StyleSheet.create({
   daySeparatorText: {
     fontSize: 20,
     fontWeight: 'bold',
-    textDecorationLine: 'underline',
     padding: 1,
     marginLeft: 15,
   },

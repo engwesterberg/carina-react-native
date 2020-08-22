@@ -1,7 +1,7 @@
 /* eslint react-native/no-inline-styles: 0 */
 import moment from 'moment';
 import {COLORS} from '../colors.js';
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -527,9 +527,9 @@ const styles = StyleSheet.create({
     height: 30,
   },
   text: {
-    fontSize: 18,
+    fontSize: 30,
     color: COLORS.mainDark,
-    fontFamily: 'Roboto',
+    fontFamily: '3Dumb',
   },
   swipeRight: {
     backgroundColor: COLORS.red,
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
   todoTitle: {
     marginLeft: 5,
     marginRight: 25,
-    fontSize: 30,
+    fontSize: 18,
     textAlignVertical: 'center',
     color: COLORS.mainLight,
   },

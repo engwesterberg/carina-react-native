@@ -52,6 +52,14 @@ const Todo = (props) => {
   const [newSubTask, setNewSubTask] = useState('');
   const [pickerValue, setPickerValue] = useState(0);
 
+  const datePickerHandler = () => {
+    setShowDatePicker(true);
+  };
+
+  const timePickerHandler = () => {
+    setShowTimePicker(true);
+  };
+
   const onModalClose = () => {
     props.todoListUpdater();
   };
@@ -87,28 +95,27 @@ const Todo = (props) => {
           setModalVisible(false);
         }}>
         <View style={styles.modalView}>
-          <View style={styles.modalHeader}>
-            <TextInput
-              style={styles.todoTitle}
-              defaultValue={newTitle || props.todo.title}
-              onChangeText={(text) => {
-                if (text) {
-                  setNewTitle(text);
-                }
-              }}
-              onEndEditing={() => {
-                syncTodoToDatabase(newDate || props.todo.due_date);
-              }}
-            />
+          <View>
+            <View style={styles.modalHeader}>
+              <TextInput
+                style={styles.todoTitle}
+                defaultValue={newTitle || props.todo.title}
+                onChangeText={(text) => {
+                  if (text) {
+                    setNewTitle(text);
+                  }
+                }}
+                onEndEditing={() => {
+                  syncTodoToDatabase(newDate || props.todo.due_date);
+                }}
+              />
+            </View>
             <View style={styles.expandedTools}>
               <View style={styles.pomoContainer}>
-                <Button
-                  icon={<Icon name="play" size={15} color="white" />}
-                  buttonStyle={{
-                    backgroundColor: COLORS.mainLight,
-                    height: 20,
-                    marginLeft: 5,
-                  }}
+                <Icon
+                  name="play"
+                  size={15}
+                  color={COLORS.mainDark}
                   onPress={() => {
                     props.updatePomoActive(props.todo);
                     setModalVisible(false);
@@ -132,84 +139,84 @@ const Todo = (props) => {
                   }}
                 />
               </View>
-              <Button
-                onPress={() => {
-                  setShowDatePicker(true);
-                }}
-                icon={
+              <View style={styles.datetimeView}>
+                {!props.todo.due_date && (
                   <Icon
                     name="calendar"
                     size={TOOLBAR_ICON_SIZE}
-                    color={COLORS.mainLight}
+                    color={COLORS.mainDark}
+                    style={styles.button}
+                    onPress={() => {
+                      setShowDatePicker(true);
+                    }}
                   />
-                }
-                buttonStyle={styles.button}
-              />
-              <DateTimePickerModal
-                isVisible={showDatePicker}
-                mode="date"
-                onConfirm={(date) => {
-                  setShowDatePicker(false);
-                  let yy = moment(date).year();
-                  let mm = moment(date).month();
-                  let dd = moment(date).date();
-                  let deadline;
-                  if (props.todo.due_date === null) {
-                    deadline = moment([yy, mm, dd, hour || 18, minute || 0]);
-                  } else if (props.todo.due_date || newDate) {
-                    deadline = moment(props.todo.due_date || newDate).set({
-                      year: yy,
-                      month: mm,
-                      date: dd,
-                    });
-                  }
-                  setNewDate(deadline);
-                  syncTodoToDatabase(deadline);
-                }}
-                onCancel={() => {
-                  setShowDatePicker(false);
-                }}
-              />
-              <Button
-                onPress={() => {
-                  setShowTimePicker(true);
-                }}
-                buttonStyle={styles.button}
-                icon={
+                )}
+                <DateTimePickerModal
+                  isVisible={showDatePicker}
+                  mode="date"
+                  onConfirm={(date) => {
+                    setShowDatePicker(false);
+                    let yy = moment(date).year();
+                    let mm = moment(date).month();
+                    let dd = moment(date).date();
+                    let deadline;
+                    if (props.todo.due_date === null) {
+                      deadline = moment([yy, mm, dd, hour || 18, minute || 0]);
+                    } else if (props.todo.due_date || newDate) {
+                      deadline = moment(props.todo.due_date || newDate).set({
+                        year: yy,
+                        month: mm,
+                        date: dd,
+                      });
+                    }
+                    setNewDate(deadline);
+                    syncTodoToDatabase(deadline);
+                  }}
+                  onCancel={() => {
+                    setShowDatePicker(false);
+                  }}
+                />
+                {props.todo.due_date &&
+                  dateOnly(props.todo, datePickerHandler, timePickerHandler)}
+                {!props.todo.has_time && (
                   <Icon
                     name="clock-o"
                     size={TOOLBAR_ICON_SIZE}
-                    color={COLORS.mainLight}
+                    color={COLORS.mainDark}
+                    style={styles.button}
+                    onPress={() => {
+                      setShowTimePicker(true);
+                    }}
                   />
-                }
-              />
-              <DateTimePickerModal
-                isVisible={showTimePicker}
-                mode="time"
-                onConfirm={(date) => {
-                  setShowTimePicker(false);
-                  let deadline;
-                  if (props.todo.due_date || newDate) {
-                    let h = moment(date).hour();
-                    let m = moment(date).minute();
-                    deadline = moment(props.todo.due_date || newDate)
-                      .set('hour', h)
-                      .set('minute', m);
-                    setNewDate(deadline);
-                    syncTodoToDatabase(deadline, true);
-                    setHasTime(true);
-                  }
-                }}
-                onCancel={() => {
-                  setShowTimePicker(false);
-                }}
-              />
+                )}
+                <DateTimePickerModal
+                  isVisible={showTimePicker}
+                  mode="time"
+                  onConfirm={(date) => {
+                    setShowTimePicker(false);
+                    let deadline;
+                    if (props.todo.due_date || newDate) {
+                      let h = moment(date).hour();
+                      let m = moment(date).minute();
+                      deadline = moment(props.todo.due_date || newDate)
+                        .set('hour', h)
+                        .set('minute', m);
+                      setNewDate(deadline);
+                      syncTodoToDatabase(deadline, true);
+                      setHasTime(true);
+                    }
+                  }}
+                  onCancel={() => {
+                    setShowTimePicker(false);
+                  }}
+                />
+              </View>
               {(props.todo.due_date || newDate) && (
                 <Picker
                   selectedValue={
                     props.todo.recurring ? props.todo.recurring : pickerValue
                   }
-                  style={{flex: 1, color: COLORS.mainDark}}
+                  style={styles.repeatPicker}
                   onValueChange={(itemValue, itemIndex) => {
                     setPickerValue(itemValue);
                     let updated = props.todo;
@@ -240,15 +247,16 @@ const Todo = (props) => {
               setNewSubTask(text);
             }}
             onBlur={() => {
-              if (newSubTask !== ''){  
-              addSubTask(props.todo.id, newSubTask).then(() => {
-                getSubTasks(props.todo.id).then((res) => {
-                  setSubTasks(res);
+              if (newSubTask !== '') {
+                addSubTask(props.todo.id, newSubTask).then(() => {
+                  getSubTasks(props.todo.id).then((res) => {
+                    setSubTasks(res);
+                  });
                 });
-              });
-              console.warn(props.todo.id, newSubTask);
-              setNewSubTask('');
-            }}}
+                console.warn(props.todo.id, newSubTask);
+                setNewSubTask('');
+              }
+            }}
           />
           {subTasks.length > 0 && (
             <View
@@ -263,7 +271,7 @@ const Todo = (props) => {
                     <View style={styles.subTaskContainer}>
                       <RadioButton
                         status={item.state === 0 ? 'unchecked' : 'checked'}
-                        color={COLORS.mainDark}
+                        color={COLORS.mainLight}
                         onPress={() => {
                           editSubTask(
                             item.id,
@@ -495,11 +503,57 @@ const dateLabel = (todo) => {
     </View>
   );
 };
+const dateOnly = (todo, datePickerHandler, timePickerHandler) => {
+  let date = moment(todo.due_date).format('MMM Do');
+  let time;
+  if (todo.has_time) {
+    time = moment(todo.due_date).hour() + ':' + moment(todo.due_date).minute();
+    if (moment(todo.due_date).minute() === 0) {
+      time = time + '0';
+    }
+  }
+
+  return (
+    <View
+      style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+      }}>
+      <Text
+        style={{
+          color: COLORS.mainDark,
+          borderRadius: 3,
+          fontSize: 16,
+          paddingRight: 1,
+          paddingLeft: 1,
+          fontFamily: 'Helvetica',
+        }}
+        onPress={datePickerHandler}>
+        {date}
+      </Text>
+      {time && (
+        <Text
+          style={{
+            color: COLORS.mainDark,
+            borderRadius: 3,
+            fontSize: 16,
+            paddingRight: 1,
+            paddingLeft: 1,
+            fontFamily: 'Helvetica-Bold',
+          }}
+          onPress={timePickerHandler}>
+          {time}
+        </Text>
+      )}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   todoContainer: {
     flexDirection: 'row',
-    height: 55,
+    height: 50,
     width: '98%',
     alignItems: 'center',
     alignSelf: 'center',
@@ -553,32 +607,41 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flex: 1,
   },
-  modalHeader: {},
+  modalHeader: {flexDirection: 'row'},
+
   expandedTools: {
-    height: 40,
-    backgroundColor: 'white',
+    height: 30,
+    paddingLeft: 5,
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: COLORS.mainLight,
   },
   todoTitle: {
     marginLeft: 5,
+    flex: 1,
     marginRight: 25,
+    padding: 0,
     fontSize: 30,
     textAlignVertical: 'center',
     color: COLORS.mainLight,
+    fontFamily: 'Helvetica',
+  },
+  repeatPicker: {
+    width: 150,
+    color: COLORS.mainDark,
   },
   button: {
-    backgroundColor: 'white',
+    marginLeft: 5,
+    alignSelf: 'center',
   },
   pomoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   pomoTools: {
-    color: COLORS.mainLight,
+    color: COLORS.mainDark,
     marginLeft: 1,
     maxWidth: 20,
     fontSize: 15,
@@ -586,7 +649,7 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   pomoSeparator: {
-    color: COLORS.mainLight,
+    color: COLORS.mainDark,
     marginLeft: 1,
     maxWidth: 5,
     textAlign: 'center',
@@ -602,6 +665,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
   },
+  datetimeView: {
+    flexDirection: 'row', 
+  }
 });
 
 export default Todo;

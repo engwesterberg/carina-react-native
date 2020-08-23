@@ -31,7 +31,6 @@ const PomodoroBar = (props) => {
             setPause(!pause);
             incPomo(props.userId, props.todo.id);
           }}
-          onPress={() => alert('hello')}
           size={20}
           timeToShow={['M', 'S']}
           digitStyle={{backgroundColor: '#FFF'}}

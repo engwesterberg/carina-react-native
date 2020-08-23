@@ -1,5 +1,3 @@
-/* eslint react-native/no-inline-styles: 0 */
-import moment from 'moment';
 import {COLORS} from '../colors.js';
 import React, {useState} from 'react';
 import {
@@ -24,14 +22,15 @@ import {
 import Swipeable from 'react-native-swipeable-row';
 import Modal from 'react-native-modal';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import {Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {TextInput as PaperTextInput} from 'react-native-paper';
 import {Picker} from 'react-native';
+import moment from 'moment';
 
 const TOOLBAR_ICON_SIZE = 20;
+const MODAL_LEFT_MARGIN = 5;
 
 const Todo = (props) => {
   //gui
@@ -51,14 +50,6 @@ const Todo = (props) => {
   const [subTasks, setSubTasks] = useState([]);
   const [newSubTask, setNewSubTask] = useState('');
   const [pickerValue, setPickerValue] = useState(0);
-
-  const datePickerHandler = () => {
-    setShowDatePicker(true);
-  };
-
-  const timePickerHandler = () => {
-    setShowTimePicker(true);
-  };
 
   const onModalClose = () => {
     props.todoListUpdater();
@@ -110,11 +101,15 @@ const Todo = (props) => {
                 }}
               />
             </View>
+            <View style={styles.dateRowView}>
+              {props.todo.due_date && dateOnly()}
+            </View>
             <View style={styles.expandedTools}>
               <View style={styles.pomoContainer}>
                 <Icon
                   name="play"
                   size={15}
+                  style={styles.button}
                   color={COLORS.mainDark}
                   onPress={() => {
                     props.updatePomoActive(props.todo);
@@ -140,17 +135,15 @@ const Todo = (props) => {
                 />
               </View>
               <View style={styles.datetimeView}>
-                {!props.todo.due_date && (
-                  <Icon
-                    name="calendar"
-                    size={TOOLBAR_ICON_SIZE}
-                    color={COLORS.mainDark}
-                    style={styles.button}
-                    onPress={() => {
-                      setShowDatePicker(true);
-                    }}
-                  />
-                )}
+                <Icon
+                  name="calendar"
+                  size={TOOLBAR_ICON_SIZE}
+                  color={COLORS.mainDark}
+                  style={styles.button}
+                  onPress={() => {
+                    setShowDatePicker(true);
+                  }}
+                />
                 <DateTimePickerModal
                   isVisible={showDatePicker}
                   mode="date"
@@ -176,19 +169,16 @@ const Todo = (props) => {
                     setShowDatePicker(false);
                   }}
                 />
-                {props.todo.due_date &&
-                  dateOnly(props.todo, datePickerHandler, timePickerHandler)}
-                {!props.todo.has_time && (
-                  <Icon
-                    name="clock-o"
-                    size={TOOLBAR_ICON_SIZE}
-                    color={COLORS.mainDark}
-                    style={styles.button}
-                    onPress={() => {
-                      setShowTimePicker(true);
-                    }}
-                  />
-                )}
+                <Icon
+                  name="clock-o"
+                  size={TOOLBAR_ICON_SIZE}
+                  color={COLORS.mainDark}
+                  backgroundColor="red"
+                  style={styles.button}
+                  onPress={() => {
+                    setShowTimePicker(true);
+                  }}
+                />
                 <DateTimePickerModal
                   isVisible={showTimePicker}
                   mode="time"
@@ -210,31 +200,31 @@ const Todo = (props) => {
                     setShowTimePicker(false);
                   }}
                 />
+                {(props.todo.due_date || newDate) && (
+                  <Picker
+                    selectedValue={
+                      props.todo.recurring ? props.todo.recurring : pickerValue
+                    }
+                    style={styles.repeatPicker}
+                    onValueChange={(itemValue, itemIndex) => {
+                      setPickerValue(itemValue);
+                      let updated = props.todo;
+                      updated.recurring = itemValue;
+                      updateTodo(updated).then((res) => {});
+                    }}>
+                    <Picker.Item label="No Repetition" value={0} />
+                    <Picker.Item label="Every Day" value={1} />
+                    <Picker.Item label="Every second day" value={2} />
+                    <Picker.Item label="Every 3rd day" value={3} />
+                    <Picker.Item label="Every 4th day" value={4} />
+                    <Picker.Item label="Every 5th day" value={5} />
+                    <Picker.Item label="Every 6th day" value={6} />
+                    <Picker.Item label="Every week" value={7} />
+                    <Picker.Item label="Every month" value={30} />
+                    <Picker.Item label="Every year" value={365} />
+                  </Picker>
+                )}
               </View>
-              {(props.todo.due_date || newDate) && (
-                <Picker
-                  selectedValue={
-                    props.todo.recurring ? props.todo.recurring : pickerValue
-                  }
-                  style={styles.repeatPicker}
-                  onValueChange={(itemValue, itemIndex) => {
-                    setPickerValue(itemValue);
-                    let updated = props.todo;
-                    updated.recurring = itemValue;
-                    updateTodo(updated).then((res) => {});
-                  }}>
-                  <Picker.Item label="No Repetition" value={0} />
-                  <Picker.Item label="Every Day" value={1} />
-                  <Picker.Item label="Every second day" value={2} />
-                  <Picker.Item label="Every 3rd day" value={3} />
-                  <Picker.Item label="Every 4th day" value={4} />
-                  <Picker.Item label="Every 5th day" value={5} />
-                  <Picker.Item label="Every 6th day" value={6} />
-                  <Picker.Item label="Every week" value={7} />
-                  <Picker.Item label="Every month" value={30} />
-                  <Picker.Item label="Every year" value={365} />
-                </Picker>
-              )}
             </View>
           </View>
           <PaperTextInput
@@ -327,6 +317,52 @@ const Todo = (props) => {
           </View>
         </View>
       </Modal>
+    );
+  };
+  const dateOnly = () => {
+    let date = moment(newDate || props.todo.due_date).format('MMM Do');
+    let time;
+    if (props.todo.has_time) {
+      time =
+        moment(newDate || props.todo.due_date).hour() +
+        ':' +
+        moment(newDate || props.todo.due_date).minute();
+      if (moment(props.todo.due_date).minute() === 0) {
+        time = time + '0';
+      }
+    }
+
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          marginLeft: MODAL_LEFT_MARGIN,
+        }}>
+        <Text
+          style={{
+            color: COLORS.mainDark,
+            borderRadius: 3,
+            fontSize: 14,
+            paddingRight: 1,
+            paddingLeft: 1,
+            fontFamily: 'Helvetica',
+          }}>
+          {date}
+        </Text>
+        {time && (
+          <Text
+            style={{
+              color: COLORS.mainDark,
+              borderRadius: 3,
+              fontSize: 14,
+              paddingRight: 1,
+              paddingLeft: 1,
+              fontFamily: 'Helvetica-Bold',
+            }}>
+            {time}
+          </Text>
+        )}
+      </View>
     );
   };
 
@@ -503,52 +539,6 @@ const dateLabel = (todo) => {
     </View>
   );
 };
-const dateOnly = (todo, datePickerHandler, timePickerHandler) => {
-  let date = moment(todo.due_date).format('MMM Do');
-  let time;
-  if (todo.has_time) {
-    time = moment(todo.due_date).hour() + ':' + moment(todo.due_date).minute();
-    if (moment(todo.due_date).minute() === 0) {
-      time = time + '0';
-    }
-  }
-
-  return (
-    <View
-      style={{
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
-      }}>
-      <Text
-        style={{
-          color: COLORS.mainDark,
-          borderRadius: 3,
-          fontSize: 16,
-          paddingRight: 1,
-          paddingLeft: 1,
-          fontFamily: 'Helvetica',
-        }}
-        onPress={datePickerHandler}>
-        {date}
-      </Text>
-      {time && (
-        <Text
-          style={{
-            color: COLORS.mainDark,
-            borderRadius: 3,
-            fontSize: 16,
-            paddingRight: 1,
-            paddingLeft: 1,
-            fontFamily: 'Helvetica-Bold',
-          }}
-          onPress={timePickerHandler}>
-          {time}
-        </Text>
-      )}
-    </View>
-  );
-};
 
 const styles = StyleSheet.create({
   todoContainer: {
@@ -609,28 +599,29 @@ const styles = StyleSheet.create({
   },
   modalHeader: {flexDirection: 'row'},
 
+  dateRowView: {justifyContent: 'center'},
   expandedTools: {
     height: 30,
     paddingLeft: 5,
     alignItems: 'center',
-    justifyContent: 'space-between',
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.mainLight,
+    borderBottomWidth: 0.5,
+    borderBottomColor: COLORS.mainDark,
   },
   todoTitle: {
-    marginLeft: 5,
+    marginLeft: MODAL_LEFT_MARGIN,
     flex: 1,
     marginRight: 25,
     padding: 0,
-    fontSize: 30,
+    fontSize: 25,
     textAlignVertical: 'center',
-    color: COLORS.mainLight,
+    color: COLORS.mainDark,
     fontFamily: 'Helvetica',
   },
   repeatPicker: {
-    width: 150,
+    flex: 1,
     color: COLORS.mainDark,
+    marginLeft: MODAL_LEFT_MARGIN,
   },
   button: {
     marginLeft: 5,
@@ -666,8 +657,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   datetimeView: {
-    flexDirection: 'row', 
-  }
+    flexDirection: 'row',
+  },
 });
 
 export default Todo;

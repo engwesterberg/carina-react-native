@@ -105,7 +105,7 @@ const Todo = (props) => {
               {props.todo.due_date && dateOnly()}
             </View>
             <View style={styles.expandedTools}>
-              <View style={styles.pomoContainer}>
+              {/* <View style={styles.pomoContainer}>
                 <Icon
                   name="play"
                   size={15}
@@ -133,7 +133,7 @@ const Todo = (props) => {
                     syncTodoToDatabase(newDate || props.todo.due_date);
                   }}
                 />
-              </View>
+              </View>*/}
               <View style={styles.datetimeView}>
                 <Icon
                   name="calendar"
@@ -517,20 +517,19 @@ const dateLabel = (todo) => {
       <Text
         style={{
           color: color,
-          alignSelf: 'flex-start',
           fontSize: 12,
           fontFamily: 'Helvetica-Bold',
         }}>
         {days}
       </Text>
       {todo.pomo_estimate !== 0 ? (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginLeft: 5,
-          }}>
-          <Text style={{color: COLORS.mainDark}}>
+        <View style={{}}>
+          <Text
+            style={{
+              color: COLORS.mainDark,
+              fontFamily: 'Helvetica-Bold',
+              fontSize: 12,
+            }}>
             {' '}
             {`${todo.pomo_done}/${todo.pomo_estimate}🍅`}
           </Text>

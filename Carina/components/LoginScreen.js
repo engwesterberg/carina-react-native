@@ -87,7 +87,7 @@ const LoginScreen = (props) => {
           </View>
         ) : (
           <View style={styles.loginContainer}>
-            <Text style={styles.title}> Join </Text>
+            <Text style={styles.title}> Register </Text>
             <PaperTextInput
               mode="outlined"
               dense={true}
@@ -213,6 +213,7 @@ const styles = StyleSheet.create({
     color: 'white',
     marginLeft: 20,
     marginRight: 20,
+    fontFamily: 'Helvetica',
   },
   input: {width: '90%', marginLeft: 5, marginBottom: 10},
 });

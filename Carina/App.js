@@ -27,11 +27,14 @@ const App = () => {
   //gui state
   const [showDone, setShowDone] = useState(false);
   const [pomoActive, setPomoActive] = useState(false);
-
+  const [pomoBreak, setPomoBreak] = useState(false);
   useEffect(() => {
     setDevelopmentUserState();
   }, []);
 
+  const pomoBreakUpdater = () => {
+    setPomoBreak(!pomoBreak);
+  };
 
   const signOut = () => {
     setLoggedIn(false);
@@ -173,13 +176,15 @@ const App = () => {
           </View>
         </View>
       )}
-      {pomoActive && (
+      {/*pomoActive && (
         <PomodoroBar
           todo={pomoActive}
           updatePomoActive={updatePomoActive}
           userId={userId}
+          countdownTime={pomoBreak ? 10 : 3}
+          pomoBreakUpdater={pomoBreakUpdater}
         />
-      )}
+      )*/}
     </SafeAreaView>
   );
 };
@@ -193,6 +198,8 @@ const styles = StyleSheet.create({
     color: COLORS.mainDark,
     fontSize: 18,
     alignSelf: 'center',
+    fontFamily: 'Helvetica-Bold',
+    marginTop: 10,
     padding: 10,
   },
   listSpecificButton: {

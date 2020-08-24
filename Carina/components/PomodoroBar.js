@@ -1,16 +1,17 @@
 import {COLORS} from '../colors.js';
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import CountDown from 'react-native-countdown-component';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import moment from 'moment';
 import {Button} from 'react-native-elements';
 import {incPomo, getPomosToday} from '../functions';
+import CountDown from 'react-native-countdown-component';
+
 const POMO_TIME = 10;
 const POMO_PAUSE = 3;
 
 const PomodoroBar = (props) => {
-  const [pause, setPause] = useState(false);
+  const [pause, setPause] = useState(true);
   const [pomosToday, setPomosToday] = useState([]);
   const [pomoTime, setPomoTime] = useState(POMO_TIME);
   const [pausePressed, setPausePressed] = useState(false);
@@ -19,7 +20,21 @@ const PomodoroBar = (props) => {
     getPomosToday(props.userId).then((res) => {
       setPomosToday(res);
     });
+    logState();
   }, [props.userId]);
+
+  const logState = () => {
+    console.log(
+      'pause: ',
+      pause,
+      'pausePressed: ',
+      pausePressed,
+      'POMO_TIME',
+      POMO_TIME,
+      'POMO_PAUSE',
+      POMO_PAUSE,
+    );
+  };
 
   return (
     <View
@@ -36,7 +51,7 @@ const PomodoroBar = (props) => {
         <View style={styles.row2}>
           <View style={styles.button}>
             <Icon
-              name={!pausePressed ? 'pause' : 'play'}
+              name={!pausePressed || !pause ? 'pause' : 'play'}
               size={25}
               color={COLORS.mainDark}
               onPress={() => {
@@ -52,6 +67,7 @@ const PomodoroBar = (props) => {
               onPress={() => {
                 props.updatePomoActive(null);
                 setPause(false);
+                setPomoTime(POMO_TIME);
               }}
             />
           </View>
@@ -59,19 +75,14 @@ const PomodoroBar = (props) => {
       </View>
       <View style={styles.col2}>
         <CountDown
-          until={pomoTime}
-          onFinish={() => {
-            console.log('pause: ', pause);
-            setPomoTime(!pause ? POMO_TIME : POMO_PAUSE);
-            setPause(!pause);
-            incPomo(props.userId, props.todo.id);
-          }}
-          running={!pausePressed}
+          until={props.countdownTime}
+          onFinish={props.pomoBreakUpdater}
           onPress={() => alert('hello')}
-          size={26}
-          timeToShow={['M', 'S']}
+          size={25}
           digitStyle={{backgroundColor: '#FFF'}}
-          timeLabels={{m: null, s: null}}
+          digitTxtStyle={{color: '#1CC625'}}
+          timeToShow={['M', 'S']}
+          timeLabels={{}}
         />
       </View>
     </View>

@@ -397,40 +397,6 @@ const Todo = (props) => {
           props.removeFromList(props.todo.id);
         }}>
         <View style={styles.todoContainer} key={props.id}>
-          <View style={styles.radioButtonContainer}>
-            {props.todo.state !== 2 ? (
-              <RadioButton
-                status={props.todo.state === 0 ? 'unchecked' : 'checked'}
-                color={COLORS.mainDark}
-                onPress={() => {
-                  let updatedTodo = props.todo;
-                  updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
-                  updateTodo(updatedTodo).then(props.todoListUpdater());
-                  if (props.todo.recurring) {
-                    let copy = props.todo;
-                    copy.due_date = moment(copy.due_date).add(
-                      props.todo.recurring,
-                      'days',
-                    );
-                    copyTodo(props.todo).then(() => {
-                      updateTodo(updatedTodo).then(props.todoListUpdater());
-                    });
-                  }
-                }}
-              />
-            ) : (
-              <Icon
-                name="recycle"
-                size={30}
-                color={COLORS.mainLight}
-                onPress={() => {
-                  let updatedTodo = props.todo;
-                  updatedTodo.state = 0;
-                  updateTodo(updatedTodo).then(props.todoListUpdater());
-                }}
-              />
-            )}
-          </View>
           <TouchableOpacity
             style={{flex: 1}}
             activeOpacity={1}
@@ -442,6 +408,38 @@ const Todo = (props) => {
             }}>
             <View style={styles.todoInfoContainer}>
               <View style={styles.row1}>
+                {props.todo.state !== 2 ? (
+                  <RadioButton
+                    status={props.todo.state === 0 ? 'unchecked' : 'checked'}
+                    color={COLORS.mainDark}
+                    onPress={() => {
+                      let updatedTodo = props.todo;
+                      updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
+                      updateTodo(updatedTodo).then(props.todoListUpdater());
+                      if (props.todo.recurring) {
+                        let copy = props.todo;
+                        copy.due_date = moment(copy.due_date).add(
+                          props.todo.recurring,
+                          'days',
+                        );
+                        copyTodo(props.todo).then(() => {
+                          updateTodo(updatedTodo).then(props.todoListUpdater());
+                        });
+                      }
+                    }}
+                  />
+                ) : (
+                  <Icon
+                    name="recycle"
+                    size={30}
+                    color={COLORS.mainLight}
+                    onPress={() => {
+                      let updatedTodo = props.todo;
+                      updatedTodo.state = 0;
+                      updateTodo(updatedTodo).then(props.todoListUpdater());
+                    }}
+                  />
+                )}
                 <Text
                   style={[
                     styles.text,
@@ -542,24 +540,24 @@ const dateLabel = (todo) => {
 const styles = StyleSheet.create({
   todoContainer: {
     flexDirection: 'row',
-    height: 50,
+    marginLeft: 10,
+    height: 40,
     width: '98%',
-    alignItems: 'center',
-    alignSelf: 'center',
-    paddingBottom: 5,
-    paddingTop: 5,
-  },
-  radioButtonContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 40,
   },
   todoInfoContainer: {
     justifyContent: 'center',
     flexGrow: 1,
   },
-  row1: {flex: 10, justifyContent: 'flex-end'},
-  row2: {flex: 2, justifyContent: 'center'},
+  row1: {
+    flex: 2,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  row2: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   noteContainer: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -570,7 +568,7 @@ const styles = StyleSheet.create({
     height: 30,
   },
   text: {
-    fontSize: 18,
+    fontSize: 16,
     color: 'black',
     fontFamily: 'Helvetica',
   },
@@ -653,7 +651,7 @@ const styles = StyleSheet.create({
   },
   todoLabelContainer: {
     flexDirection: 'row',
-    position: 'absolute',
+    marginLeft: 40,
   },
   datetimeView: {
     flexDirection: 'row',

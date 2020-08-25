@@ -62,7 +62,7 @@ export const addGoogleUser = async (googleId, email, name) => {
   return results;
 };
 
-export const googleSignIn = async (google_id) => {
+export const getUserIdByGoogleId = async (google_id) => {
   let res = await axios
     .get(`http://192.168.0.100:5000/api/id/${google_id}`)
     .then((res) => res.data)

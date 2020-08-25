@@ -3,7 +3,12 @@ import React, {useState, useEffect} from 'react';
 import AppButton from './AppButton.js';
 import Header from './Header';
 import Hr from 'react-native-hr-component';
-import {signUp, signIn} from '../functions.js';
+import {
+  signUp,
+  signIn,
+  addGoogleUser,
+  getUserIdByGoogleId,
+} from '../functions.js';
 import {TextInput as PaperTextInput} from 'react-native-paper';
 
 import {
@@ -33,15 +38,11 @@ const LoginScreen = (props) => {
 
   useEffect(() => {
     GoogleSignin.configure({
-      scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
+      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
       webClientId:
-        '564449950849-1g9n892jm9q4mu9tigs18f38jbgdqgso.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access)
-      offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
-      //hostedDomain: '', // specifies a hosted domain restriction
-      //loginHint: '', // [iOS] The user's ID, or email address, to be prefilled in the authentication UI if possible. [See docs here](https://developers.google.com/identity/sign-in/ios/api/interface_g_i_d_sign_in.html#a0a68c7504c31ab0b728432565f6e33fd)
-      forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-      //accountName: '', // [Android] specifies an account name on the device that should be used
-      //iosClientId: '<FROM DEVELOPER CONSOLE>', // [iOS] optional, if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
+        '564449950849-1g9n892jm9q4mu9tigs18f38jbgdqgso.apps.googleusercontent.com',
+      offlineAccess: true,
+      forceCodeForRefreshToken: true,
     });
   }, []);
 
@@ -49,8 +50,15 @@ const LoginScreen = (props) => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      this.setState({userInfo});
+      let user = userInfo.user;
+      addGoogleUser(user.id, user.email, user.name).then(() => {
+        getUserIdByGoogleId(user.id).then((res) => {
+          console.log('SAGNIN: ', res);
+          props.parentUpdater(user.name, user.email, res);
+        });
+      });
     } catch (error) {
+      console.log({error});
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {
@@ -61,6 +69,10 @@ const LoginScreen = (props) => {
         // some other error happened
       }
     }
+  };
+
+  const hr = () => {
+    return <View style={{backgroundColor: 'white', width: '90%', height: 1}} />;
   };
 
   return (
@@ -120,11 +132,13 @@ const LoginScreen = (props) => {
                   });
               }}
             />
-             <GoogleSigninButton
-    style={{ width: 192, height: 48 }}
-    size={GoogleSigninButton.Size.Wide}
-    color={GoogleSigninButton.Color.Dark}
-               onPress={() => { console.warn("clickos") }}/>
+            {hr()}
+            <GoogleSigninButton
+              style={{width: 120, height: 48, marginBottom: 10, marginTop: 10}}
+              size={GoogleSigninButton.Size.Standard}
+              color={GoogleSigninButton.Color.Light}
+              onPress={googleSignIn}
+            />
           </View>
         ) : (
           <View style={styles.loginContainer}>

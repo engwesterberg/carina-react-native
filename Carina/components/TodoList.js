@@ -40,6 +40,10 @@ const TodoList = (props) => {
 const daySeparator = (curr, prev) => {
   let current = moment(curr);
   let previous = moment(prev);
+
+  if (current.date() === previous.date()) {
+    return null;
+  }
   let separatorText = (
     <View style={styles.daySeparatorContainer}>
       <Text
@@ -49,43 +53,10 @@ const daySeparator = (curr, prev) => {
           },
           styles.daySeparatorText,
         ]}>
-        {current.format('MMMM Do ')}
+        {curr !== 'No Date' ? current.format('MMMM Do ') : 'No Date'}
       </Text>
     </View>
   );
-  if (current.date() === previous.date()) {
-    return null;
-  }
-  if (curr === 'No Date') {
-    return (
-      <View style={styles.daySeparatorContainer}>
-        <Text
-          style={[
-            {
-              color: 'black',
-            },
-            styles.daySeparatorText,
-          ]}>
-          No Date
-        </Text>
-      </View>
-    );
-  } else if (!prev) {
-    separatorText = (
-      <View style={styles.daySeparatorContainer}>
-        <Text
-          style={[
-            {
-              color:
-                current.date() < moment().date() ? COLORS.red : 'black',
-            },
-            styles.daySeparatorText,
-          ]}>
-          {current.format('MMMM Do ')}
-        </Text>
-      </View>
-    );
-  }
   return separatorText;
 };
 

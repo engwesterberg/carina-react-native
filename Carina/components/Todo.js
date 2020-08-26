@@ -31,7 +31,7 @@ import {Picker} from 'react-native';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import moment from 'moment';
 
-const TOOLBAR_ICON_SIZE = 20;
+const TOOLBAR_ICON_SIZE = 30;
 const MODAL_LEFT_MARGIN = 5;
 
 const Todo = (props) => {
@@ -167,7 +167,7 @@ const Todo = (props) => {
                 <Icon
                   name="calendar"
                   size={TOOLBAR_ICON_SIZE}
-                  color="white"
+                  color={COLORS.mainLight}
                   style={styles.button}
                   onPress={() => {
                     setShowDatePicker(true);
@@ -201,7 +201,7 @@ const Todo = (props) => {
                 <Icon
                   name="clock-o"
                   size={TOOLBAR_ICON_SIZE}
-                  color="white"
+                  color={COLORS.mainLight}
                   backgroundColor="red"
                   style={styles.button}
                   onPress={() => {
@@ -239,7 +239,7 @@ const Todo = (props) => {
                             <Icon
                               name="repeat"
                               size={TOOLBAR_ICON_SIZE}
-                              color="white"
+                              color={COLORS.mainLight}
                               onPress={showRepeatMenu}
                             />
                           }
@@ -291,10 +291,9 @@ const Todo = (props) => {
               </View>
             </View>
           </View>
-          <PaperTextInput
-            dense={true}
+          <TextInput
             value={newSubTask}
-            style={styles.input}
+            style={styles.bar}
             placeholder="Add Subtask"
             placeholderTextColor={COLORS.mainLight}
             onChangeText={(text) => {
@@ -364,14 +363,6 @@ const Todo = (props) => {
               </ScrollView>
             </View>
           )}
-          <Text>
-            <MaterialCommunityIconsI
-              name="tooltip-text"
-              size={18}
-              color={COLORS.mainDark}
-            />
-            <Text style={{fontFamily: 'Roboto', fontSize: 18}}>Notes</Text>
-          </Text>
           <View style={{flex: 2}}>
             <TextInput
               style={styles.note}
@@ -412,9 +403,9 @@ const Todo = (props) => {
         }}>
         <Text
           style={{
-            color: 'black',
+            color: COLORS.mainDark,
             borderRadius: 3,
-            fontSize: 14,
+            fontSize: 18,
             paddingRight: 1,
             paddingLeft: 1,
             fontFamily: 'Roboto',
@@ -424,9 +415,9 @@ const Todo = (props) => {
         {time && (
           <Text
             style={{
-              color: 'black',
+              color: COLORS.mainDark,
               borderRadius: 3,
-              fontSize: 14,
+              fontSize: 18,
               paddingRight: 1,
               paddingLeft: 1,
               fontFamily: 'Roboto-Bold',
@@ -437,9 +428,9 @@ const Todo = (props) => {
         {props.todo.recurring !== 0 && (
           <Text
             style={{
-              color: 'black',
+              color: COLORS.mainDark,
               borderRadius: 3,
-              fontSize: 14,
+              fontSize: 18,
               paddingRight: 1,
               paddingLeft: 1,
               fontFamily: 'Roboto',
@@ -692,25 +683,25 @@ const styles = StyleSheet.create({
 
   dateRowView: {justifyContent: 'center'},
   expandedTools: {
-    height: 28,
+    height: 40,
+    alignSelf: 'center',
+    width: '98%',
     paddingLeft: MODAL_LEFT_MARGIN,
     marginTop: 10,
     alignItems: 'center',
     flexDirection: 'row',
-    borderBottomWidth: 0.5,
-    borderBottomColor: COLORS.mainDark,
-    borderTopWidth: 0.5,
-    borderTopColor: COLORS.mainDark,
-    backgroundColor: COLORS.mainLight,
+    borderTopWidth: 0.8,
+    borderTopColor: COLORS.mainLight,
+    backgroundColor: 'white',
   },
   todoTitle: {
     marginLeft: MODAL_LEFT_MARGIN,
     flex: 1,
     marginRight: 25,
     padding: 0,
-    fontSize: 30,
+    fontSize: 40,
     textAlignVertical: 'center',
-    color: 'black',
+    color: COLORS.mainLight,
     fontFamily: 'Roboto',
   },
   repeatPicker: {
@@ -751,6 +742,8 @@ const styles = StyleSheet.create({
   note: {
     backgroundColor: 'white',
     height: '80%',
+    fontSize: 24,
+    fontFamily: 'Roboto-Light',
     textAlignVertical: 'top',
   },
   todoLabelContainer: {
@@ -760,6 +753,20 @@ const styles = StyleSheet.create({
   },
   datetimeView: {
     flexDirection: 'row',
+  },
+  bar: {
+    alignSelf: 'center',
+    color: COLORS.mainDark,
+    marginTop: 5,
+    backgroundColor: COLORS.mainSuperLight,
+    width: '100%',
+    paddingLeft: 10,
+    borderBottomWidth: 0.2,
+    borderBottomColor: COLORS.mainLight,
+    borderTopWidth: 0.2,
+    borderTopColor: COLORS.mainLight,
+    fontSize: 16,
+    borderColor: COLORS.mainLight,
   },
 });
 

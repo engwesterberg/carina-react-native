@@ -26,12 +26,11 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {TextInput as PaperTextInput} from 'react-native-paper';
 import {Picker} from 'react-native';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import moment from 'moment';
 
-const TOOLBAR_ICON_SIZE = 30;
+const TOOLBAR_ICON_SIZE = 25;
 const MODAL_LEFT_MARGIN = 5;
 
 const Todo = (props) => {
@@ -67,6 +66,28 @@ const Todo = (props) => {
     {text: 'Every month', value: 30},
     {text: 'Every year', value: 365},
   ];
+
+  const getRepeatValueString = (value) => {
+    let string;
+    switch (value) {
+      case 0:
+        string = null;
+        break;
+      case 1:
+        string = 'Every Day';
+        break;
+      case 7:
+        string = 'Every Week';
+        break;
+      case value % 7 === 0:
+        string = `Every ${value / 7} weeks`;
+        break;
+      default:
+        string = `Every ${value} days`;
+        break;
+    }
+    return " "+ string;
+  };
 
   const setRepeatMenuRef = (ref) => {
     setRepeatMenu(ref);
@@ -294,7 +315,7 @@ const Todo = (props) => {
           <TextInput
             value={newSubTask}
             style={styles.bar}
-            placeholder="Add Subtask"
+            placeholder="+ Add Subtask"
             placeholderTextColor={COLORS.mainLight}
             onChangeText={(text) => {
               setNewSubTask(text);
@@ -435,7 +456,7 @@ const Todo = (props) => {
               paddingLeft: 1,
               fontFamily: 'Roboto',
             }}>
-            Every {props.todo.recurring} days
+            {getRepeatValueString(props.todo.recurring)}
           </Text>
         )}
       </View>
@@ -759,13 +780,14 @@ const styles = StyleSheet.create({
     color: COLORS.mainDark,
     marginTop: 5,
     backgroundColor: COLORS.mainSuperLight,
+    height: 40,
     width: '100%',
     paddingLeft: 10,
     borderBottomWidth: 0.2,
     borderBottomColor: COLORS.mainLight,
     borderTopWidth: 0.2,
     borderTopColor: COLORS.mainLight,
-    fontSize: 16,
+    fontSize: 14,
     borderColor: COLORS.mainLight,
   },
 });

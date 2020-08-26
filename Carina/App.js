@@ -8,7 +8,6 @@ import TodoList from './components/TodoList';
 import PomodoroBar from './components/PomodoroBar';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
-import { MenuProvider } from 'react-native-popup-menu';
 
 
 import {getTodos, getLists, emptyTrash} from './functions';
@@ -95,7 +94,6 @@ const App = () => {
   };
 
   return (
-    <MenuProvider>
     <SafeAreaView style={styles.safeArea}>
       {!loggedIn && <LoginScreen parentUpdater={loginUpdater} />}
       {loggedIn && (
@@ -190,7 +188,7 @@ const App = () => {
           pomoBreakUpdater={pomoBreakUpdater}
         />
       )*/}
-    </SafeAreaView></MenuProvider>
+    </SafeAreaView>
   );
 };
 

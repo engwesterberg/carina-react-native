@@ -20,6 +20,7 @@ import {
   deleteSubTask,
 } from '../functions';
 import Swipeable from 'react-native-swipeable-row';
+import {Button} from 'react-native-elements';
 import Modal from 'react-native-modal';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -27,12 +28,7 @@ import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunity
 
 import {TextInput as PaperTextInput} from 'react-native-paper';
 import {Picker} from 'react-native';
-import {
-  Menu,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
-} from 'react-native-popup-menu';
+import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import moment from 'moment';
 
 const TOOLBAR_ICON_SIZE = 20;
@@ -43,6 +39,8 @@ const Todo = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  //Repeat Menu
+  const [repeatMenu, setRepeatMenu] = useState(null);
   //For updating todos
   const [newTitle, setNewTitle] = useState(null);
   const [newNote, setNewNote] = useState(null);
@@ -56,6 +54,31 @@ const Todo = (props) => {
   const [subTasks, setSubTasks] = useState([]);
   const [newSubTask, setNewSubTask] = useState('');
   const [pickerValue, setPickerValue] = useState(0);
+
+  const repeatValues = [
+    {text: 'No Repetition', value: 0},
+    {text: 'Every Day', value: 1},
+    {text: 'Every second day', value: 2},
+    {text: 'Every 3rd day', value: 3},
+    {text: 'Every 4th day', value: 4},
+    {text: 'Every 5th day', value: 5},
+    {text: 'Every 6th day', value: 6},
+    {text: 'Every week', value: 7},
+    {text: 'Every month', value: 30},
+    {text: 'Every year', value: 365},
+  ];
+
+  const setRepeatMenuRef = (ref) => {
+    setRepeatMenu(ref);
+  };
+
+  const hideRepeatMenu = () => {
+    repeatMenu.hide();
+  };
+
+  const showRepeatMenu = () => {
+    repeatMenu.show();
+  };
 
   const onModalClose = () => {
     props.todoListUpdater();
@@ -144,7 +167,7 @@ const Todo = (props) => {
                 <Icon
                   name="calendar"
                   size={TOOLBAR_ICON_SIZE}
-                  color="black"
+                  color="white"
                   style={styles.button}
                   onPress={() => {
                     setShowDatePicker(true);
@@ -178,7 +201,7 @@ const Todo = (props) => {
                 <Icon
                   name="clock-o"
                   size={TOOLBAR_ICON_SIZE}
-                  color="black"
+                  color="white"
                   backgroundColor="red"
                   style={styles.button}
                   onPress={() => {
@@ -207,43 +230,64 @@ const Todo = (props) => {
                   }}
                 />
                 {(props.todo.due_date || newDate) && (
-                  <Picker
-                    selectedValue={
-                      props.todo.recurring ? props.todo.recurring : pickerValue
-                    }
-                    style={styles.repeatPicker}
-                    onValueChange={(itemValue, itemIndex) => {
-                      setPickerValue(itemValue);
-                      let updated = props.todo;
-                      updated.recurring = itemValue;
-                      updateTodo(updated).then((res) => {});
-                    }}>
-                    <Picker.Item label="No Repetition" value={0} />
-                    <Picker.Item label="Every Day" value={1} />
-                    <Picker.Item label="Every second day" value={2} />
-                    <Picker.Item label="Every 3rd day" value={3} />
-                    <Picker.Item label="Every 4th day" value={4} />
-                    <Picker.Item label="Every 5th day" value={5} />
-                    <Picker.Item label="Every 6th day" value={6} />
-                    <Picker.Item label="Every week" value={7} />
-                    <Picker.Item label="Every month" value={30} />
-                    <Picker.Item label="Every year" value={365} />
-                  </Picker>
+                  <View>
+                    <Menu
+                      ref={setRepeatMenuRef}
+                      button={
+                        <Button
+                          icon={
+                            <Icon
+                              name="repeat"
+                              size={TOOLBAR_ICON_SIZE}
+                              color="white"
+                              onPress={showRepeatMenu}
+                            />
+                          }
+                          buttonStyle={styles.settingsButton}
+                        />
+                      }>
+                      {repeatValues.map((item) => {
+                        return (
+                          <MenuItem
+                            onPress={() => {
+                              console.warn(item.value);
+                              hideRepeatMenu();
+                              setPickerValue(item.value);
+                              let updated = props.todo;
+                              updated.recurring = item.value;
+                              updateTodo(updated).then((res) => {});
+                            }}>
+                            <Text>{item.text}</Text>
+                          </MenuItem>
+                        );
+                      })}
+                    </Menu>
+                    <Picker
+                      selectedValue={
+                        props.todo.recurring
+                          ? props.todo.recurring
+                          : pickerValue
+                      }
+                      style={styles.repeatPicker}
+                      onValueChange={(itemValue, itemIndex) => {
+                        setPickerValue(itemValue);
+                        let updated = props.todo;
+                        updated.recurring = itemValue;
+                        updateTodo(updated).then((res) => {});
+                      }}>
+                      <Picker.Item label="No Repetition" value={0} />
+                      <Picker.Item label="Every Day" value={1} />
+                      <Picker.Item label="Every second day" value={2} />
+                      <Picker.Item label="Every 3rd day" value={3} />
+                      <Picker.Item label="Every 4th day" value={4} />
+                      <Picker.Item label="Every 5th day" value={5} />
+                      <Picker.Item label="Every 6th day" value={6} />
+                      <Picker.Item label="Every week" value={7} />
+                      <Picker.Item label="Every month" value={30} />
+                      <Picker.Item label="Every year" value={365} />
+                    </Picker>
+                  </View>
                 )}
-                <Menu>
-                  <MenuTrigger text="Select action" />
-                  <MenuOptions>
-                    <MenuOption onSelect={() => alert('Save')} text="Save" />
-                    <MenuOption onSelect={() => alert('Delete')}>
-                      <Text style={{color: 'red'}}>Delete</Text>
-                    </MenuOption>
-                    <MenuOption
-                      onSelect={() => alert('Not called')}
-                      disabled={true}
-                      text="Disabled"
-                    />
-                  </MenuOptions>
-                </Menu>
               </View>
             </View>
           </View>
@@ -320,6 +364,14 @@ const Todo = (props) => {
               </ScrollView>
             </View>
           )}
+          <Text>
+            <MaterialCommunityIconsI
+              name="tooltip-text"
+              size={18}
+              color={COLORS.mainDark}
+            />
+            <Text style={{fontFamily: 'Roboto', fontSize: 18}}>Notes</Text>
+          </Text>
           <View style={{flex: 2}}>
             <TextInput
               style={styles.note}
@@ -360,7 +412,7 @@ const Todo = (props) => {
         }}>
         <Text
           style={{
-            color: COLORS.mainDark,
+            color: 'black',
             borderRadius: 3,
             fontSize: 14,
             paddingRight: 1,
@@ -372,7 +424,7 @@ const Todo = (props) => {
         {time && (
           <Text
             style={{
-              color: COLORS.mainDark,
+              color: 'black',
               borderRadius: 3,
               fontSize: 14,
               paddingRight: 1,
@@ -380,6 +432,19 @@ const Todo = (props) => {
               fontFamily: 'Roboto-Bold',
             }}>
             {time}
+          </Text>
+        )}
+        {props.todo.recurring !== 0 && (
+          <Text
+            style={{
+              color: 'black',
+              borderRadius: 3,
+              fontSize: 14,
+              paddingRight: 1,
+              paddingLeft: 1,
+              fontFamily: 'Roboto',
+            }}>
+            Every {props.todo.recurring} days
           </Text>
         )}
       </View>
@@ -627,19 +692,23 @@ const styles = StyleSheet.create({
 
   dateRowView: {justifyContent: 'center'},
   expandedTools: {
-    height: 30,
-    paddingLeft: 5,
+    height: 28,
+    paddingLeft: MODAL_LEFT_MARGIN,
+    marginTop: 10,
     alignItems: 'center',
     flexDirection: 'row',
     borderBottomWidth: 0.5,
     borderBottomColor: COLORS.mainDark,
+    borderTopWidth: 0.5,
+    borderTopColor: COLORS.mainDark,
+    backgroundColor: COLORS.mainLight,
   },
   todoTitle: {
     marginLeft: MODAL_LEFT_MARGIN,
     flex: 1,
     marginRight: 25,
     padding: 0,
-    fontSize: 25,
+    fontSize: 30,
     textAlignVertical: 'center',
     color: 'black',
     fontFamily: 'Roboto',
@@ -651,6 +720,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginLeft: 5,
+    marginRight: 10,
     alignSelf: 'center',
   },
   pomoContainer: {
@@ -671,6 +741,11 @@ const styles = StyleSheet.create({
     maxWidth: 5,
     textAlign: 'center',
     padding: 0,
+  },
+
+  settingsButton: {
+    backgroundColor: 'transparent',
+    height: 100,
   },
   subTaskContainer: {flexDirection: 'row', alignItems: 'center'},
   note: {

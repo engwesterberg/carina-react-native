@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     color: 'white',
     marginLeft: 20,
     marginRight: 20,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Roboto',
   },
   input: {width: '90%', marginLeft: 5, marginBottom: 10},
 });

@@ -4,14 +4,14 @@ import {COLORS} from './colors.js';
 export const globalStyles = StyleSheet.create({
   title: {
     fontSize: 18,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Roboto',
   },
   mainText: {
     fontSize: 18,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Roboto',
   },
   smallBold: {
     fontSize: 12,
-    fontFamily: 'Helvetica-Bold',
+    fontFamily: 'Roboto-Bold',
   },
 });

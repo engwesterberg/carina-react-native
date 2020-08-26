@@ -27,6 +27,12 @@ import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunity
 
 import {TextInput as PaperTextInput} from 'react-native-paper';
 import {Picker} from 'react-native';
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
 import moment from 'moment';
 
 const TOOLBAR_ICON_SIZE = 20;
@@ -138,7 +144,7 @@ const Todo = (props) => {
                 <Icon
                   name="calendar"
                   size={TOOLBAR_ICON_SIZE}
-                  color={COLORS.mainDark}
+                  color="black"
                   style={styles.button}
                   onPress={() => {
                     setShowDatePicker(true);
@@ -172,7 +178,7 @@ const Todo = (props) => {
                 <Icon
                   name="clock-o"
                   size={TOOLBAR_ICON_SIZE}
-                  color={COLORS.mainDark}
+                  color="black"
                   backgroundColor="red"
                   style={styles.button}
                   onPress={() => {
@@ -224,6 +230,20 @@ const Todo = (props) => {
                     <Picker.Item label="Every year" value={365} />
                   </Picker>
                 )}
+                <Menu>
+                  <MenuTrigger text="Select action" />
+                  <MenuOptions>
+                    <MenuOption onSelect={() => alert('Save')} text="Save" />
+                    <MenuOption onSelect={() => alert('Delete')}>
+                      <Text style={{color: 'red'}}>Delete</Text>
+                    </MenuOption>
+                    <MenuOption
+                      onSelect={() => alert('Not called')}
+                      disabled={true}
+                      text="Disabled"
+                    />
+                  </MenuOptions>
+                </Menu>
               </View>
             </View>
           </View>
@@ -345,7 +365,7 @@ const Todo = (props) => {
             fontSize: 14,
             paddingRight: 1,
             paddingLeft: 1,
-            fontFamily: 'Helvetica',
+            fontFamily: 'Roboto',
           }}>
           {date}
         </Text>
@@ -357,7 +377,7 @@ const Todo = (props) => {
               fontSize: 14,
               paddingRight: 1,
               paddingLeft: 1,
-              fontFamily: 'Helvetica-Bold',
+              fontFamily: 'Roboto-Bold',
             }}>
             {time}
           </Text>
@@ -409,10 +429,16 @@ const Todo = (props) => {
             <View style={styles.todoInfoContainer}>
               <View style={styles.row1}>
                 {props.todo.state !== 2 ? (
-                  <RadioButton
-                    status={props.todo.state === 0 ? 'unchecked' : 'checked'}
-                    color={COLORS.mainDark}
+                  <MaterialCommunityIconsI
+                    size={25}
+                    name={
+                      props.todo.state === 0
+                        ? 'checkbox-blank-circle-outline'
+                        : 'checkbox-marked-circle-outline'
+                    }
+                    color="black"
                     onPress={() => {
+                      console.warn('Yoyo');
                       let updatedTodo = props.todo;
                       updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
                       updateTodo(updatedTodo).then(props.todoListUpdater());
@@ -446,6 +472,7 @@ const Todo = (props) => {
                     {
                       textDecorationLine:
                         props.todo.state === 1 ? 'line-through' : 'none',
+                      marginLeft: 5,
                     },
                   ]}>
                   {props.todo.title}
@@ -512,11 +539,12 @@ const dateLabel = (todo) => {
 
   return (
     <View style={styles.todoLabelContainer}>
+      <Icon name="calendar" size={12} color={color} style={{marginBottom: 2}} />
       <Text
         style={{
           color: color,
           fontSize: 12,
-          fontFamily: 'Helvetica-Bold',
+          fontFamily: 'Roboto',
         }}>
         {days}
       </Text>
@@ -524,8 +552,8 @@ const dateLabel = (todo) => {
         <View style={{}}>
           <Text
             style={{
-              color: COLORS.mainDark,
-              fontFamily: 'Helvetica-Bold',
+              color: 'black',
+              fontFamily: 'Roboto-Bold',
               fontSize: 12,
             }}>
             {' '}
@@ -541,21 +569,22 @@ const styles = StyleSheet.create({
   todoContainer: {
     flexDirection: 'row',
     marginLeft: 10,
-    height: 40,
-    width: '98%',
+    height: 35,
+    marginBottom: 7,
   },
   todoInfoContainer: {
     justifyContent: 'center',
     flexGrow: 1,
+    marginLeft: 5,
   },
   row1: {
-    flex: 2,
+    flex: 3,
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
   row2: {
-    flex: 1,
+    flex: 2,
     justifyContent: 'center',
   },
   noteContainer: {
@@ -568,9 +597,9 @@ const styles = StyleSheet.create({
     height: 30,
   },
   text: {
-    fontSize: 16,
+    fontSize: 18,
     color: 'black',
-    fontFamily: 'Helvetica',
+    fontFamily: 'Roboto',
   },
   swipeRight: {
     backgroundColor: COLORS.red,
@@ -612,12 +641,12 @@ const styles = StyleSheet.create({
     padding: 0,
     fontSize: 25,
     textAlignVertical: 'center',
-    color: COLORS.mainDark,
-    fontFamily: 'Helvetica',
+    color: 'black',
+    fontFamily: 'Roboto',
   },
   repeatPicker: {
     flex: 1,
-    color: COLORS.mainDark,
+    color: 'black',
     marginLeft: MODAL_LEFT_MARGIN,
   },
   button: {
@@ -629,7 +658,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pomoTools: {
-    color: COLORS.mainDark,
+    color: 'black',
     marginLeft: 1,
     maxWidth: 20,
     fontSize: 15,
@@ -637,7 +666,7 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   pomoSeparator: {
-    color: COLORS.mainDark,
+    color: 'black',
     marginLeft: 1,
     maxWidth: 5,
     textAlign: 'center',
@@ -651,7 +680,8 @@ const styles = StyleSheet.create({
   },
   todoLabelContainer: {
     flexDirection: 'row',
-    marginLeft: 40,
+    alignItems: 'center',
+    marginLeft: 32,
   },
   datetimeView: {
     flexDirection: 'row',

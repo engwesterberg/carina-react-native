@@ -7,7 +7,9 @@ import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
 import PomodoroBar from './components/PomodoroBar';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
-import moment from 'moment';
+import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MenuProvider } from 'react-native-popup-menu';
+
 
 import {getTodos, getLists, emptyTrash} from './functions';
 
@@ -93,6 +95,7 @@ const App = () => {
   };
 
   return (
+    <MenuProvider>
     <SafeAreaView style={styles.safeArea}>
       {!loggedIn && <LoginScreen parentUpdater={loginUpdater} />}
       {loggedIn && (
@@ -128,13 +131,15 @@ const App = () => {
                 updatePomoActive={updatePomoActive}
               />
               {selectedList.id !== DELETED_LIST_ID && (
-                <Text
-                  style={styles.showDoneText}
-                  onPress={() => {
+                <View
+                  onStartShouldSetResponder={() => {
                     setShowDone(!showDone);
                   }}>
-                  {showDone ? 'Hide Done' : 'Show Done'}
-                </Text>
+                  <Text style={styles.showDoneText}>
+                    <MaterialCommunityIconsI size={15} name="check" />
+                    {showDone ? 'Hide Done' : 'Show Done'}
+                  </Text>
+                </View>
               )}
               {showDone && (
                 <TodoList
@@ -185,7 +190,7 @@ const App = () => {
           pomoBreakUpdater={pomoBreakUpdater}
         />
       )*/}
-    </SafeAreaView>
+    </SafeAreaView></MenuProvider>
   );
 };
 
@@ -195,10 +200,10 @@ const styles = StyleSheet.create({
   },
   container: {flexGrow: 1, backgroundColor: 'white'},
   showDoneText: {
-    color: COLORS.mainDark,
-    fontSize: 18,
+    color: COLORS.mainLight,
+    fontSize: 14,
     alignSelf: 'center',
-    fontFamily: 'Helvetica-Bold',
+    fontFamily: 'Roboto',
     marginTop: 10,
     padding: 10,
   },

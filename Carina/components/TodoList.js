@@ -4,8 +4,21 @@ import React, {useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Todo from './Todo';
 import moment from 'moment';
-import Hr from 'react-native-hr-component';
 
+const hr = () => {
+  return (
+    <View
+      style={{
+        height: 0.5,
+        width: '90%',
+        backgroundColor: 'gray',
+        alignSelf: 'center',
+        marginBottom: 1,
+      }}>
+      <Text />
+    </View>
+  );
+};
 const TodoList = (props) => {
   return (
     <View style={styles.todoListContainer}>
@@ -62,17 +75,17 @@ const daySeparator = (curr, prev) => {
 
 const styles = StyleSheet.create({
   todoListContainer: {},
-  firstSeparatorText: {color: 'white', fontSize: 18, marginLeft: 10},
   daySeparatorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
   },
   daySeparatorText: {
-    fontSize: 20,
+    fontSize: 22,
     padding: 1,
-    fontFamily: 'Helvetica-Bold',
+    fontFamily: 'Roboto-Bold',
     marginLeft: 15,
+    marginBottom: 3,
   },
 });
 

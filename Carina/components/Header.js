@@ -156,7 +156,7 @@ const Header = (props) => {
               );
             }}
           />
-          <Text style={styles.guide}>Currenltly shared with</Text>
+          <Text style={styles.guide}>{sharedWithUsers.length > 0 && 'Currently shared with'}</Text>
           {sharedWithUsers.map((item) => {
             return (
               <Chip

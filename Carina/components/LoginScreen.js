@@ -1,8 +1,6 @@
 import {COLORS} from '../colors.js';
 import React, {useState, useEffect} from 'react';
 import AppButton from './AppButton.js';
-import Header from './Header';
-import Hr from 'react-native-hr-component';
 import {
   signUp,
   signIn,
@@ -53,20 +51,15 @@ const LoginScreen = (props) => {
       let user = userInfo.user;
       addGoogleUser(user.id, user.email, user.name).then(() => {
         getUserIdByGoogleId(user.id).then((res) => {
-          console.log('SAGNIN: ', res);
-          props.parentUpdater(user.name, user.email, res);
+          props.signInHandler(res);
         });
       });
     } catch (error) {
       console.log({error});
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // play services not available or outdated
       } else {
-        // some other error happened
       }
     }
   };
@@ -121,7 +114,7 @@ const LoginScreen = (props) => {
                 signIn(email, secret)
                   .then((res) => {
                     let result = res[0][0];
-                    props.parentUpdater(
+                    props.signInHandler(
                       result.fullname,
                       result.email,
                       result.id,

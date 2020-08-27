@@ -10,7 +10,6 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import {RadioButton} from 'react-native-paper';
 import {
   updateTodo,
   deleteTodo,
@@ -28,8 +27,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {Picker} from 'react-native';
-import Menu, {MenuItem} from 'react-native-material-menu';
+import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import moment from 'moment';
 
 const TOOLBAR_ICON_SIZE = 25;
@@ -42,6 +40,7 @@ const Todo = (props) => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   //Repeat Menu
   const [repeatMenu, setRepeatMenu] = useState(null);
+  const [listMenu, setListMenu] = useState(null);
   //For updating todos
   const [newTitle, setNewTitle] = useState(null);
   const [newNote, setNewNote] = useState(null);
@@ -101,6 +100,18 @@ const Todo = (props) => {
 
   const showRepeatMenu = () => {
     repeatMenu.show();
+  };
+
+  const setListMenuRef = (ref) => {
+    setListMenu(ref);
+  };
+
+  const hideListMenu = () => {
+    listMenu.hide();
+  };
+
+  const showListMenu = () => {
+    listMenu.show();
   };
 
   const onModalClose = () => {
@@ -285,32 +296,63 @@ const Todo = (props) => {
                         );
                       })}
                     </Menu>
-                    <Picker
-                      selectedValue={
-                        props.todo.recurring
-                          ? props.todo.recurring
-                          : pickerValue
-                      }
-                      style={styles.repeatPicker}
-                      onValueChange={(itemValue, itemIndex) => {
-                        setPickerValue(itemValue);
-                        let updated = props.todo;
-                        updated.recurring = itemValue;
-                        updateTodo(updated).then((res) => {});
-                      }}>
-                      <Picker.Item label="No Repetition" value={0} />
-                      <Picker.Item label="Every Day" value={1} />
-                      <Picker.Item label="Every second day" value={2} />
-                      <Picker.Item label="Every 3rd day" value={3} />
-                      <Picker.Item label="Every 4th day" value={4} />
-                      <Picker.Item label="Every 5th day" value={5} />
-                      <Picker.Item label="Every 6th day" value={6} />
-                      <Picker.Item label="Every week" value={7} />
-                      <Picker.Item label="Every month" value={30} />
-                      <Picker.Item label="Every year" value={365} />
-                    </Picker>
                   </View>
                 )}
+                <View>
+                  <Menu
+                    ref={setListMenuRef}
+                    button={
+                      <Button
+                        icon={
+                          <MaterialCommunityIconsI
+                            name="folder-move-outline"
+                            size={TOOLBAR_ICON_SIZE}
+                            color={COLORS.mainLight}
+                            onPress={showListMenu}
+                          />
+                        }
+                        buttonStyle={styles.settingsButton}
+                      />
+                    }>
+                    <MenuItem
+                      onPress={() => {
+                        hideListMenu();
+                        let updated = props.todo;
+                        updated.list_id = null;
+                        updateTodo(updated).then((res) => {});
+                      }}>
+                      <Text
+                        style={{
+                          fontWeight: !props.todo.list_id ? 'bold' : 'normal',
+                        }}>
+                        Carina (default)
+                      </Text>
+                    </MenuItem>
+                    <MenuDivider />
+                    {props.lists.map((item) => {
+                      return (
+                        <MenuItem
+                          onPress={() => {
+                            console.warn(item);
+                            hideListMenu();
+                            let updated = props.todo;
+                            updated.list_id = item.id;
+                            updateTodo(updated).then((res) => {});
+                          }}>
+                          <Text
+                            style={{
+                              fontWeight:
+                                item.id === props.todo.list_id
+                                  ? 'bold'
+                                  : 'normal',
+                            }}>
+                            {item.title}
+                          </Text>
+                        </MenuItem>
+                      );
+                    })}
+                  </Menu>
+                </View>
               </View>
             </View>
           </View>

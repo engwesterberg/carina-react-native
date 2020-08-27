@@ -45,6 +45,7 @@ const TodoList = (props) => {
               removeFromList={props.removeFromList}
               updatePomoActive={props.updatePomoActive || null}
               showBorder={index !== props.todos.length}
+              lists={props.lists}
             />
           </View>
         );
@@ -110,7 +111,7 @@ const daySeparator = (curr, prev) => {
 };
 
 const styles = StyleSheet.create({
-  todoListContainer: {},
+  todoListContainer: {marginTop: 10},
   daySeparatorContainer: {
     flexDirection: 'row',
     alignItems: 'center',

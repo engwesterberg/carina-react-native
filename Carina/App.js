@@ -24,9 +24,6 @@ const DELETED = 2;
 const DELETED_LIST_ID = -1;
 
 const App = () => {
-  const [loggedIn, setLoggedIn] = useState(true);
-  const [name, setName] = useState(null);
-  const [email, setEmail] = useState(null);
   const [userId, setUserId] = useState(1);
   const [todos, setTodos] = useState([]);
   const [lists, setLists] = useState([]);
@@ -44,9 +41,6 @@ const App = () => {
   };
 
   const signOut = () => {
-    setLoggedIn(false);
-    setName(null);
-    setEmail(null);
     setUserId(null);
     setTodos([]);
     setLists([]);
@@ -63,14 +57,10 @@ const App = () => {
     getLists(1).then((res) => {
       setLists(res);
     });
-    setLoggedIn(true);
   };
 
-  const loginUpdater = (aName, aEmail, aId) => {
-    setLoggedIn(true);
-    setName(aName);
+  const signInHandler = (aId) => {
     setUserId(aId);
-    setEmail(aEmail);
     getTodos(aId).then((res) => {
       setTodos(res);
     });
@@ -101,8 +91,8 @@ const App = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {!loggedIn && <LoginScreen parentUpdater={loginUpdater} />}
-      {loggedIn && (
+      {!userId && <LoginScreen signInHandler={signInHandler} />}
+      {userId && (
         <View style={styles.container}>
           <Header
             selectedList={selectedList}
@@ -133,9 +123,11 @@ const App = () => {
                 removeFromList={removeFromList}
                 listId={selectedList ? selectedList.id : null}
                 updatePomoActive={updatePomoActive}
+                lists={lists}
               />
               {selectedList.id !== DELETED_LIST_ID && (
                 <TouchableOpacity
+                  style={styles.showDoneView}
                   onPress={() => {
                     setShowDone(!showDone);
                   }}>
@@ -155,6 +147,7 @@ const App = () => {
                   todoListUpdater={todoListUpdater}
                   removeFromList={removeFromList}
                   listId={selectedList ? selectedList.id : null}
+                  lists={lists}
                 />
               )}
               {selectedList.id === DELETED_LIST_ID && (
@@ -164,6 +157,7 @@ const App = () => {
                   todoListUpdater={todoListUpdater}
                   removeFromList={removeFromList}
                   listId={selectedList ? selectedList.id : null}
+                  lists={lists}
                   listSpecificButton={
                     <View style={styles.listSpecificButton}>
                       <Icon
@@ -203,13 +197,19 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   container: {flexGrow: 1, backgroundColor: 'white'},
+  showDoneView: {
+    backgroundColor: COLORS.mainSuperLight,
+    alignItems: 'center',
+    marginTop: 15,
+    borderTopColor: COLORS.mainLight,
+    borderTopWidth: 0.5,
+    borderBottomColor: COLORS.mainLight,
+    borderBottomWidth: 0.5,
+  },
   showDoneText: {
     color: COLORS.mainLight,
     fontSize: 14,
-    alignSelf: 'center',
     fontFamily: 'Roboto',
-    marginTop: 10,
-    padding: 10,
   },
   listSpecificButton: {
     alignSelf: 'center',

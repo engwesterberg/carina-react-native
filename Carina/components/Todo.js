@@ -1,4 +1,5 @@
 import {COLORS} from '../colors.js';
+
 import React, {useState} from 'react';
 import {
   View,
@@ -344,9 +345,7 @@ const Todo = (props) => {
                 {subTasks.map((item) => {
                   return (
                     <View style={styles.subTaskContainer}>
-                      <RadioButton
-                        status={item.state === 0 ? 'unchecked' : 'checked'}
-                        color={COLORS.mainLight}
+                      <TouchableOpacity
                         onPress={() => {
                           editSubTask(
                             item.id,
@@ -357,8 +356,17 @@ const Todo = (props) => {
                               setSubTasks(res);
                             });
                           });
-                        }}
-                      />
+                        }}>
+                        <MaterialCommunityIconsI
+                          size={25}
+                          name={
+                            item.state === 0
+                              ? 'checkbox-blank-circle-outline'
+                              : 'checkbox-marked-circle-outline'
+                          }
+                          color={COLORS.mainLight}
+                        />
+                      </TouchableOpacity>
                       <Text
                         style={{
                           textDecorationLine:
@@ -457,7 +465,7 @@ const Todo = (props) => {
               paddingLeft: 1,
               fontFamily: 'Roboto',
             }}>
-            {getRepeatValueString(props.todo.recurring)}
+            {props.todo.recurring && getRepeatValueString(props.todo.recurring)}
           </Text>
         )}
       </View>
@@ -497,7 +505,6 @@ const Todo = (props) => {
         <View style={styles.todoContainer} key={props.id}>
           <TouchableOpacity
             style={{flex: 1}}
-            activeOpacity={1}
             onPress={() => {
               setModalVisible(true);
               getSubTasks(props.todo.id).then((res) => {
@@ -682,7 +689,7 @@ const styles = StyleSheet.create({
   todoContainer: {
     flexDirection: 'row',
     marginLeft: 10,
-    height: 50,
+    height: 45,
   },
   todoInfoContainer: {
     justifyContent: 'center',

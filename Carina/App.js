@@ -32,6 +32,7 @@ const App = () => {
   const [showDone, setShowDone] = useState(false);
   const [pomoActive, setPomoActive] = useState(false);
   const [pomoBreak, setPomoBreak] = useState(false);
+
   useEffect(() => {
     setDevelopmentUserState();
   }, []);

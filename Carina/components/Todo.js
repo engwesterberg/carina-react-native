@@ -19,6 +19,7 @@ import {
   editSubTask,
   deleteSubTask,
 } from '../functions';
+
 import Swipeable from 'react-native-swipeable-row';
 import {Button} from 'react-native-elements';
 import Modal from 'react-native-modal';
@@ -27,7 +28,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {Picker} from 'react-native';
-import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
+import Menu, {MenuItem} from 'react-native-material-menu';
 import moment from 'moment';
 
 const TOOLBAR_ICON_SIZE = 25;
@@ -529,7 +530,7 @@ const Todo = (props) => {
                           ? 'checkbox-blank-circle-outline'
                           : 'checkbox-marked-circle-outline'
                       }
-                      color="black"
+                      color={COLORS.gray}
                     />
                   ) : (
                     <Icon
@@ -559,7 +560,7 @@ const Todo = (props) => {
               <View style={styles.row2}>
                 {props.todo.due_date &&
                   props.todo.state != 1 &&
-                  dateLabel(props.todo)}
+                  timeLabel(props.todo)}
               </View>
             </View>
           </TouchableOpacity>
@@ -568,7 +569,7 @@ const Todo = (props) => {
               <MaterialCommunityIconsI
                 name="tooltip-text"
                 size={25}
-                color={COLORS.mainDark}
+                color={COLORS.gray}
               />
             )}
           </View>
@@ -577,7 +578,42 @@ const Todo = (props) => {
     </View>
   );
 };
+const timeLabel = (todo) => {
+  let time;
+  if (todo.has_time) {
+    time = moment(todo.due_date).hour() + ':' + moment(todo.due_date).minute();
+    if (moment(todo.due_date).minute() === 0) {
+      time = time + '0';
+    }
+  }
 
+  return (
+    <View style={styles.todoLabelContainer}>
+      <Text
+        style={{
+          color: COLORS.gray,
+          fontSize: 14,
+          fontFamily: 'Roboto',
+        }}>
+        {time}
+      </Text>
+      {todo.pomo_estimate !== 0 ? (
+        <View style={{}}>
+          <Text
+            style={{
+              color: COLORS.gray,
+              fontFamily: 'Roboto-Bold',
+              fontSize: 14,
+              marginLeft: 2,
+            }}>
+            {' '}
+            {`${todo.pomo_done}/${todo.pomo_estimate}🍅`}
+          </Text>
+        </View>
+      ) : null}
+    </View>
+  );
+};
 const dateLabel = (todo) => {
   const one_day = 1000 * 60 * 60 * 24;
   let color;
@@ -617,7 +653,6 @@ const dateLabel = (todo) => {
 
   return (
     <View style={styles.todoLabelContainer}>
-      <Icon name="calendar" size={12} color={color} style={{marginBottom: 2}} />
       <Text
         style={{
           color: color,
@@ -647,8 +682,7 @@ const styles = StyleSheet.create({
   todoContainer: {
     flexDirection: 'row',
     marginLeft: 10,
-    height: 35,
-    marginBottom: 7,
+    height: 50,
   },
   todoInfoContainer: {
     justifyContent: 'center',
@@ -656,14 +690,15 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   row1: {
-    flex: 3,
+    flex: 4,
+    paddingTop: 5,
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
   row2: {
-    flex: 2,
-    justifyContent: 'center',
+    flex: 3,
+    justifyContent: 'flex-start',
   },
   noteContainer: {
     justifyContent: 'center',
@@ -676,7 +711,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 18,
-    color: 'black',
+    color: COLORS.gray,
     fontFamily: 'Roboto',
   },
   swipeRight: {

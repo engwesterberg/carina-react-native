@@ -1,6 +1,13 @@
 import {COLORS} from './colors.js';
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, ScrollView, SafeAreaView} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
+} from 'react-native';
 import Header from './components/Header';
 import LoginScreen from './components/LoginScreen';
 import CarinaBar from './components/CarinaBar';
@@ -8,7 +15,6 @@ import TodoList from './components/TodoList';
 import PomodoroBar from './components/PomodoroBar';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
-
 
 import {getTodos, getLists, emptyTrash} from './functions';
 
@@ -129,15 +135,15 @@ const App = () => {
                 updatePomoActive={updatePomoActive}
               />
               {selectedList.id !== DELETED_LIST_ID && (
-                <View
-                  onStartShouldSetResponder={() => {
+                <TouchableOpacity
+                  onPress={() => {
                     setShowDone(!showDone);
                   }}>
                   <Text style={styles.showDoneText}>
                     <MaterialCommunityIconsI size={15} name="check" />
                     {showDone ? 'Hide Done' : 'Show Done'}
                   </Text>
-                </View>
+                </TouchableOpacity>
               )}
               {showDone && (
                 <TodoList

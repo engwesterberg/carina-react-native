@@ -86,7 +86,7 @@ const Todo = (props) => {
         string = `Every ${value} days`;
         break;
     }
-    return " "+ string;
+    return ' ' + string;
   };
 
   const setRepeatMenuRef = (ref) => {
@@ -505,44 +505,45 @@ const Todo = (props) => {
             }}>
             <View style={styles.todoInfoContainer}>
               <View style={styles.row1}>
-                {props.todo.state !== 2 ? (
-                  <MaterialCommunityIconsI
-                    size={25}
-                    name={
-                      props.todo.state === 0
-                        ? 'checkbox-blank-circle-outline'
-                        : 'checkbox-marked-circle-outline'
+                <TouchableOpacity
+                  onPress={() => {
+                    let updatedTodo = props.todo;
+                    updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
+                    updateTodo(updatedTodo).then(props.todoListUpdater());
+                    if (props.todo.recurring) {
+                      let copy = props.todo;
+                      copy.due_date = moment(copy.due_date).add(
+                        props.todo.recurring,
+                        'days',
+                      );
+                      copyTodo(props.todo).then(() => {
+                        updateTodo(updatedTodo).then(props.todoListUpdater());
+                      });
                     }
-                    color="black"
-                    onPress={() => {
-                      console.warn('Yoyo');
-                      let updatedTodo = props.todo;
-                      updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
-                      updateTodo(updatedTodo).then(props.todoListUpdater());
-                      if (props.todo.recurring) {
-                        let copy = props.todo;
-                        copy.due_date = moment(copy.due_date).add(
-                          props.todo.recurring,
-                          'days',
-                        );
-                        copyTodo(props.todo).then(() => {
-                          updateTodo(updatedTodo).then(props.todoListUpdater());
-                        });
+                  }}>
+                  {props.todo.state !== 2 ? (
+                    <MaterialCommunityIconsI
+                      size={25}
+                      name={
+                        props.todo.state === 0
+                          ? 'checkbox-blank-circle-outline'
+                          : 'checkbox-marked-circle-outline'
                       }
-                    }}
-                  />
-                ) : (
-                  <Icon
-                    name="recycle"
-                    size={30}
-                    color={COLORS.mainLight}
-                    onPress={() => {
-                      let updatedTodo = props.todo;
-                      updatedTodo.state = 0;
-                      updateTodo(updatedTodo).then(props.todoListUpdater());
-                    }}
-                  />
-                )}
+                      color="black"
+                    />
+                  ) : (
+                    <Icon
+                      name="recycle"
+                      size={30}
+                      color={COLORS.mainLight}
+                      onPress={() => {
+                        let updatedTodo = props.todo;
+                        updatedTodo.state = 0;
+                        updateTodo(updatedTodo).then(props.todoListUpdater());
+                      }}
+                    />
+                  )}
+                </TouchableOpacity>
                 <Text
                   style={[
                     styles.text,
@@ -581,7 +582,7 @@ const dateLabel = (todo) => {
   const one_day = 1000 * 60 * 60 * 24;
   let color;
   let days;
-  let diff = moment(todo.due_date).date() - moment().date();
+  let diff = moment(todo.due_date) - moment();
   if (diff === 0) {
     color = COLORS.orange;
     days = 'Today';

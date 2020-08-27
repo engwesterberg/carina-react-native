@@ -62,7 +62,7 @@ const daySeparator = (curr, prev) => {
       <Text
         style={[
           {
-            color: current.date() < moment().date() ? COLORS.red : 'black',
+            color: current< moment() ? COLORS.red : 'black',
           },
           styles.daySeparatorText,
         ]}>

@@ -8,16 +8,7 @@ import moment from 'moment';
 
 const hr = (color) => {
   return (
-    <View
-      style={{
-        flex: 1,
-        height: 1,
-        marginRight: 13,
-        marginLeft: 10,
-        backgroundColor: color,
-        alignSelf: 'center',
-        marginTop: 5,
-      }}>
+    <View style={[styles.hr, {backgroundColor: color}]}>
       <Text />
     </View>
   );
@@ -29,13 +20,13 @@ const TodoList = (props) => {
         return (
           <View>
             {item.due_date &&
-              props.state !== 2 &&
+              props.state === 0 &&
               daySeparator(
                 item.due_date,
                 index !== 0 && props.todos[index - 1].due_date,
               )}
             {index !== 0 &&
-              props.state !== 2 &&
+              props.state === 0 &&
               !item.due_date &&
               props.todos[index - 1].due_date &&
               daySeparator('No Date')}
@@ -123,6 +114,14 @@ const styles = StyleSheet.create({
     padding: 1,
     fontFamily: 'Roboto-Light',
     marginLeft: 3,
+  },
+  hr: {
+    flex: 1,
+    height: 1,
+    marginRight: 13,
+    marginLeft: 10,
+    alignSelf: 'center',
+    marginTop: 5,
   },
 });
 

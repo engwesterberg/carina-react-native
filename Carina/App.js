@@ -199,13 +199,8 @@ const styles = StyleSheet.create({
   },
   container: {flexGrow: 1, backgroundColor: 'white'},
   showDoneView: {
-    backgroundColor: COLORS.mainSuperLight,
     alignItems: 'center',
     marginTop: 15,
-    borderTopColor: COLORS.mainLight,
-    borderTopWidth: 0.5,
-    borderBottomColor: COLORS.mainLight,
-    borderBottomWidth: 0.5,
   },
   showDoneText: {
     color: COLORS.mainLight,

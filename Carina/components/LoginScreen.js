@@ -22,6 +22,7 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-community/google-signin';
+import Toast from 'react-native-simple-toast';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -43,6 +44,29 @@ const LoginScreen = (props) => {
       forceCodeForRefreshToken: true,
     });
   }, []);
+
+  function validateEmail(email) {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  }
+  const signUpHandler = () => {
+    if (name && email && secret && repeatSecret && secret === repeatSecret) {
+      if (validateEmail(email)) {
+        signUp(null, email, name, secret);
+        setSignupSuccess(true);
+      } else {
+        Toast.show('Please enter a valid email');
+      }
+    } else if (name && email) {
+      Toast.show("Passwords doesn't match");
+    } else if (!name) {
+      Toast.show('Please enter your name');
+    } else if (!email) {
+      Toast.show('Please enter your email');
+    } else if (!secret) {
+      Toast.show('Please enter your password');
+    }
+  };
 
   const googleSignIn = async () => {
     try {
@@ -81,6 +105,7 @@ const LoginScreen = (props) => {
               dense={true}
               style={styles.input}
               mode="outlined"
+              value={signupSuccess && email}
               placeholder="Username"
               placeholderTextColor="black"
               onChangeText={(text) => {
@@ -99,6 +124,7 @@ const LoginScreen = (props) => {
               }}
             />
             <View style={styles.displayRow}>
+        {!signupSuccess && 
               <Text
                 style={styles.textButton}
                 onPress={() => {
@@ -106,6 +132,7 @@ const LoginScreen = (props) => {
                 }}>
                 Sign Up
               </Text>
+        }
               <Text style={styles.textButton}>Reset Password</Text>
             </View>
             <AppButton
@@ -179,25 +206,37 @@ const LoginScreen = (props) => {
               placeholderTextColor="black"
             />
             {signupSuccess && (
-              <Text>Signup Successfull. Welcome to Carina {name}!</Text>
+              <View>
+                <Text style={styles.signupSuccessText}>
+                  Signup Successfull!
+                </Text>
+                <Text style={styles.signupSuccessText}>
+                  Welcome to Carina {name}
+                </Text>
+              </View>
             )}
-            <View style={styles.displayRow}>
-              <AppButton
-                title="Sign Up"
-                onPress={() => {
-                  if (secret === repeatSecret) {
-                    signUp(null, email, name, secret);
-                    setSignupSuccess(true);
-                  }
-                }}
-              />
-              <AppButton
-                title="Abort"
-                onPress={() => {
-                  setSignupOpen(false);
-                  setSignupSuccess(false);
-                }}
-              />
+            <View>
+              {!signupSuccess ? (
+                <View style={styles.displayRow}>
+                  <AppButton title="Sign Up" onPress={signUpHandler} />
+                  <AppButton
+                    title="Abort"
+                    onPress={() => {
+                      setSignupOpen(false);
+                      setSignupSuccess(false);
+                    }}
+                  />
+                </View>
+              ) : (
+                <View style={styles.displayRow}>
+                  <AppButton
+                    title="Go Back"
+                    onPress={() => {
+                      setSignupOpen(false);
+                    }}
+                  />
+                </View>
+              )}
             </View>
           </View>
         )}
@@ -264,6 +303,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
   },
   input: {width: '90%', marginLeft: 5, marginBottom: 10},
+  signupSuccessText: {
+    color: 'white',
+    alignSelf: 'center',
+    fontFamily: 'Roboto',
+  },
 });
 
 export default LoginScreen;

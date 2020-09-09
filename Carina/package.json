@@ -31,6 +31,7 @@
     "react-native-popover-menu": "^2.0.1",
     "react-native-popup-menu": "^0.15.9",
     "react-native-simple-dialogs": "^1.3.0",
+    "react-native-simple-toast": "^1.1.2",
     "react-native-swipeable-row": "^0.8.1",
     "react-native-vector-icons": "^7.0.0",
     "watchman": "^1.0.0"

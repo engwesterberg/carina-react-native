@@ -31,9 +31,13 @@ const LoginScreen = (props) => {
   const [signupOpen, setSignupOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [secret, setSecret] = useState('');
   const [repeatSecret, setRepeatSecret] = useState('');
+
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [smsSent, setSmsSent] = useState(false);
+  const [smsConfirmed, setSmsConfirmed] = useState(false);
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -50,21 +54,25 @@ const LoginScreen = (props) => {
     return re.test(String(email).toLowerCase());
   }
   const signUpHandler = () => {
-    if (name && email && secret && repeatSecret && secret === repeatSecret) {
-      if (validateEmail(email)) {
-        signUp(null, email, name, secret);
-        setSignupSuccess(true);
-      } else {
-        Toast.show('Please enter a valid email');
+    var https = require('https');
+    if (!smsConfirmed) {
+      if (name && email && secret && repeatSecret && secret === repeatSecret) {
+        if (validateEmail(email)) {
+        } else {
+          Toast.show('Please enter a valid email');
+        }
+      } else if (name && email) {
+        Toast.show("Passwords doesn't match");
+      } else if (!name) {
+        Toast.show('Please enter your name');
+      } else if (!email) {
+        Toast.show('Please enter your email');
+      } else if (!secret) {
+        Toast.show('Please enter your password');
       }
-    } else if (name && email) {
-      Toast.show("Passwords doesn't match");
-    } else if (!name) {
-      Toast.show('Please enter your name');
-    } else if (!email) {
-      Toast.show('Please enter your email');
-    } else if (!secret) {
-      Toast.show('Please enter your password');
+    } else {
+      signUp(null, email, name, secret);
+      setSignupSuccess(true);
     }
   };
 
@@ -124,15 +132,15 @@ const LoginScreen = (props) => {
               }}
             />
             <View style={styles.displayRow}>
-        {!signupSuccess && 
-              <Text
-                style={styles.textButton}
-                onPress={() => {
-                  setSignupOpen(!signupOpen);
-                }}>
-                Sign Up
-              </Text>
-        }
+              {!signupSuccess && (
+                <Text
+                  style={styles.textButton}
+                  onPress={() => {
+                    setSignupOpen(!signupOpen);
+                  }}>
+                  Sign Up
+                </Text>
+              )}
               <Text style={styles.textButton}>Reset Password</Text>
             </View>
             <AppButton
@@ -186,6 +194,17 @@ const LoginScreen = (props) => {
             <PaperTextInput
               mode="outlined"
               dense={true}
+              onChangeText={(text) => {
+                setPhoneNumber(text);
+              }}
+              style={styles.input}
+              placeholder="Phone Number"
+              placeholderTextColor="black"
+            />
+            <Text style={styles.infoText}>Confirmation sms will be sent</Text>
+            <PaperTextInput
+              mode="outlined"
+              dense={true}
               secureTextEntry={true}
               onChangeText={(text) => {
                 setSecret(text);
@@ -207,9 +226,7 @@ const LoginScreen = (props) => {
             />
             {signupSuccess && (
               <View>
-                <Text style={styles.signupSuccessText}>
-                  Signup Successfull!
-                </Text>
+                <Text style={styles.infoText}>Signup Successfull!</Text>
                 <Text style={styles.signupSuccessText}>
                   Welcome to Carina {name}
                 </Text>
@@ -303,8 +320,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
   },
   input: {width: '90%', marginLeft: 5, marginBottom: 10},
-  signupSuccessText: {
+  infoText: {
     color: 'white',
+    marginBottom: 5,
+    textAlign: 'center',
     alignSelf: 'center',
     fontFamily: 'Roboto',
   },

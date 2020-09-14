@@ -51,7 +51,7 @@ const App = () => {
   };
 
   const setDevelopmentUserState = () => {
-    setUserId(1);
+    setUserId(null);
     getTodos(1).then((res) => {
       setTodos(res);
     });

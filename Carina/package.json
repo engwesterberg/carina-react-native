@@ -16,6 +16,8 @@
     "axios": "^0.19.2",
     "moment": "^2.27.0",
     "moments": "0.0.2",
+    "query-string": "^6.13.1",
+    "querystring": "^0.2.0",
     "react": "16.13.1",
     "react-native": "0.63.2",
     "react-native-countdown-component": "^2.7.1",

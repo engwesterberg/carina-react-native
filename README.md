@@ -1,7 +1,7 @@
 # carina-react-native
 
 Carina - react native version
-
+Before running, make sure the required Express API is running alongside its corresponding MySQL instance. Check out [https://github.com/engwesterberg/carina-express-server](Carina-Express-Api) for a installation guide.
 ```bash
 npm install
 ```

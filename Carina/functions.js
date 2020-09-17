@@ -291,3 +291,64 @@ export const deleteList = async (list_id) => {
 
   return results[0];
 };
+
+//Update todos
+export const updateTodoTitle = async (todo_id, newTitle) => {
+  let results = axios
+    .put('http://192.168.0.44:5000/api/todotitle/', {
+      todo_id: todo_id,
+      newTitle: newTitle,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};
+
+export const updateTodoNote = async (todo_id, newNote) => {
+  let results = axios
+    .put('http://192.168.0.44:5000/api/todonote/', {
+      todo_id: todo_id,
+      newNote: newNote,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};
+
+export const updatePomoEstimate = async (todo_id, newPomoEstimate) => {
+  let results = axios
+    .put('http://192.168.0.44:5000/api/todopomoestimate/', {
+      todo_id: todo_id,
+      newPomoEstimate: newPomoEstimate,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};
+
+export const updateTodoDate = async (todo_id, newDate) => {
+  let results = axios
+    .put('http://192.168.0.44:5000/api/tododate/', {
+      todo_id: todo_id,
+      newDate: newDate,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};
+
+export const updateTodoTime = async (todo_id, newTime) => {
+  let results = axios
+    .put('http://192.168.0.44:5000/api/todotime/', {
+      todo_id: todo_id,
+      newTime: newTime,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};

@@ -18,6 +18,10 @@ import {
   addSubTask,
   editSubTask,
   deleteSubTask,
+  updateTodoTitle,
+  updateTodoNote,
+  updateTodoDate,
+  updateTodoTime,
 } from '../functions';
 
 import Swipeable from 'react-native-swipeable-row';
@@ -158,7 +162,7 @@ const Todo = (props) => {
                   }
                 }}
                 onEndEditing={() => {
-                  syncTodoToDatabase(newDate || props.todo.due_date);
+                  updateTodoTitle(props.todo.id, newTitle);
                 }}
               />
             </View>
@@ -222,6 +226,10 @@ const Todo = (props) => {
                         month: mm,
                         date: dd,
                       });
+                      updateTodoDate(
+                        props.todo.id,
+                        moment(date).format('YYYY-MM-DD'),
+                      );
                     }
                     setNewDate(deadline);
                     syncTodoToDatabase(deadline);
@@ -442,7 +450,7 @@ const Todo = (props) => {
                 setNewNote(text);
               }}
               onEndEditing={() => {
-                syncTodoToDatabase(newDate || props.todo.due_date);
+                updateTodoNote(props.todo.id, newNote);
               }}
             />
           </View>

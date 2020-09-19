@@ -1,12 +1,11 @@
 import {COLORS} from '../colors.js';
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, Component, setState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
   TouchableHighlight,
-  ScrollView,
 } from 'react-native';
 import Swipeable from 'react-native-swipeable-row';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
@@ -20,85 +19,90 @@ const rightButtons = [
   </TouchableHighlight>,
 ];
 
-const CarinaBar = (props) => {
-  const [planningMode, setPlanningMode] = useState(false);
-  const [planningModeButton, setPlanningModeButton] = useState(false);
-  const [query, setQuery] = useState('');
-  const [planningAttributes, setPlanningAttributes] = useState('');
+class CarinaBar extends Component {
+  state = {
+    planningMode: false,
+    planningModeButton: false,
+    query: '',
+    planningAttributes: '',
+  };
 
-  return (
-    <View style={styles.container}>
-      <TextInput
-        value={query}
-        style={styles.bar}
-        placeholder="Add task to Carina"
-        autoFocus={true}
-        onFocus={() => {
-          if (!planningMode) {
-            setPlanningModeButton(true);
-          }
-        }}
-        onBlur={() => {
-          if (planningModeButton) {
-            setPlanningMode(false);
-          }
-          setPlanningModeButton(false);
-        }}
-        placeholderTextColor={COLORS.mainLight}
-        onSubmitEditing={(text) => {
-          addTodo(
-            props.userId,
-            planningMode ? query + ' ' + planningAttributes : query,
-            props.listId,
-          ).then(() => {
-            props.todoListUpdater();
-          });
-          setQuery('');
-        }}
-        onChangeText={(text) => {
-          setQuery(text);
-        }}
-      />
-      {planningModeButton && (
-        <View style={styles.planningModContainer}>
-          <Icon name="calendar-outline" size={15} color={COLORS.mainDark} />
-          <Text
-            style={styles.planningModeText}
-            onPress={() => {
-              setPlanningMode(true);
-              setPlanningModeButton(false);
-            }}>
-            Planning Mode
-          </Text>
-        </View>
-      )}
-      {planningMode && (
-        <View>
-          <Swipeable
-            leftContent={leftContent}
-            rightButtons={rightButtons}
-            onLeftActionRelease={() => {
-              setPlanningMode(false);
-              setPlanningModeButton(true);
-            }}
-            onRightActionRelease={() => {
-              setPlanningMode(false);
-              setPlanningModeButton(true);
-            }}>
-            <TextInput
-              style={styles.planningModeBar}
-              placeholder="Enter todo attributes"
-              placeholderTextColor={COLORS.mainLight}
-              onChangeText={(text) => {
-                setPlanningAttributes(text);
+  render() {
+    return (
+      <View style={styles.container}>
+        <TextInput
+          value={this.state.query}
+          ref="textinput"
+          style={styles.bar}
+          placeholder="Add task to Carina"
+          autoFocus={true}
+          onFocus={() => {
+            if (!this.state.planningMode) {
+              this.setState({planningModeButton: true});
+            }
+          }}
+          onBlur={() => {
+            if (this.state.planningModeButton) {
+              this.setState({planningMode: false});
+            }
+            this.setState({planningModeButton: false});
+          }}
+          placeholderTextColor={COLORS.mainLight}
+          onSubmitEditing={(text) => {
+            addTodo(
+              this.props.userId,
+              this.state.planningMode
+                ? this.state.query + ' ' + this.state.planningAttributes
+                : this.state.query,
+              this.props.listId,
+            ).then(() => {
+              this.props.todoListUpdater();
+            this.refs.textinput.focus();
+            });
+            this.setState({query: ''});
+          }}
+          onChangeText={(text) => {
+            this.setState({query: text});
+          }}
+        />
+        {this.state.planningModeButton && (
+          <View style={styles.planningModContainer}>
+            <Icon name="calendar-outline" size={15} color={COLORS.mainDark} />
+            <Text
+              style={styles.planningModeText}
+              onPress={() => {
+                this.setState({planningMode: true, planningModeButton: false});
+              }}>
+              Planning Mode
+            </Text>
+          </View>
+        )}
+        {this.state.planningMode && (
+          <View>
+            <Swipeable
+              leftContent={leftContent}
+              rightButtons={rightButtons}
+              onLeftActionRelease={() => {
+                this.setState({planningMode: false, planningModeButton: true});
               }}
-            />
-          </Swipeable>
-        </View>
-      )}
-    </View>
-  );
-};
+              onRightActionRelease={() => {
+                this.setState({planningMode: false, planningModeButton: true});
+              }}>
+              <TextInput
+                style={styles.planningModeBar}
+                placeholder="Enter todo attributes"
+                placeholderTextColor={COLORS.mainLight}
+                onChangeText={(text) => {
+                  this.setState({planningAttributes: text});
+                }}
+              />
+            </Swipeable>
+          </View>
+        )}
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {

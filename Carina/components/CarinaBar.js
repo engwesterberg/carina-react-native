@@ -1,11 +1,12 @@
 import {COLORS} from '../colors.js';
-import React, {useState} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
   TouchableHighlight,
+  ScrollView,
 } from 'react-native';
 import Swipeable from 'react-native-swipeable-row';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
@@ -31,9 +32,10 @@ const CarinaBar = (props) => {
         value={query}
         style={styles.bar}
         placeholder="Add task to Carina"
+        autoFocus={true}
         onFocus={() => {
           if (!planningMode) {
-          setPlanningModeButton(true);
+            setPlanningModeButton(true);
           }
         }}
         onBlur={() => {
@@ -46,7 +48,7 @@ const CarinaBar = (props) => {
         onSubmitEditing={(text) => {
           addTodo(
             props.userId,
-            planningMode ? query + planningAttributes : query,
+            planningMode ? query + ' ' + planningAttributes : query,
             props.listId,
           ).then(() => {
             props.todoListUpdater();

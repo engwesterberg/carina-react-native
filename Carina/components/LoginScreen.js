@@ -96,7 +96,8 @@ const LoginScreen = (props) => {
     <ImageBackground
       style={styles.imgBackground}
       resizeMode="cover"
-      source={require('../assets/note.jpg')}>
+      //source={require('../assets/note.jpg')}>
+      source={require('../assets/beach.jpg')}>
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         {!signupOpen ? (
           <View style={styles.loginContainer}>

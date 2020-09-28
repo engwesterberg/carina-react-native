@@ -675,7 +675,7 @@ const timeLabel = (todo) => {
               marginLeft: 2,
             }}>
             {' '}
-            {`${todo.pomo_done}/${todo.pomo_estimate}🍅`}
+            {/*{`${todo.pomo_done}/${todo.pomo_estimate}🍅`}*/}
           </Text>
         </View>
       ) : null}

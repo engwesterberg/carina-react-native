@@ -156,7 +156,9 @@ const Header = (props) => {
               );
             }}
           />
-          <Text style={styles.guide}>{sharedWithUsers.length > 0 && 'Currently shared with'}</Text>
+          <Text style={styles.guide}>
+            {sharedWithUsers.length > 0 && 'Currently shared with'}
+          </Text>
           {sharedWithUsers.map((item) => {
             return (
               <Chip
@@ -211,7 +213,8 @@ const Header = (props) => {
               props.selectedListUpdater({id: null, title: 'Carina'});
               hideMenu();
             }}>
-            Carina (default)
+            <Icon name="add" size={18} color="white" />
+            <Text>Default</Text>
           </MenuItem>
           <MenuDivider />
           {props.lists.map((item, index) => {
@@ -222,7 +225,8 @@ const Header = (props) => {
                   props.selectedListUpdater(item);
                   hideMenu();
                 }}>
-                {item.title}
+                <Icon name="add" size={18} color="white" />
+                <Text>{item.title}</Text>
               </MenuItem>
             );
           })}

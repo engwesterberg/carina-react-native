@@ -31,7 +31,7 @@ export const signUp = async (userId, email, fullname, secret) => {
     secret: secret,
   };
   let results = await axios
-    .post('http://192.168.0.44:5000/api/createuser', body)
+    .post('http://192.168.43.149:5000/api/createuser', body)
     .then((res) => res.data)
     .catch((err) => console.error("Wasn't able to update property.", err));
   return results;
@@ -43,7 +43,7 @@ export const signIn = async (email, secret) => {
     secret: secret,
   };
   let results = await axios
-    .post('http://192.168.0.44:5000/api/signin', body)
+    .post('http://192.168.43.149:5000/api/signin', body)
     .then((res) => res.data)
     .catch((err) => console.error("Wasn't able to update property.", err));
   return results;
@@ -56,7 +56,7 @@ export const addGoogleUser = async (googleId, email, name) => {
     name: name,
   };
   let results = await axios
-    .post('http://192.168.0.44:5000/api/user', body)
+    .post('http://192.168.43.149:5000/api/user', body)
     .then((res) => res.data)
     .catch((err) => console.error("Wasn't able to update property.", err));
   return results;
@@ -64,7 +64,7 @@ export const addGoogleUser = async (googleId, email, name) => {
 
 export const getUserIdByGoogleId = async (google_id) => {
   let res = await axios
-    .get(`http://192.168.0.44:5000/api/id/${google_id}`)
+    .get(`http://192.168.43.149:5000/api/id/${google_id}`)
     .then((res) => res.data)
     .catch((err) => console.error(err));
   return res[0].id;
@@ -72,7 +72,7 @@ export const getUserIdByGoogleId = async (google_id) => {
 
 export const getTodos = async (user_id) => {
   let results = await axios
-    .get(`http://192.168.0.44:5000/api/todos/${user_id}`)
+    .get(`http://192.168.43.149:5000/api/todos/${user_id}`)
     .then((results) => results.data)
     .catch((error) => console.error(error));
   return results;
@@ -80,7 +80,7 @@ export const getTodos = async (user_id) => {
 
 export const getSubTasks = async (todo_id) => {
   let results = await axios
-    .get(`http://192.168.0.44:5000/api/subtask/${todo_id}`)
+    .get(`http://192.168.43.149:5000/api/subtask/${todo_id}`)
     .then((results) => {
       return results.data[0];
     })
@@ -90,7 +90,7 @@ export const getSubTasks = async (todo_id) => {
 
 export const getLists = async (user_id) => {
   let results = await axios
-    .get(`http://192.168.0.44:5000/api/list/${user_id}`)
+    .get(`http://192.168.43.149:5000/api/list/${user_id}`)
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -101,7 +101,7 @@ export const getLists = async (user_id) => {
 
 export const incPomo = async (user_id, todo_id) => {
   let results = await axios
-    .put('http://192.168.0.44:5000/api/incpomo/', {
+    .put('http://192.168.43.149:5000/api/incpomo/', {
       user_id: user_id,
       todo_id: todo_id,
     })
@@ -113,7 +113,7 @@ export const incPomo = async (user_id, todo_id) => {
 
 export const getPomosToday = async (user_id) => {
   let results = await axios
-    .put(`http://192.168.0.44:5000/api/pomotoday/${user_id}`)
+    .put(`http://192.168.43.149:5000/api/pomotoday/${user_id}`)
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
@@ -122,7 +122,7 @@ export const getPomosToday = async (user_id) => {
 
 export const addTodo = async (user_id, query, list_id) => {
   let results = await axios
-    .post('http://192.168.0.44:5000/api/todo', {
+    .post('http://192.168.43.149:5000/api/todo', {
       user_id: user_id,
       query: query,
       list_id: list_id,
@@ -134,7 +134,7 @@ export const addTodo = async (user_id, query, list_id) => {
 
 export const addSubTask = async (todo_id, title) => {
   let results = await axios
-    .post('http://192.168.0.44:5000/api/subtask', {
+    .post('http://192.168.43.149:5000/api/subtask', {
       todo_id: todo_id,
       title: title,
     })
@@ -145,7 +145,7 @@ export const addSubTask = async (todo_id, title) => {
 
 export const deleteSubTask = async (id) => {
   let results = await axios
-    .delete(`http://192.168.0.44:5000/api/subtask/${id}`)
+    .delete(`http://192.168.43.149:5000/api/subtask/${id}`)
     .then((res) => res.data)
     .catch((e) => console.error(e));
   return results[0];
@@ -153,7 +153,7 @@ export const deleteSubTask = async (id) => {
 
 export const editSubTask = async (subtask_id, title, state) => {
   let results = await axios
-    .put('http://192.168.0.44:5000/api/subtask', {
+    .put('http://192.168.43.149:5000/api/subtask', {
       subtask_id: subtask_id,
       title: title,
       state: state,
@@ -165,7 +165,7 @@ export const editSubTask = async (subtask_id, title, state) => {
 
 export const copyTodo = async (todo) => {
   let results = await axios
-    .post('http://192.168.0.44:5000/api/todocopy', {
+    .post('http://192.168.43.149:5000/api/todocopy', {
       user_id: todo.user_id,
       list_id: todo.list_id,
       title: todo.title,
@@ -195,7 +195,7 @@ export const updateTodo = async (todo) => {
     recurring: todo.recurring,
   };
   let results = await axios
-    .put('http://192.168.0.44:5000/api/todo/', body)
+    .put('http://192.168.43.149:5000/api/todo/', body)
     .then((res) => {
       return res.data;
     })
@@ -206,7 +206,7 @@ export const updateTodo = async (todo) => {
 
 export const deleteTodo = async (todo_id) => {
   let results = await axios
-    .delete(`http://192.168.0.44:5000/api/todo/${todo_id}`)
+    .delete(`http://192.168.43.149:5000/api/todo/${todo_id}`)
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -217,7 +217,7 @@ export const deleteTodo = async (todo_id) => {
 
 export const emptyTrash = async (user_id) => {
   let results = await axios
-    .delete(`http://192.168.0.44:5000/api/emptytrash/${user_id}`)
+    .delete(`http://192.168.43.149:5000/api/emptytrash/${user_id}`)
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -228,7 +228,7 @@ export const emptyTrash = async (user_id) => {
 
 export const createList = async (user_id, listName) => {
   let results = await axios
-    .post('http://192.168.0.44:5000/api/list/', {
+    .post('http://192.168.43.149:5000/api/list/', {
       user_id: user_id,
       title: listName,
     })
@@ -239,7 +239,7 @@ export const createList = async (user_id, listName) => {
 
 export const shareList = async (list_id, share_email, owner_id) => {
   let results = await axios
-    .post('http://192.168.0.44:5000/api/shared_list/', {
+    .post('http://192.168.43.149:5000/api/shared_list/', {
       list_id: list_id,
       shared_with: share_email,
       owner_id: owner_id,
@@ -251,7 +251,7 @@ export const shareList = async (list_id, share_email, owner_id) => {
 
 export const stopSharingList = async (list_id, shared_with) => {
   let results = await axios
-    .post('http://192.168.0.44:5000/api/stopsharinglist/', {
+    .post('http://192.168.43.149:5000/api/stopsharinglist/', {
       list_id: list_id,
       shared_with: shared_with,
     })
@@ -262,7 +262,7 @@ export const stopSharingList = async (list_id, shared_with) => {
 
 export const getSharedWith = async (list_id) => {
   let results = await axios
-    .get(`http://192.168.0.44:5000/api/sharedwith/${list_id}`)
+    .get(`http://192.168.43.149:5000/api/sharedwith/${list_id}`)
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -273,7 +273,7 @@ export const getSharedWith = async (list_id) => {
 
 export const updateList = async (list_id, title) => {
   let results = axios
-    .put('http://192.168.0.44:5000/api/list/', {
+    .put('http://192.168.43.149:5000/api/list/', {
       list_id: list_id,
       title: title,
     })
@@ -285,7 +285,7 @@ export const updateList = async (list_id, title) => {
 
 export const deleteList = async (list_id) => {
   let results = axios
-    .delete(`http://192.168.0.44:5000/api/list/${list_id}`)
+    .delete(`http://192.168.43.149:5000/api/list/${list_id}`)
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
@@ -295,7 +295,7 @@ export const deleteList = async (list_id) => {
 //Update todos
 export const updateTodoTitle = async (todo_id, newTitle) => {
   let results = axios
-    .put('http://192.168.0.44:5000/api/todotitle/', {
+    .put('http://192.168.43.149:5000/api/todotitle/', {
       todo_id: todo_id,
       newTitle: newTitle,
     })
@@ -307,7 +307,7 @@ export const updateTodoTitle = async (todo_id, newTitle) => {
 
 export const updateTodoNote = async (todo_id, newNote) => {
   let results = axios
-    .put('http://192.168.0.44:5000/api/todonote/', {
+    .put('http://192.168.43.149:5000/api/todonote/', {
       todo_id: todo_id,
       newNote: newNote,
     })
@@ -319,7 +319,7 @@ export const updateTodoNote = async (todo_id, newNote) => {
 
 export const updatePomoEstimate = async (todo_id, newPomoEstimate) => {
   let results = axios
-    .put('http://192.168.0.44:5000/api/todopomoestimate/', {
+    .put('http://192.168.43.149:5000/api/todopomoestimate/', {
       todo_id: todo_id,
       newPomoEstimate: newPomoEstimate,
     })
@@ -331,7 +331,7 @@ export const updatePomoEstimate = async (todo_id, newPomoEstimate) => {
 
 export const updateTodoDate = async (todo_id, newDate) => {
   let results = axios
-    .put('http://192.168.0.44:5000/api/tododate/', {
+    .put('http://192.168.43.149:5000/api/tododate/', {
       todo_id: todo_id,
       newDate: newDate,
     })
@@ -343,7 +343,7 @@ export const updateTodoDate = async (todo_id, newDate) => {
 
 export const updateTodoTime = async (todo_id, newTime) => {
   let results = axios
-    .put('http://192.168.0.44:5000/api/todotime/', {
+    .put('http://192.168.43.149:5000/api/todotime/', {
       todo_id: todo_id,
       newTime: newTime,
     })

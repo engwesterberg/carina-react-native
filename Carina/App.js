@@ -42,15 +42,6 @@ const App = () => {
     setPomoBreak(!pomoBreak);
   };
 
-  const signOut = () => {
-    setUserId(null);
-    setTodos([]);
-    setLists([]);
-    setSelectedList({id: null, title: 'Carina'});
-    setShowDone(false);
-    setPomoActive(false);
-  };
-
   const setDevelopmentUserState = () => {
     setUserId(1);
     getTodos(1).then((res) => {
@@ -59,6 +50,16 @@ const App = () => {
     getLists(1).then((res) => {
       setLists(res);
     });
+  };
+
+
+  const signOut = () => {
+    setUserId(null);
+    setTodos([]);
+    setLists([]);
+    setSelectedList({id: null, title: 'Carina'});
+    setShowDone(false);
+    setPomoActive(false);
   };
 
   const signInHandler = (aId) => {

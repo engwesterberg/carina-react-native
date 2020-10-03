@@ -1,4 +1,5 @@
 import {COLORS} from '../colors.js';
+import {globalStyles} from '../globalstyles.js';
 
 import React, {useState} from 'react';
 import {
@@ -140,6 +141,25 @@ const Todo = (props) => {
 
     updateTodo(updated);
     return updated;
+  };
+
+  const recurringMenu = () => {
+    return (
+      <PopupMenu>
+        <MenuTrigger text="Select action" />
+        <MenuOptions>
+          <MenuOption onSelect={() => alert('Save')} text="Save" />
+          <MenuOption onSelect={() => alert('Delete')}>
+            <Text style={{color: 'red'}}>Delete</Text>
+          </MenuOption>
+          <MenuOption
+            onSelect={() => alert('Not called')}
+            disabled={true}
+            text="Disabled"
+          />
+        </MenuOptions>
+      </PopupMenu>
+    );
   };
 
   const expandedTodo = () => {
@@ -470,7 +490,7 @@ const Todo = (props) => {
               />
             </View>
           </View>
-          </MenuProvider>
+        </MenuProvider>
       </Modal>
     );
   };

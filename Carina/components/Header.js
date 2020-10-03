@@ -1,4 +1,5 @@
 import {COLORS} from '../colors.js';
+import {globalStyles} from '../globalstyles.js';
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, Platform, TextInput} from 'react-native';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
@@ -8,7 +9,7 @@ import Modal from 'react-native-modal';
 import {TextInput as PaperTextInput, Chip} from 'react-native-paper';
 import {ConfirmDialog} from 'react-native-simple-dialogs';
 import {
-  Menu as Menu,
+  Menu,
   MenuOptions,
   MenuOption,
   MenuTrigger,
@@ -37,7 +38,6 @@ const Header = (props) => {
 
   const displayPrompt = () => {
     setShowPrompt(true);
-    hideMenu();
   };
 
   const listSettings = () => {
@@ -70,6 +70,7 @@ const Header = (props) => {
                 onEndEditing={() => {
                   updateList(props.selectedList.id, newListName).then(() => {
                     props.listUpdater();
+              props.selectedListUpdater({id: props.selectedList.id, title: newListName});
                   });
                 }}
               />
@@ -169,9 +170,14 @@ const Header = (props) => {
             onSelect={() => {
               props.selectedListUpdater({id: null, title: 'Carina'});
             }}>
-            <View style={styles.menuRow}>
+            <View
+              style={[
+                globalStyles.menuRow,
+                globalStyles.menuDivider,
+                globalStyles.menuTopRow,
+              ]}>
               <Icon name="menu" size={18} color="white" />
-              <Text style={styles.menuItemtext}>Carina (default)</Text>
+              <Text style={globalStyles.menuItemtext}>Carina (default)</Text>
             </View>
           </MenuOption>
           {props.lists.map((item, index) => {
@@ -181,26 +187,31 @@ const Header = (props) => {
                 onSelect={() => {
                   props.selectedListUpdater(item);
                 }}>
-                <View style={styles.menuRow}>
+                <View
+                  style={
+                    index === props.lists.length - 1
+                      ? [globalStyles.menuRow, globalStyles.menuDivider]
+                      : globalStyles.menuRow
+                  }>
                   <Icon name="add" size={18} color="white" />
-                  <Text style={styles.menuItemtext}>{item.title}</Text>
+                  <Text style={globalStyles.menuItemtext}>{item.title}</Text>
                 </View>
               </MenuOption>
             );
           })}
           <MenuOption onSelect={displayPrompt}>
-            <View style={styles.menuRow}>
+            <View style={globalStyles.menuRow}>
               <Icon name="add" size={18} color={COLORS.mainLight} />
-              <Text style={styles.menuItemtext}>New List </Text>
+              <Text style={globalStyles.menuItemtext}>New List </Text>
             </View>
           </MenuOption>
           <MenuOption
             onSelect={() => {
               props.selectedListUpdater({id: -1, title: 'Archive'});
             }}>
-            <View style={styles.menuRow}>
+            <View style={globalStyles.menuRow}>
               <Icon name="trash" size={18} color={COLORS.mainLight} />
-              <Text style={styles.menuItemtext}>Archive</Text>
+              <Text style={globalStyles.menuItemtext}>Archive</Text>
             </View>
           </MenuOption>
         </MenuOptions>
@@ -219,9 +230,9 @@ const Header = (props) => {
             onSelect={() => {
               props.signOutHandler();
             }}>
-            <View style={styles.menuRow}>
+            <View style={[globalStyles.menuRow, globalStyles.menuTopRow]}>
               <Icon name="ios-log-out" size={20} color={COLORS.mainLight} />
-              <Text style={styles.menuItemtext}>Sign Out</Text>
+              <Text style={globalStyles.menuItemtext}>Sign Out</Text>
             </View>
           </MenuOption>
         </MenuOptions>
@@ -329,8 +340,6 @@ const styles = StyleSheet.create({
   },
   bold: {fontWeight: 'bold', color: COLORS.mainLight},
   input: {width: '90%', marginLeft: 5, marginBottom: 10},
-  menuRow: {flexDirection: 'row', alignItems: 'center'},
-  menuItemtext: {fontSize: 18, fontFamily: 'Roboto'},
 });
 
 export default Header;

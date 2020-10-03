@@ -17,6 +17,7 @@ import TextButton from './components/TextButton';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
 import {MenuProvider} from 'react-native-popup-menu';
+import {ConfirmDialog} from 'react-native-simple-dialogs';
 
 import {getTodos, getLists, emptyTrash} from './functions';
 
@@ -34,6 +35,7 @@ const App = () => {
   const [showDone, setShowDone] = useState(false);
   const [pomoActive, setPomoActive] = useState(false);
   const [pomoBreak, setPomoBreak] = useState(false);
+  const [showTrashDialog, setShowTrashDialog] = useState(false);
 
   useEffect(() => {
     setDevelopmentUserState();
@@ -162,25 +164,45 @@ const App = () => {
                     removeFromList={removeFromList}
                     listId={selectedList ? selectedList.id : null}
                     lists={lists}
-                    listSpecificButton={
-                      <View style={styles.listSpecificButton}>
-                        <Icon
-                          name="trash"
-                          size={50}
-                          color={COLORS.mainLight}
-                          onPress={() => {
-                            emptyTrash(userId).then(() => {
-                              todoListUpdater();
-                            });
-                          }}
-                        />
-                        <Text style={styles.specificButtonText}>
-                          Empty Trash
-                        </Text>
-                      </View>
-                    }
-                  />
+                    childAtTop={true}>
+                    <View style={styles.listSpecificButton}>
+                      <Icon
+                        name="trash"
+                        size={50}
+                        color={COLORS.mainLight}
+                        onPress={() => {
+                          setShowTrashDialog(true);
+                        }}
+                      />
+                      <Text style={styles.specificButtonText}>Empty Trash</Text>
+                    </View>
+                  </TodoList>
                 )}
+                <ConfirmDialog
+                  title="Empty Trash"
+                  message={
+                    'Are you sure you want to empty the trash? Changes will be permanent.'
+                  }
+                  visible={showTrashDialog}
+                  onTouchOutside={() => {
+                    setShowTrashDialog(false);
+                  }}
+                  positiveButton={{
+                    title: 'YES',
+                    onPress: () => {
+                      setShowTrashDialog(false);
+                      emptyTrash(userId).then(() => {
+                        todoListUpdater();
+                      });
+                    },
+                  }}
+                  negativeButton={{
+                    title: 'NO',
+                    onPress: () => {
+                      setShowTrashDialog(false);
+                    },
+                  }}
+                />
               </ScrollView>
             </View>
           </View>
@@ -221,6 +243,7 @@ const styles = StyleSheet.create({
   },
   specificButtonText: {
     color: COLORS.mainLight,
+    marginBottom: 30,
   },
 });
 

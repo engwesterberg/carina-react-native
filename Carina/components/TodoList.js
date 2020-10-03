@@ -16,6 +16,7 @@ const hr = (color) => {
 const TodoList = (props) => {
   return (
     <View style={styles.todoListContainer}>
+      {props.childAtTop && props.children}
       {props.todos.map((item, index) => {
         return (
           <View>
@@ -41,7 +42,7 @@ const TodoList = (props) => {
           </View>
         );
       })}
-      {props.listSpecificButton}
+      {props.childAtBottom && props.children}
     </View>
   );
 };

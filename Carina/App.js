@@ -16,6 +16,7 @@ import PomodoroBar from './components/PomodoroBar';
 import TextButton from './components/TextButton';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
+import {MenuProvider} from 'react-native-popup-menu';
 
 import {getTodos, getLists, emptyTrash} from './functions';
 
@@ -51,7 +52,6 @@ const App = () => {
       setLists(res);
     });
   };
-
 
   const signOut = () => {
     setUserId(null);
@@ -93,96 +93,99 @@ const App = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {!userId && <LoginScreen signInHandler={signInHandler} />}
-      {userId && (
-        <View style={styles.container}>
-          <Header
-            selectedList={selectedList}
-            lists={lists}
-            userId={userId}
-            listUpdater={listUpdater}
-            selectedListUpdater={(list) => {
-              setSelectedList(list);
-            }}
-            signOutHandler={signOut}
-          />
-          {selectedList.id !== DELETED_LIST_ID && (
-            <CarinaBar
+    <MenuProvider>
+      <SafeAreaView style={styles.safeArea}>
+        {!userId && <LoginScreen signInHandler={signInHandler} />}
+        {userId && (
+          <View style={styles.container}>
+            <Header
+              selectedList={selectedList}
+              lists={lists}
               userId={userId}
-              todoListUpdater={todoListUpdater}
-              listId={selectedList ? selectedList.id : null}
+              listUpdater={listUpdater}
+              selectedListUpdater={(list) => {
+                setSelectedList(list);
+              }}
+              signOutHandler={signOut}
             />
-          )}
-          <View style={{flex: 1, marginBottom: pomoActive ? 60 : 0}}>
-            <ScrollView>
-              <TodoList
-                todos={todos.filter(
-                  (obj) =>
-                    obj.state === NOT_DONE && obj.list_id === selectedList.id,
-                )}
-                state={NOT_DONE}
+            {selectedList.id !== DELETED_LIST_ID && (
+              <CarinaBar
+                userId={userId}
                 todoListUpdater={todoListUpdater}
-                removeFromList={removeFromList}
                 listId={selectedList ? selectedList.id : null}
-                updatePomoActive={updatePomoActive}
-                lists={lists}
               />
-              {selectedList.id !== DELETED_LIST_ID && (
-                <TouchableOpacity
-                  style={styles.showDoneView}
-                  onPress={() => {
-                    setShowDone(!showDone);
-                  }}>
-                  <Text style={styles.showDoneText}>
-                    <MaterialCommunityIconsI size={15} name="check" />
-                    {showDone ? 'Hide Done' : 'Show Done'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              {showDone && (
+            )}
+            <View style={{flex: 1, marginBottom: pomoActive ? 60 : 0}}>
+              <ScrollView>
                 <TodoList
                   todos={todos.filter(
                     (obj) =>
-                      obj.state === DONE && obj.list_id === selectedList.id,
+                      obj.state === NOT_DONE && obj.list_id === selectedList.id,
                   )}
-                  state={DONE}
+                  state={NOT_DONE}
                   todoListUpdater={todoListUpdater}
                   removeFromList={removeFromList}
                   listId={selectedList ? selectedList.id : null}
+                  updatePomoActive={updatePomoActive}
                   lists={lists}
                 />
-              )}
-              {selectedList.id === DELETED_LIST_ID && (
-                <TodoList
-                  todos={todos.filter((obj) => obj.state === DELETED)}
-                  state={DELETED}
-                  todoListUpdater={todoListUpdater}
-                  removeFromList={removeFromList}
-                  listId={selectedList ? selectedList.id : null}
-                  lists={lists}
-                  listSpecificButton={
-                    <View style={styles.listSpecificButton}>
-                      <Icon
-                        name="trash"
-                        size={50}
-                        color={COLORS.mainLight}
-                        onPress={() => {
-                          emptyTrash(userId).then(() => {
-                            todoListUpdater();
-                          });
-                        }}
-                      />
-                      <Text style={styles.specificButtonText}>Empty Trash</Text>
-                    </View>
-                  }
-                />
-              )}
-            </ScrollView>
+                {selectedList.id !== DELETED_LIST_ID && (
+                  <TouchableOpacity
+                    style={styles.showDoneView}
+                    onPress={() => {
+                      setShowDone(!showDone);
+                    }}>
+                    <Text style={styles.showDoneText}>
+                      <MaterialCommunityIconsI size={15} name="check" />
+                      {showDone ? 'Hide Done' : 'Show Done'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                {showDone && (
+                  <TodoList
+                    todos={todos.filter(
+                      (obj) =>
+                        obj.state === DONE && obj.list_id === selectedList.id,
+                    )}
+                    state={DONE}
+                    todoListUpdater={todoListUpdater}
+                    removeFromList={removeFromList}
+                    listId={selectedList ? selectedList.id : null}
+                    lists={lists}
+                  />
+                )}
+                {selectedList.id === DELETED_LIST_ID && (
+                  <TodoList
+                    todos={todos.filter((obj) => obj.state === DELETED)}
+                    state={DELETED}
+                    todoListUpdater={todoListUpdater}
+                    removeFromList={removeFromList}
+                    listId={selectedList ? selectedList.id : null}
+                    lists={lists}
+                    listSpecificButton={
+                      <View style={styles.listSpecificButton}>
+                        <Icon
+                          name="trash"
+                          size={50}
+                          color={COLORS.mainLight}
+                          onPress={() => {
+                            emptyTrash(userId).then(() => {
+                              todoListUpdater();
+                            });
+                          }}
+                        />
+                        <Text style={styles.specificButtonText}>
+                          Empty Trash
+                        </Text>
+                      </View>
+                    }
+                  />
+                )}
+              </ScrollView>
+            </View>
           </View>
-        </View>
-      )}
-      {/*pomoActive && (
+        )}
+        {/*pomoActive && (
         <PomodoroBar
           todo={pomoActive}
           updatePomoActive={updatePomoActive}
@@ -191,7 +194,8 @@ const App = () => {
           pomoBreakUpdater={pomoBreakUpdater}
         />
       )*/}
-    </SafeAreaView>
+      </SafeAreaView>
+    </MenuProvider>
   );
 };
 

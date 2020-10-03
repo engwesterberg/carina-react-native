@@ -2,12 +2,17 @@ import {COLORS} from '../colors.js';
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, Platform, TextInput} from 'react-native';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
-import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {Button} from 'react-native-elements';
 import DialogInput from 'react-native-dialog-input';
 import Modal from 'react-native-modal';
 import {TextInput as PaperTextInput, Chip} from 'react-native-paper';
 import {ConfirmDialog} from 'react-native-simple-dialogs';
+import {
+  Menu as Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
 
 import {
   createList,
@@ -19,38 +24,12 @@ import {
 } from '../functions';
 
 const Header = (props) => {
-  const [menu, setMenu] = useState(null);
-  const [settingsMenu, setSettingsMenu] = useState(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [newListName, setNewListName] = useState(null);
   const [shareWith, setShareWith] = useState('');
   const [sharedWithUsers, setSharedWithUsers] = useState([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-  const setMenuRef = (ref) => {
-    setMenu(ref);
-  };
-
-  const hideMenu = () => {
-    menu.hide();
-  };
-
-  const showMenu = () => {
-    menu.show();
-  };
-
-  const setSettingsMenuRef = (ref) => {
-    setSettingsMenu(ref);
-  };
-
-  const hideSettingsMenu = () => {
-    settingsMenu.hide();
-  };
-
-  const showSettingsMenu = () => {
-    settingsMenu.show();
-  };
 
   const onModalClose = () => {
     props.listUpdater();
@@ -179,6 +158,76 @@ const Header = (props) => {
       </Modal>
     );
   };
+  const hamburgerMenu = () => {
+    return (
+      <Menu>
+        <MenuTrigger>
+          <Icon name="menu" size={30} color="white" />
+        </MenuTrigger>
+        <MenuOptions>
+          <MenuOption
+            onSelect={() => {
+              props.selectedListUpdater({id: null, title: 'Carina'});
+            }}>
+            <View style={styles.menuRow}>
+              <Icon name="menu" size={18} color="white" />
+              <Text style={styles.menuItemtext}>Carina (default)</Text>
+            </View>
+          </MenuOption>
+          {props.lists.map((item, index) => {
+            return (
+              <MenuOption
+                key={item.id}
+                onSelect={() => {
+                  props.selectedListUpdater(item);
+                }}>
+                <View style={styles.menuRow}>
+                  <Icon name="add" size={18} color="white" />
+                  <Text style={styles.menuItemtext}>{item.title}</Text>
+                </View>
+              </MenuOption>
+            );
+          })}
+          <MenuOption onSelect={displayPrompt}>
+            <View style={styles.menuRow}>
+              <Icon name="add" size={18} color={COLORS.mainLight} />
+              <Text style={styles.menuItemtext}>New List </Text>
+            </View>
+          </MenuOption>
+          <MenuOption
+            onSelect={() => {
+              props.selectedListUpdater({id: -1, title: 'Archive'});
+            }}>
+            <View style={styles.menuRow}>
+              <Icon name="trash" size={18} color={COLORS.mainLight} />
+              <Text style={styles.menuItemtext}>Archive</Text>
+            </View>
+          </MenuOption>
+        </MenuOptions>
+      </Menu>
+    );
+  };
+
+  const settingsMenu = () => {
+    return (
+      <Menu>
+        <MenuTrigger>
+          <Icon name="person-circle-sharp" size={25} color="white" />
+        </MenuTrigger>
+        <MenuOptions>
+          <MenuOption
+            onSelect={() => {
+              props.signOutHandler();
+            }}>
+            <View style={styles.menuRow}>
+              <Icon name="ios-log-out" size={20} color={COLORS.mainLight} />
+              <Text style={styles.menuItemtext}>Sign Out</Text>
+            </View>
+          </MenuOption>
+        </MenuOptions>
+      </Menu>
+    );
+  };
   return (
     <View style={styles.header}>
       <DialogInput
@@ -197,55 +246,7 @@ const Header = (props) => {
           setShowPrompt(false);
         }}
       />
-      {props.lists && (
-        <Menu
-          ref={setMenuRef}
-          button={
-            <Button
-              icon={
-                <Icon name="menu" size={30} color="white" onPress={showMenu} />
-              }
-              buttonStyle={styles.menu}
-            />
-          }>
-          <MenuItem
-            onPress={() => {
-              props.selectedListUpdater({id: null, title: 'Carina'});
-              hideMenu();
-            }}>
-            <Icon name="add" size={18} color="white" />
-            <Text>Default</Text>
-          </MenuItem>
-          <MenuDivider />
-          {props.lists.map((item, index) => {
-            return (
-              <MenuItem
-                key={item.id}
-                onPress={() => {
-                  props.selectedListUpdater(item);
-                  hideMenu();
-                }}>
-                <Icon name="add" size={18} color="white" />
-                <Text>{item.title}</Text>
-              </MenuItem>
-            );
-          })}
-          <MenuDivider />
-          <MenuItem onPress={displayPrompt}>
-            <Icon name="add" size={18} color={COLORS.mainLight} />
-            <Text>New List </Text>
-          </MenuItem>
-          <MenuDivider />
-          <MenuItem
-            onPress={() => {
-              hideMenu();
-              props.selectedListUpdater({id: -1, title: 'Archive'});
-            }}>
-            <Icon name="trash" size={18} color={COLORS.mainLight} />
-            <Text>Archive</Text>
-          </MenuItem>
-        </Menu>
-      )}
+      {hamburgerMenu()}
       <View style={styles.listNameContainer}>
         <Text style={styles.text}> {props.selectedList.title}</Text>
         {props.selectedList.title !== 'Carina' &&
@@ -273,32 +274,7 @@ const Header = (props) => {
         {listSettings()}
       </View>
       {props.selectedList.title !== 'Login' &&
-        props.selectedList.title !== 'Sign Up' && (
-          <Menu
-            ref={setSettingsMenuRef}
-            button={
-              <Button
-                icon={
-                  <Icon
-                    name="person-circle-sharp"
-                    size={25}
-                    color="white"
-                    onPress={showSettingsMenu}
-                  />
-                }
-                buttonStyle={styles.settingsButton}
-              />
-            }>
-            <MenuItem
-              onPress={() => {
-                hideSettingsMenu();
-                props.signOutHandler();
-              }}>
-              <Icon name="ios-log-out" size={20} color={COLORS.mainLight} />
-              <Text>Sign Out</Text>
-            </MenuItem>
-          </Menu>
-        )}
+        props.selectedList.title !== 'Sign Up' && <View>{settingsMenu()}</View>}
     </View>
   );
 };
@@ -353,6 +329,8 @@ const styles = StyleSheet.create({
   },
   bold: {fontWeight: 'bold', color: COLORS.mainLight},
   input: {width: '90%', marginLeft: 5, marginBottom: 10},
+  menuRow: {flexDirection: 'row', alignItems: 'center'},
+  menuItemtext: {fontSize: 18, fontFamily: 'Roboto'},
 });
 
 export default Header;

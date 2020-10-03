@@ -34,6 +34,13 @@ import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunity
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import moment from 'moment';
 import TextButton from './TextButton';
+import {
+  Menu as PopupMenu,
+  MenuProvider,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
 
 const TOOLBAR_ICON_SIZE = 25;
 const MODAL_LEFT_MARGIN = 5;
@@ -151,27 +158,28 @@ const Todo = (props) => {
           onModalClose();
           setModalVisible(false);
         }}>
-        <View style={styles.modalView}>
-          <View>
-            <View style={styles.modalHeader}>
-              <TextInput
-                style={styles.todoTitle}
-                defaultValue={newTitle || props.todo.title}
-                onChangeText={(text) => {
-                  if (text) {
-                    setNewTitle(text);
-                  }
-                }}
-                onEndEditing={() => {
-                  updateTodoTitle(props.todo.id, newTitle);
-                }}
-              />
-            </View>
-            <View style={styles.dateRowView}>
-              {props.todo.due_date && dateOnly()}
-            </View>
-            <View style={styles.expandedTools}>
-              {/* <View style={styles.pomoContainer}>
+        <MenuProvider>
+          <View style={styles.modalView}>
+            <View>
+              <View style={styles.modalHeader}>
+                <TextInput
+                  style={styles.todoTitle}
+                  defaultValue={newTitle || props.todo.title}
+                  onChangeText={(text) => {
+                    if (text) {
+                      setNewTitle(text);
+                    }
+                  }}
+                  onEndEditing={() => {
+                    updateTodoTitle(props.todo.id, newTitle);
+                  }}
+                />
+              </View>
+              <View style={styles.dateRowView}>
+                {props.todo.due_date && dateOnly()}
+              </View>
+              <View style={styles.expandedTools}>
+                {/* <View style={styles.pomoContainer}>
                 <Icon
                   name="play"
                   size={15}
@@ -200,262 +208,269 @@ const Todo = (props) => {
                   }}
                 />
               </View>*/}
-              <View style={styles.datetimeView}>
-                <Icon
-                  name="calendar"
-                  size={TOOLBAR_ICON_SIZE}
-                  color={COLORS.mainLight}
-                  style={styles.button}
-                  onPress={() => {
-                    setShowDatePicker(true);
-                  }}
-                />
-                <DateTimePickerModal
-                  isVisible={showDatePicker}
-                  mode="date"
-                  onConfirm={(date) => {
-                    setShowDatePicker(false);
-                    let yy = moment(date).year();
-                    let mm = moment(date).month();
-                    let dd = moment(date).date();
-                    let deadline;
-                    if (props.todo.due_date === null) {
-                      deadline = moment([yy, mm, dd, hour || 18, minute || 0]);
-                    } else if (props.todo.due_date || newDate) {
-                      deadline = moment(props.todo.due_date || newDate).set({
-                        year: yy,
-                        month: mm,
-                        date: dd,
-                      });
-                      updateTodoDate(
-                        props.todo.id,
-                        moment(date).format('YYYY-MM-DD'),
-                      );
-                    }
-                    setNewDate(deadline);
-                    syncTodoToDatabase(deadline);
-                  }}
-                  onCancel={() => {
-                    setShowDatePicker(false);
-                  }}
-                />
-                <Icon
-                  name="clock-o"
-                  size={TOOLBAR_ICON_SIZE}
-                  color={COLORS.mainLight}
-                  backgroundColor="red"
-                  style={styles.button}
-                  onPress={() => {
-                    setShowTimePicker(true);
-                  }}
-                />
-                <DateTimePickerModal
-                  isVisible={showTimePicker}
-                  mode="time"
-                  onConfirm={(date) => {
-                    setShowTimePicker(false);
-                    let deadline;
-                    if (props.todo.due_date || newDate) {
-                      let h = moment(date).hour();
-                      let m = moment(date).minute();
-                      deadline = moment(props.todo.due_date || newDate)
-                        .set('hour', h)
-                        .set('minute', m);
+                <View style={styles.datetimeView}>
+                  <Icon
+                    name="calendar"
+                    size={TOOLBAR_ICON_SIZE}
+                    color={COLORS.mainLight}
+                    style={styles.button}
+                    onPress={() => {
+                      setShowDatePicker(true);
+                    }}
+                  />
+                  <DateTimePickerModal
+                    isVisible={showDatePicker}
+                    mode="date"
+                    onConfirm={(date) => {
+                      setShowDatePicker(false);
+                      let yy = moment(date).year();
+                      let mm = moment(date).month();
+                      let dd = moment(date).date();
+                      let deadline;
+                      if (props.todo.due_date === null) {
+                        deadline = moment([
+                          yy,
+                          mm,
+                          dd,
+                          hour || 18,
+                          minute || 0,
+                        ]);
+                      } else if (props.todo.due_date || newDate) {
+                        deadline = moment(props.todo.due_date || newDate).set({
+                          year: yy,
+                          month: mm,
+                          date: dd,
+                        });
+                        updateTodoDate(
+                          props.todo.id,
+                          moment(date).format('YYYY-MM-DD'),
+                        );
+                      }
                       setNewDate(deadline);
-                      syncTodoToDatabase(deadline, true);
-                    }
-                  }}
-                  onCancel={() => {
-                    setShowTimePicker(false);
-                  }}
-                />
-                {(props.todo.due_date || newDate) && (
+                      syncTodoToDatabase(deadline);
+                    }}
+                    onCancel={() => {
+                      setShowDatePicker(false);
+                    }}
+                  />
+                  <Icon
+                    name="clock-o"
+                    size={TOOLBAR_ICON_SIZE}
+                    color={COLORS.mainLight}
+                    backgroundColor="red"
+                    style={styles.button}
+                    onPress={() => {
+                      setShowTimePicker(true);
+                    }}
+                  />
+                  <DateTimePickerModal
+                    isVisible={showTimePicker}
+                    mode="time"
+                    onConfirm={(date) => {
+                      setShowTimePicker(false);
+                      let deadline;
+                      if (props.todo.due_date || newDate) {
+                        let h = moment(date).hour();
+                        let m = moment(date).minute();
+                        deadline = moment(props.todo.due_date || newDate)
+                          .set('hour', h)
+                          .set('minute', m);
+                        setNewDate(deadline);
+                        syncTodoToDatabase(deadline, true);
+                      }
+                    }}
+                    onCancel={() => {
+                      setShowTimePicker(false);
+                    }}
+                  />
+                  {(props.todo.due_date || newDate) && (
+                    <View>
+                      <Menu
+                        ref={setRepeatMenuRef}
+                        button={
+                          <Button
+                            icon={
+                              <Icon
+                                name="repeat"
+                                size={TOOLBAR_ICON_SIZE}
+                                color={COLORS.mainLight}
+                                onPress={showRepeatMenu}
+                              />
+                            }
+                            buttonStyle={styles.settingsButton}
+                          />
+                        }>
+                        {repeatValues.map((item) => {
+                          return (
+                            <MenuItem
+                              onPress={() => {
+                                console.warn(item.value);
+                                hideRepeatMenu();
+                                let updated = props.todo;
+                                updated.recurring = item.value;
+                                updateTodo(updated).then((res) => {});
+                              }}>
+                              <Text>{item.text}</Text>
+                            </MenuItem>
+                          );
+                        })}
+                      </Menu>
+                    </View>
+                  )}
                   <View>
                     <Menu
-                      ref={setRepeatMenuRef}
+                      ref={setListMenuRef}
                       button={
                         <Button
                           icon={
-                            <Icon
-                              name="repeat"
+                            <MaterialCommunityIconsI
+                              name="folder-move-outline"
                               size={TOOLBAR_ICON_SIZE}
                               color={COLORS.mainLight}
-                              onPress={showRepeatMenu}
+                              onPress={showListMenu}
                             />
                           }
                           buttonStyle={styles.settingsButton}
                         />
                       }>
-                      {repeatValues.map((item) => {
+                      <MenuItem
+                        onPress={() => {
+                          hideListMenu();
+                          let updated = props.todo;
+                          updated.list_id = null;
+                          updateTodo(updated).then((res) => {});
+                        }}>
+                        <Text
+                          style={{
+                            fontWeight: !props.todo.list_id ? 'bold' : 'normal',
+                          }}>
+                          Carina (default)
+                        </Text>
+                      </MenuItem>
+                      <MenuDivider />
+                      {props.lists.map((item) => {
                         return (
                           <MenuItem
                             onPress={() => {
-                              console.warn(item.value);
-                              hideRepeatMenu();
+                              console.warn(item);
+                              hideListMenu();
                               let updated = props.todo;
-                              updated.recurring = item.value;
+                              updated.list_id = item.id;
                               updateTodo(updated).then((res) => {});
                             }}>
-                            <Text>{item.text}</Text>
+                            <Text
+                              style={{
+                                fontWeight:
+                                  item.id === props.todo.list_id
+                                    ? 'bold'
+                                    : 'normal',
+                              }}>
+                              {item.title}
+                            </Text>
                           </MenuItem>
                         );
                       })}
                     </Menu>
                   </View>
-                )}
-                <View>
-                  <Menu
-                    ref={setListMenuRef}
-                    button={
-                      <Button
-                        icon={
-                          <MaterialCommunityIconsI
-                            name="folder-move-outline"
-                            size={TOOLBAR_ICON_SIZE}
-                            color={COLORS.mainLight}
-                            onPress={showListMenu}
-                          />
-                        }
-                        buttonStyle={styles.settingsButton}
-                      />
-                    }>
-                    <MenuItem
-                      onPress={() => {
-                        hideListMenu();
-                        let updated = props.todo;
-                        updated.list_id = null;
-                        updateTodo(updated).then((res) => {});
-                      }}>
-                      <Text
-                        style={{
-                          fontWeight: !props.todo.list_id ? 'bold' : 'normal',
-                        }}>
-                        Carina (default)
-                      </Text>
-                    </MenuItem>
-                    <MenuDivider />
-                    {props.lists.map((item) => {
-                      return (
-                        <MenuItem
-                          onPress={() => {
-                            console.warn(item);
-                            hideListMenu();
-                            let updated = props.todo;
-                            updated.list_id = item.id;
-                            updateTodo(updated).then((res) => {});
-                          }}>
-                          <Text
-                            style={{
-                              fontWeight:
-                                item.id === props.todo.list_id
-                                  ? 'bold'
-                                  : 'normal',
-                            }}>
-                            {item.title}
-                          </Text>
-                        </MenuItem>
-                      );
-                    })}
-                  </Menu>
                 </View>
               </View>
             </View>
-          </View>
-          <TextInput
-            value={newSubTask}
-            style={styles.bar}
-            placeholder="+ Add Subtask"
-            placeholderTextColor={COLORS.mainLight}
-            onChangeText={(text) => {
-              setNewSubTask(text);
-            }}
-            onBlur={() => {
-              if (newSubTask !== '') {
-                addSubTask(props.todo.id, newSubTask).then(() => {
-                  getSubTasks(props.todo.id).then((res) => {
-                    setSubTasks(res);
-                  });
-                });
-                console.warn(props.todo.id, newSubTask);
-                setNewSubTask('');
-              }
-            }}
-          />
-          {subTasks.length > 0 && (
-            <View
-              style={{
-                maxHeight: 150,
-                borderBottomWidth: 1,
-                borderBottomColor: COLORS.mainLight,
-              }}>
-              <ScrollView>
-                {subTasks.map((item) => {
-                  return (
-                    <View style={styles.subTaskContainer}>
-                      <TouchableOpacity
-                        onPress={() => {
-                          editSubTask(
-                            item.id,
-                            item.title,
-                            item.state === 0 ? 1 : 0,
-                          ).then(() => {
-                            getSubTasks(props.todo.id).then((res) => {
-                              setSubTasks(res);
-                            });
-                          });
-                        }}>
-                        <MaterialCommunityIconsI
-                          size={25}
-                          name={
-                            item.state === 0
-                              ? 'checkbox-blank-circle-outline'
-                              : 'checkbox-marked-circle-outline'
-                          }
-                          color={COLORS.mainLight}
-                        />
-                      </TouchableOpacity>
-                      <Text
-                        style={{
-                          textDecorationLine:
-                            item.state === 0 ? null : 'line-through',
-                        }}>
-                        {item.title}{' '}
-                      </Text>
-                      <Icon
-                        style={{marginLeft: 'auto', marginRight: 10}}
-                        name="trash"
-                        size={20}
-                        color={COLORS.mainLight}
-                        onPress={() => {
-                          deleteSubTask(item.id).then(() => {
-                            getSubTasks(props.todo.id).then((res) => {
-                              setSubTasks(res);
-                            });
-                          });
-                        }}
-                      />
-                    </View>
-                  );
-                })}
-              </ScrollView>
-            </View>
-          )}
-          <View style={{flex: 2}}>
             <TextInput
-              style={styles.note}
-              placeholder="Write a note"
-              defaultValue={props.todo.note}
-              placeholderTextColor="gray"
-              multiline={true}
+              value={newSubTask}
+              style={styles.bar}
+              placeholder="+ Add Subtask"
+              placeholderTextColor={COLORS.mainLight}
               onChangeText={(text) => {
-                setNewNote(text);
+                setNewSubTask(text);
               }}
-              onEndEditing={() => {
-                updateTodoNote(props.todo.id, newNote);
+              onBlur={() => {
+                if (newSubTask !== '') {
+                  addSubTask(props.todo.id, newSubTask).then(() => {
+                    getSubTasks(props.todo.id).then((res) => {
+                      setSubTasks(res);
+                    });
+                  });
+                  console.warn(props.todo.id, newSubTask);
+                  setNewSubTask('');
+                }
               }}
             />
+            {subTasks.length > 0 && (
+              <View
+                style={{
+                  maxHeight: 150,
+                  borderBottomWidth: 1,
+                  borderBottomColor: COLORS.mainLight,
+                }}>
+                <ScrollView>
+                  {subTasks.map((item) => {
+                    return (
+                      <View style={styles.subTaskContainer}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            editSubTask(
+                              item.id,
+                              item.title,
+                              item.state === 0 ? 1 : 0,
+                            ).then(() => {
+                              getSubTasks(props.todo.id).then((res) => {
+                                setSubTasks(res);
+                              });
+                            });
+                          }}>
+                          <MaterialCommunityIconsI
+                            size={25}
+                            name={
+                              item.state === 0
+                                ? 'checkbox-blank-circle-outline'
+                                : 'checkbox-marked-circle-outline'
+                            }
+                            color={COLORS.mainLight}
+                          />
+                        </TouchableOpacity>
+                        <Text
+                          style={{
+                            textDecorationLine:
+                              item.state === 0 ? null : 'line-through',
+                          }}>
+                          {item.title}{' '}
+                        </Text>
+                        <Icon
+                          style={{marginLeft: 'auto', marginRight: 10}}
+                          name="trash"
+                          size={20}
+                          color={COLORS.mainLight}
+                          onPress={() => {
+                            deleteSubTask(item.id).then(() => {
+                              getSubTasks(props.todo.id).then((res) => {
+                                setSubTasks(res);
+                              });
+                            });
+                          }}
+                        />
+                      </View>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            )}
+            <View style={{flex: 2}}>
+              <TextInput
+                style={styles.note}
+                placeholder="Write a note"
+                defaultValue={props.todo.note}
+                placeholderTextColor="gray"
+                multiline={true}
+                onChangeText={(text) => {
+                  setNewNote(text);
+                }}
+                onEndEditing={() => {
+                  updateTodoNote(props.todo.id, newNote);
+                }}
+              />
+            </View>
           </View>
-        </View>
+          </MenuProvider>
       </Modal>
     );
   };
@@ -651,7 +666,7 @@ const timeLabel = (todo) => {
         daysAgoString = 'Done Yesterday';
         break;
       default:
-        daysAgoString = '$Done {daysAgo} days ago';
+        daysAgoString = `Done ${daysAgo} days ago`;
         break;
     }
   }

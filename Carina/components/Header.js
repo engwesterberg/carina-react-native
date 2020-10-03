@@ -70,7 +70,10 @@ const Header = (props) => {
                 onEndEditing={() => {
                   updateList(props.selectedList.id, newListName).then(() => {
                     props.listUpdater();
-              props.selectedListUpdater({id: props.selectedList.id, title: newListName});
+                    props.selectedListUpdater({
+                      id: props.selectedList.id,
+                      title: newListName,
+                    });
                   });
                 }}
               />
@@ -117,13 +120,11 @@ const Header = (props) => {
             Share <Text style={styles.bold}>{props.selectedList.title} </Text>
             with other people
           </Text>
-          <PaperTextInput
-            style={styles.input}
+          <TextInput
             label="Email Address"
+            style={styles.bar}
             placeholder="Email Address"
-            selectionColor={COLORS.mainLight}
-            underlineColor={COLORS.mainLight}
-            dense={true}
+            placeholderTextColor={COLORS.mainLight}
             onChangeText={(text) => {
               setShareWith(text);
             }}
@@ -194,7 +195,9 @@ const Header = (props) => {
                       : globalStyles.menuRow
                   }>
                   <Icon name="add" size={18} color="white" />
-                  <Text style={globalStyles.menuItemtext}>{item.title}</Text>
+                  <Text style={globalStyles.menuItemtext}>
+                    {stringWithMaxLength(item.title, 22)}
+                  </Text>
                 </View>
               </MenuOption>
             );
@@ -239,6 +242,13 @@ const Header = (props) => {
       </Menu>
     );
   };
+  const stringWithMaxLength = (string, maxLength) => {
+    if (maxLength >= string.length) {
+      return string;
+    } else {
+      return string.substring(0, maxLength) + '..';
+    }
+  };
   return (
     <View style={styles.header}>
       <DialogInput
@@ -259,29 +269,22 @@ const Header = (props) => {
       />
       {hamburgerMenu()}
       <View style={styles.listNameContainer}>
-        <Text style={styles.text}> {props.selectedList.title}</Text>
-        {props.selectedList.title !== 'Carina' &&
-          props.selectedList.title !== 'Archive' &&
-          props.selectedList.title !== 'Sign Up' &&
-          props.selectedList.title !== 'Login' && (
-            <Button
-              icon={
-                <Icon
-                  name="settings"
-                  size={18}
-                  color="white"
-                  onPress={() => {
-                    setModalVisible(true);
-                    getSharedWith(props.selectedList.id).then((res) => {
-                      setSharedWithUsers(res);
-                      console.warn(res);
-                    });
-                  }}
-                />
-              }
-              buttonStyle={styles.listSettingsButton}
-            />
-          )}
+        <Text
+          style={styles.text}
+          onPress={() => {
+            if (
+          props.selectedList.id > 0
+            ) {
+              setModalVisible(true);
+              getSharedWith(props.selectedList.id).then((res) => {
+                setSharedWithUsers(res);
+                console.warn(res);
+              });
+            }
+          }}>
+          {' '}
+          {stringWithMaxLength(props.selectedList.title, 20)}
+        </Text>
         {listSettings()}
       </View>
       {props.selectedList.title !== 'Login' &&
@@ -340,6 +343,21 @@ const styles = StyleSheet.create({
   },
   bold: {fontWeight: 'bold', color: COLORS.mainLight},
   input: {width: '90%', marginLeft: 5, marginBottom: 10},
+  bar: {
+    alignSelf: 'center',
+    color: COLORS.mainDark,
+    marginTop: 5,
+    backgroundColor: COLORS.mainSuperLight,
+    height: 40,
+    width: '100%',
+    paddingLeft: 10,
+    borderBottomWidth: 0.2,
+    borderBottomColor: COLORS.mainLight,
+    borderTopWidth: 0.2,
+    borderTopColor: COLORS.mainLight,
+    fontSize: 14,
+    borderColor: COLORS.mainLight,
+  },
 });
 
 export default Header;

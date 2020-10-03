@@ -17,5 +17,5 @@ export const globalStyles = StyleSheet.create({
   menuRow: {flexDirection: 'row', alignItems: 'center', paddingBottom: 10},
   menuTopRow: {paddingTop: 10},
   menuDivider: {borderBottomWidth: 1, borderBottomColor: COLORS.mainSuperLight},
-  menuItemtext: {fontSize: 18, fontFamily: 'Roboto'},
+  menuItemtext: {fontSize: 16, fontFamily: 'Roboto'},
 });

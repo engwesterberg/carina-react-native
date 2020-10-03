@@ -65,6 +65,7 @@ const App = () => {
   };
 
   const signInHandler = (aId) => {
+    console.warn('Fetching todos for id: ', aId);
     setUserId(aId);
     getTodos(aId).then((res) => {
       setTodos(res);

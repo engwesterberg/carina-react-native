@@ -23,6 +23,7 @@ import {
   updateTodoNote,
   updateTodoDate,
   updateTodoTime,
+  updateTodoRecurring,
 } from '../functions';
 
 import Swipeable from 'react-native-swipeable-row';
@@ -61,6 +62,7 @@ const Todo = (props) => {
     props.todo.pomo_estimate,
   );
   const [newDate, setNewDate] = useState(null);
+  const [newRepeat, setNewRepeat] = useState(null);
   const [hour, setHour] = useState(null);
   const [minute, setMinute] = useState(null);
   const [subTasks, setSubTasks] = useState([]);
@@ -141,6 +143,83 @@ const Todo = (props) => {
 
     updateTodo(updated);
     return updated;
+  };
+
+  const datePicker = () => {
+    return (
+      <View style={styles.button}>
+        <Icon
+          name="calendar"
+          size={TOOLBAR_ICON_SIZE}
+          color={COLORS.mainLight}
+          onPress={() => {
+            setShowDatePicker(true);
+          }}
+        />
+        <DateTimePickerModal
+          isVisible={showDatePicker}
+          mode="date"
+          onConfirm={(date) => {
+            setShowDatePicker(false);
+            let yy = moment(date).year();
+            let mm = moment(date).month();
+            let dd = moment(date).date();
+            let deadline;
+            if (props.todo.due_date === null) {
+              deadline = moment([yy, mm, dd, hour || 18, minute || 0]);
+            } else if (props.todo.due_date || newDate) {
+              deadline = moment(props.todo.due_date || newDate).set({
+                year: yy,
+                month: mm,
+                date: dd,
+              });
+              updateTodoDate(props.todo.id, moment(date).format('YYYY-MM-DD'));
+            }
+            setNewDate(deadline);
+            syncTodoToDatabase(deadline);
+          }}
+          onCancel={() => {
+            setShowDatePicker(false);
+          }}
+        />
+      </View>
+    );
+  };
+
+  const timePicker = () => {
+    return (
+      <View style={styles.button}>
+        <Icon
+          name="clock-o"
+          size={TOOLBAR_ICON_SIZE}
+          color={COLORS.mainLight}
+          backgroundColor="red"
+          onPress={() => {
+            setShowTimePicker(true);
+          }}
+        />
+        <DateTimePickerModal
+          isVisible={showTimePicker}
+          mode="time"
+          onConfirm={(date) => {
+            setShowTimePicker(false);
+            let deadline;
+            if (props.todo.due_date || newDate) {
+              let h = moment(date).hour();
+              let m = moment(date).minute();
+              deadline = moment(props.todo.due_date || newDate)
+                .set('hour', h)
+                .set('minute', m);
+              setNewDate(deadline);
+              syncTodoToDatabase(deadline, true);
+            }
+          }}
+          onCancel={() => {
+            setShowTimePicker(false);
+          }}
+        />
+      </View>
+    );
   };
 
   const recurringMenu = () => {
@@ -228,81 +307,9 @@ const Todo = (props) => {
                   }}
                 />
               </View>*/}
-                <View style={styles.datetimeView}>
-                  <Icon
-                    name="calendar"
-                    size={TOOLBAR_ICON_SIZE}
-                    color={COLORS.mainLight}
-                    style={styles.button}
-                    onPress={() => {
-                      setShowDatePicker(true);
-                    }}
-                  />
-                  <DateTimePickerModal
-                    isVisible={showDatePicker}
-                    mode="date"
-                    onConfirm={(date) => {
-                      setShowDatePicker(false);
-                      let yy = moment(date).year();
-                      let mm = moment(date).month();
-                      let dd = moment(date).date();
-                      let deadline;
-                      if (props.todo.due_date === null) {
-                        deadline = moment([
-                          yy,
-                          mm,
-                          dd,
-                          hour || 18,
-                          minute || 0,
-                        ]);
-                      } else if (props.todo.due_date || newDate) {
-                        deadline = moment(props.todo.due_date || newDate).set({
-                          year: yy,
-                          month: mm,
-                          date: dd,
-                        });
-                        updateTodoDate(
-                          props.todo.id,
-                          moment(date).format('YYYY-MM-DD'),
-                        );
-                      }
-                      setNewDate(deadline);
-                      syncTodoToDatabase(deadline);
-                    }}
-                    onCancel={() => {
-                      setShowDatePicker(false);
-                    }}
-                  />
-                  <Icon
-                    name="clock-o"
-                    size={TOOLBAR_ICON_SIZE}
-                    color={COLORS.mainLight}
-                    backgroundColor="red"
-                    style={styles.button}
-                    onPress={() => {
-                      setShowTimePicker(true);
-                    }}
-                  />
-                  <DateTimePickerModal
-                    isVisible={showTimePicker}
-                    mode="time"
-                    onConfirm={(date) => {
-                      setShowTimePicker(false);
-                      let deadline;
-                      if (props.todo.due_date || newDate) {
-                        let h = moment(date).hour();
-                        let m = moment(date).minute();
-                        deadline = moment(props.todo.due_date || newDate)
-                          .set('hour', h)
-                          .set('minute', m);
-                        setNewDate(deadline);
-                        syncTodoToDatabase(deadline, true);
-                      }
-                    }}
-                    onCancel={() => {
-                      setShowTimePicker(false);
-                    }}
-                  />
+                <View style={styles.todoTools}>
+                  {datePicker()}
+                  {timePicker()}
                   {(props.todo.due_date || newDate) && (
                     <View>
                       <Menu
@@ -324,11 +331,14 @@ const Todo = (props) => {
                           return (
                             <MenuItem
                               onPress={() => {
-                                console.warn(item.value);
                                 hideRepeatMenu();
-                                let updated = props.todo;
-                                updated.recurring = item.value;
-                                updateTodo(updated).then((res) => {});
+                                setNewRepeat(item.value);
+                                updateTodoRecurring(
+                                  props.todo.id,
+                                  item.value,
+                                ).then((res) => {
+                                  console.log(res);
+                                });
                               }}>
                               <Text>{item.text}</Text>
                             </MenuItem>
@@ -547,7 +557,8 @@ const Todo = (props) => {
               paddingLeft: 1,
               fontFamily: 'Roboto',
             }}>
-            {props.todo.recurring && getRepeatValueString(props.todo.recurring)}
+            {(props.todo.recurring || newRepeat) &&
+              getRepeatValueString(newRepeat || props.todo.recurring)}
           </Text>
         )}
       </View>
@@ -913,7 +924,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 32,
   },
-  datetimeView: {
+  todoTools: {
     flexDirection: 'row',
   },
   bar: {

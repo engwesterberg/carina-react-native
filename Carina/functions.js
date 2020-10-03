@@ -352,3 +352,15 @@ export const updateTodoTime = async (todo_id, newTime) => {
 
   return results[0];
 };
+
+export const updateTodoRecurring = async (todo_id, newRecurring) => {
+  let results = axios
+    .put('http://172.16.11.253:5000/api/todorecurring/', {
+      todo_id: todo_id,
+      newRecurring: newRecurring,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};

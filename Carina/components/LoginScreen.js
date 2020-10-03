@@ -142,8 +142,6 @@ const LoginScreen = (props) => {
                   .then((res) => {
                     let result = res[0][0];
                     props.signInHandler(
-                      result.fullname,
-                      result.email,
                       result.id,
                     );
                   })

@@ -35,7 +35,6 @@ class CarinaBar extends Component {
           ref="textinput"
           style={styles.bar}
           placeholder="Add task to Carina"
-          autoFocus={true}
           onFocus={() => {
             if (!this.state.planningMode) {
               this.setState({planningModeButton: true});
@@ -57,7 +56,9 @@ class CarinaBar extends Component {
               this.props.listId,
             ).then(() => {
               this.props.todoListUpdater();
-            this.refs.textinput.focus();
+              if (this.state.planningMode) {
+                this.refs.textinput.focus();
+              }
             });
             this.setState({query: ''});
           }}

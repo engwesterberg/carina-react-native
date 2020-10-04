@@ -112,7 +112,7 @@ const daySeparator = (curr, prev) => {
             styles.daySeparatorText,
           ]}>
           {text}
-          {isNewYear && current.year()}
+          {isNewYear && !isNaN(current.year()) && current.year()}
         </Text>
         {hr(color)}
       </View>

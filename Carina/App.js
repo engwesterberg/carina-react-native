@@ -7,6 +7,7 @@ import {
   ScrollView,
   SafeAreaView,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import Header from './components/Header';
 import LoginScreen from './components/LoginScreen';
@@ -100,6 +101,7 @@ const App = () => {
         {!userId && <LoginScreen signInHandler={signInHandler} />}
         {userId && (
           <View style={styles.container}>
+            <StatusBar backgroundColor={COLORS.mainDark} />
             <Header
               selectedList={selectedList}
               lists={lists}

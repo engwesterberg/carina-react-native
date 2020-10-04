@@ -13,7 +13,6 @@ import LoginScreen from './components/LoginScreen';
 import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
 import PomodoroBar from './components/PomodoroBar';
-import TextButton from './components/TextButton';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
 import {MenuProvider} from 'react-native-popup-menu';
@@ -166,17 +165,27 @@ const App = () => {
                     listId={selectedList ? selectedList.id : null}
                     lists={lists}
                     childAtTop={true}>
-                    <View style={styles.listSpecificButton}>
-                      <Icon
-                        name="trash"
-                        size={50}
-                        color={COLORS.mainLight}
-                        onPress={() => {
-                          setShowTrashDialog(true);
-                        }}
-                      />
-                      <Text style={styles.specificButtonText}>Empty Trash</Text>
-                    </View>
+                    {todos.filter((obj) => obj.state === DELETED).length > 0 ? (
+                      <View style={styles.listSpecificButton}>
+                        <Icon
+                          name="trash"
+                          size={50}
+                          color={COLORS.mainLight}
+                          onPress={() => {
+                            setShowTrashDialog(true);
+                          }}
+                        />
+                        <Text style={styles.specificButtonText}>
+                          Empty trash
+                        </Text>
+                      </View>
+                    ) : (
+                      <View style={styles.listSpecificButton}>
+                        <Text style={styles.specificButtonText}>
+                          The trash is empty :)
+                        </Text>
+                      </View>
+                    )}
                   </TodoList>
                 )}
                 <ConfirmDialog

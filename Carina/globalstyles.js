@@ -9,6 +9,12 @@ export const globalStyles = StyleSheet.create({
   mainText: {
     fontSize: 18,
     fontFamily: 'Roboto',
+    color: COLORS.mainLight,
+  },
+  coloredTextMedium: {
+    fontSize: 14,
+    fontFamily: 'Roboto',
+    color: COLORS.mainLight,
   },
   smallBold: {
     fontSize: 12,

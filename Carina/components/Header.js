@@ -210,11 +210,11 @@ const Header = (props) => {
           </MenuOption>
           <MenuOption
             onSelect={() => {
-              props.selectedListUpdater({id: -1, title: 'Archive'});
+              props.selectedListUpdater({id: -1, title: 'Trash'});
             }}>
             <View style={globalStyles.menuRow}>
               <Icon name="trash" size={18} color={COLORS.mainLight} />
-              <Text style={globalStyles.menuItemtext}>Archive</Text>
+              <Text style={globalStyles.menuItemtext}>Trash</Text>
             </View>
           </MenuOption>
         </MenuOptions>
@@ -272,9 +272,7 @@ const Header = (props) => {
         <Text
           style={styles.text}
           onPress={() => {
-            if (
-          props.selectedList.id > 0
-            ) {
+            if (props.selectedList.id > 0) {
               setModalVisible(true);
               getSharedWith(props.selectedList.id).then((res) => {
                 setSharedWithUsers(res);

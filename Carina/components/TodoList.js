@@ -1,10 +1,11 @@
 /* eslint react-native/no-inline-styles: 0 */
 import {COLORS} from '../colors.js';
 import React, {useState} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Todo from './Todo';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
+import Toast from 'react-native-simple-toast';
 
 const hr = (color) => {
   return (
@@ -49,7 +50,7 @@ const TodoList = (props) => {
 const daySeparator = (curr, prev) => {
   let current = moment(curr);
   let previous = moment(prev);
-
+  let isNewYear = current.year() !== moment().year();
   if (current.date() === previous.date()) {
     return null;
   }
@@ -85,19 +86,37 @@ const daySeparator = (curr, prev) => {
     text = current.format('MMMM Do ');
   }
   let separatorText = (
-    <View style={styles.daySeparatorContainer}>
-      <Icon name="calendar" size={22} color={color} />
-      <Text
-        style={[
-          {
-            color: color,
-          },
-          styles.daySeparatorText,
-        ]}>
-        {text}
-      </Text>
-      {hr(color)}
-    </View>
+    <TouchableOpacity
+      onPress={() => {
+        let dayDiff = moment(curr).diff(moment(), 'days');
+        switch (dayDiff) {
+          case 0:
+            Toast.show("It's today, get on it mate");
+            break;
+        }
+        if (dayDiff === 0) {
+          Toast.show("It's today, get on it mate");
+        } else if (dayDiff > 0) {
+          Toast.show(`${dayDiff} days left`);
+        } else {
+          Toast.show(`${Math.abs(dayDiff)} days ago, get on it`);
+        }
+      }}>
+      <View style={styles.daySeparatorContainer}>
+        <Icon name="calendar" size={22} color={color} />
+        <Text
+          style={[
+            {
+              color: color,
+            },
+            styles.daySeparatorText,
+          ]}>
+          {text}
+          {isNewYear && current.year()}
+        </Text>
+        {hr(color)}
+      </View>
+    </TouchableOpacity>
   );
   return separatorText;
 };
@@ -111,7 +130,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   daySeparatorText: {
-    fontSize: 22,
+    fontSize: 28,
     padding: 1,
     fontFamily: 'Roboto-Light',
     marginLeft: 3,

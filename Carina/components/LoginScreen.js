@@ -16,6 +16,7 @@ import {
   Dimensions,
   ImageBackground,
   KeyboardAvoidingView,
+  TextInput,
 } from 'react-native';
 import {
   GoogleSignin,
@@ -101,21 +102,17 @@ const LoginScreen = (props) => {
         {!signupOpen ? (
           <View style={styles.loginContainer}>
             <Text style={styles.title}> Carina </Text>
-            <PaperTextInput
-              dense={true}
-              style={styles.input}
-              mode="outlined"
-              value={signupSuccess && email}
+            <TextInput
+              value={email}
+              style={styles.bar}
               placeholder="Username"
               placeholderTextColor="black"
               onChangeText={(text) => {
                 setEmail(text);
               }}
             />
-            <PaperTextInput
-              dense={true}
-              style={styles.input}
-              mode="outlined"
+            <TextInput
+              style={styles.bar}
               secureTextEntry={true}
               placeholder="Password"
               placeholderTextColor="black"
@@ -141,9 +138,7 @@ const LoginScreen = (props) => {
                 signIn(email, secret)
                   .then((res) => {
                     let result = res[0][0];
-                    props.signInHandler(
-                      result.id,
-                    );
+                    props.signInHandler(result.id);
                   })
                   .catch((e) => {
                     console.error(e);
@@ -161,45 +156,39 @@ const LoginScreen = (props) => {
         ) : (
           <View style={styles.loginContainer}>
             <Text style={styles.title}> Register </Text>
-            <PaperTextInput
-              mode="outlined"
-              dense={true}
+            <TextInput
               onChangeText={(text) => {
                 setName(text);
               }}
-              style={styles.input}
+              style={styles.bar}
               placeholder="Name"
               placeholderTextColor="black"
             />
-            <PaperTextInput
-              mode="outlined"
-              dense={true}
+            <TextInput
               onChangeText={(text) => {
                 setEmail(text);
               }}
-              style={styles.input}
+              style={styles.bar}
               placeholder="Email"
               placeholderTextColor="black"
             />
-            <PaperTextInput
-              mode="outlined"
-              dense={true}
+            <TextInput
               secureTextEntry={true}
               onChangeText={(text) => {
                 setSecret(text);
               }}
-              style={styles.input}
+              style={styles.bar}
               placeholder="Password"
               placeholderTextColor="black"
             />
-            <PaperTextInput
+            <TextInput
               mode="outlined"
               dense={true}
               secureTextEntry={true}
               onChangeText={(text) => {
                 setRepeatSecret(text);
               }}
-              style={styles.input}
+              style={styles.bar}
               placeholder="Repeat Password"
               placeholderTextColor="black"
             />
@@ -305,6 +294,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignSelf: 'center',
     fontFamily: 'Roboto',
+  },
+  bar: {
+    alignSelf: 'center',
+    color: COLORS.mainDark,
+    marginBottom: 10,
+    backgroundColor: COLORS.mainSuperLight,
+    height: 40,
+    width: '90%',
+    paddingLeft: 10,
+    borderBottomWidth: 0.2,
+    borderBottomColor: COLORS.mainLight,
+    borderTopWidth: 0.2,
+    borderTopColor: COLORS.mainLight,
+    fontSize: 14,
+    borderColor: COLORS.mainLight,
   },
 });
 

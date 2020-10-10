@@ -19,7 +19,7 @@ import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunity
 import {MenuProvider} from 'react-native-popup-menu';
 import {ConfirmDialog} from 'react-native-simple-dialogs';
 
-import {getTodos, getLists, emptyTrash} from './functions';
+import {getTodos, getLists, emptyTrash, deleteTodo} from './functions';
 
 const NOT_DONE = 0;
 const DONE = 1;
@@ -27,7 +27,8 @@ const DELETED = 2;
 const DELETED_LIST_ID = -1;
 
 const App = () => {
-  const [userId, setUserId] = useState(1);
+  const [userId, setUserId] = useState(null);
+  const [token, setToken] = useState(null);
   const [todos, setTodos] = useState([]);
   const [lists, setLists] = useState([]);
   const [selectedList, setSelectedList] = useState({id: null, title: 'Carina'});
@@ -38,7 +39,7 @@ const App = () => {
   const [showTrashDialog, setShowTrashDialog] = useState(false);
 
   useEffect(() => {
-    setDevelopmentUserState();
+    //setDevelopmentUserState();
   }, []);
 
   const pomoBreakUpdater = () => {
@@ -64,24 +65,25 @@ const App = () => {
     setPomoActive(false);
   };
 
-  const signInHandler = (aId) => {
-    console.warn('Fetching todos for id: ', aId);
+  const signInHandler = (aId, aToken) => {
     setUserId(aId);
-    getTodos(aId).then((res) => {
+    setToken(aToken);
+    getTodos(aId, aToken).then((res) => {
       setTodos(res);
     });
-    getLists(aId).then((res) => {
+    getLists(aId, aToken).then((res) => {
       setLists(res);
     });
   };
 
   const todoListUpdater = () => {
-    getTodos(userId).then((res) => {
+    getTodos(userId, token).then((res) => {
+console.warn("Update lists");
       setTodos(res);
     });
   };
   const listUpdater = () => {
-    getLists(userId).then((res) => {
+    getLists(userId, token).then((res) => {
       setLists(res);
       todoListUpdater();
     });
@@ -105,6 +107,7 @@ const App = () => {
             <Header
               selectedList={selectedList}
               lists={lists}
+              token={token}
               userId={userId}
               listUpdater={listUpdater}
               selectedListUpdater={(list) => {
@@ -114,6 +117,7 @@ const App = () => {
             />
             {selectedList.id !== DELETED_LIST_ID && (
               <CarinaBar
+              token={token}
                 userId={userId}
                 todoListUpdater={todoListUpdater}
                 listId={selectedList ? selectedList.id : null}
@@ -122,6 +126,7 @@ const App = () => {
             <View style={{flex: 1, marginBottom: pomoActive ? 60 : 0}}>
               <ScrollView>
                 <TodoList
+              token={token}
                   todos={todos.filter(
                     (obj) =>
                       obj.state === NOT_DONE && obj.list_id === selectedList.id,
@@ -147,6 +152,7 @@ const App = () => {
                 )}
                 {showDone && (
                   <TodoList
+              token={token}
                     todos={todos.filter(
                       (obj) =>
                         obj.state === DONE && obj.list_id === selectedList.id,
@@ -160,12 +166,13 @@ const App = () => {
                 )}
                 {selectedList.id === DELETED_LIST_ID && (
                   <TodoList
+              token={token}
                     todos={todos.filter((obj) => obj.state === DELETED)}
                     state={DELETED}
-                    todoListUpdater={todoListUpdater}
                     removeFromList={removeFromList}
                     listId={selectedList ? selectedList.id : null}
                     lists={lists}
+                    todoListUpdater={todoListUpdater}
                     childAtTop={true}>
                     {todos.filter((obj) => obj.state === DELETED).length > 0 ? (
                       <View style={styles.listSpecificButton}>
@@ -183,6 +190,11 @@ const App = () => {
                       </View>
                     ) : (
                       <View style={styles.listSpecificButton}>
+                        <MaterialCommunityIconsI
+                          name="check-bold"
+                          size={50}
+                          color={COLORS.mainLight}
+                        />
                         <Text style={styles.specificButtonText}>
                           The trash is empty :)
                         </Text>
@@ -226,6 +238,7 @@ const App = () => {
           userId={userId}
           countdownTime={pomoBreak ? 10 : 3}
           pomoBreakUpdater={pomoBreakUpdater}
+              token={token}
         />
       )*/}
       </SafeAreaView>

@@ -3,6 +3,14 @@ import moment from 'moment';
 
 const dbFormat = 'YYYY-MM-DD HH:mm:ss';
 
+const getRequestConfig = (token) => {
+  return {
+    headers: {
+      Authorization: 'Bearer ' + token,
+    },
+  };
+};
+
 export const dbDate = (moment) => {
   if (process.env.NODE_ENV !== 'production') {
     return moment.format(dbFormat);
@@ -44,7 +52,11 @@ export const signIn = async (email, secret) => {
   };
   let results = await axios
     .post('http://172.16.11.253:5000/api/signin', body)
-    .then((res) => res.data)
+    .then((res) => {
+      console.log('userinfo: ', res.data.userInfo);
+      console.log('token: ', res.data.token);
+      return res.data;
+    })
     .catch((err) => console.error("Wasn't able to update property.", err));
   return results;
 };
@@ -70,17 +82,23 @@ export const getUserIdByGoogleId = async (google_id) => {
   return res[0].id;
 };
 
-export const getTodos = async (user_id) => {
+export const getTodos = async (user_id, token) => {
   let results = await axios
-    .get(`http://172.16.11.253:5000/api/todos/${user_id}`)
+    .get(
+      `http://172.16.11.253:5000/api/todos/${user_id}`,
+      getRequestConfig(token),
+    )
     .then((results) => results.data)
     .catch((error) => console.error(error));
   return results;
 };
 
-export const getSubTasks = async (todo_id) => {
+export const getSubTasks = async (todo_id, token) => {
   let results = await axios
-    .get(`http://172.16.11.253:5000/api/subtask/${todo_id}`)
+    .get(
+      `http://172.16.11.253:5000/api/subtask/${todo_id}`,
+      getRequestConfig(token),
+    )
     .then((results) => {
       return results.data[0];
     })
@@ -88,9 +106,12 @@ export const getSubTasks = async (todo_id) => {
   return results;
 };
 
-export const getLists = async (user_id) => {
+export const getLists = async (user_id, token) => {
   let results = await axios
-    .get(`http://172.16.11.253:5000/api/list/${user_id}`)
+    .get(
+      `http://172.16.11.253:5000/api/list/${user_id}`,
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -163,18 +184,22 @@ export const editSubTask = async (subtask_id, title, state) => {
   return results[0];
 };
 
-export const copyTodo = async (todo) => {
+export const copyTodo = async (todo, token) => {
   let results = await axios
-    .post('http://172.16.11.253:5000/api/todocopy', {
-      user_id: todo.user_id,
-      list_id: todo.list_id,
-      title: todo.title,
-      note: todo.note,
-      due_date: todo.due_date,
-      hasTime: todo.has_time,
-      pomo_estimate: todo.pomo_estimate,
-      recurring: todo.recurring,
-    })
+    .post(
+      'http://172.16.11.253:5000/api/todocopy',
+      {
+        user_id: todo.user_id,
+        list_id: todo.list_id,
+        title: todo.title,
+        note: todo.note,
+        due_date: todo.due_date,
+        hasTime: todo.has_time,
+        pomo_estimate: todo.pomo_estimate,
+        recurring: todo.recurring,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
   return results[0];
@@ -293,6 +318,22 @@ export const deleteList = async (list_id) => {
 };
 
 //Update todos
+export const updateTodoState = async (todo_id, newState, token) => {
+  let results = axios
+    .put(
+      'http://172.16.11.253:5000/api/todostate/',
+      {
+        todo_id: todo_id,
+        state: newState,
+      },
+      getRequestConfig(token),
+    )
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};
+
 export const updateTodoTitle = async (todo_id, newTitle) => {
   let results = axios
     .put('http://172.16.11.253:5000/api/todotitle/', {

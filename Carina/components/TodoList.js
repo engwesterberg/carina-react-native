@@ -39,6 +39,7 @@ const TodoList = (props) => {
               updatePomoActive={props.updatePomoActive || null}
               showBorder={index !== props.todos.length}
               lists={props.lists}
+              token={props.token}
             />
           </View>
         );

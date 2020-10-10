@@ -137,8 +137,10 @@ const LoginScreen = (props) => {
               onPress={() => {
                 signIn(email, secret)
                   .then((res) => {
-                    let result = res[0][0];
-                    props.signInHandler(result.id);
+                    let userInfo = res.userInfo[0][0];
+                    let token = res.token;
+                    console.log('token:', token);
+                    props.signInHandler(userInfo.id, token);
                   })
                   .catch((e) => {
                     console.error(e);

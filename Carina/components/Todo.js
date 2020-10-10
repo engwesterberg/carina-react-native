@@ -19,6 +19,7 @@ import {
   addSubTask,
   editSubTask,
   deleteSubTask,
+  updateTodoState,
   updateTodoTitle,
   updateTodoNote,
   updateTodoDate,
@@ -78,7 +79,7 @@ const Todo = (props) => {
     if (value === 0) {
       return null;
     } else if (date && value === 7) {
-      return 'Every ' + moment(date).format('dddd');
+      return '  ' + 'Every ' + moment(date).format('dddd');
     }
     repeatValues.forEach((element) => {
       if (element.value === value) {
@@ -417,7 +418,7 @@ const Todo = (props) => {
             onBlur={() => {
               if (newSubTask !== '') {
                 addSubTask(props.todo.id, newSubTask).then(() => {
-                  getSubTasks(props.todo.id).then((res) => {
+                  getSubTasks(props.todo.id, props.token).then((res) => {
                     setSubTasks(res);
                   });
                 });
@@ -444,9 +445,11 @@ const Todo = (props) => {
                             item.title,
                             item.state === 0 ? 1 : 0,
                           ).then(() => {
-                            getSubTasks(props.todo.id).then((res) => {
-                              setSubTasks(res);
-                            });
+                            getSubTasks(props.todo.id, props.token).then(
+                              (res) => {
+                                setSubTasks(res);
+                              },
+                            );
                           });
                         }}>
                         <MaterialCommunityIconsI
@@ -466,9 +469,11 @@ const Todo = (props) => {
                             item.title,
                             item.state === 0 ? 1 : 0,
                           ).then(() => {
-                            getSubTasks(props.todo.id).then((res) => {
-                              setSubTasks(res);
-                            });
+                            getSubTasks(props.todo.id, props.token).then(
+                              (res) => {
+                                setSubTasks(res);
+                              },
+                            );
                           });
                         }}
                         style={{
@@ -484,9 +489,11 @@ const Todo = (props) => {
                         color={COLORS.mainLight}
                         onPress={() => {
                           deleteSubTask(item.id).then(() => {
-                            getSubTasks(props.todo.id).then((res) => {
-                              setSubTasks(res);
-                            });
+                            getSubTasks(props.todo.id, props.token).then(
+                              (res) => {
+                                setSubTasks(res);
+                              },
+                            );
                           });
                         }}
                       />
@@ -559,7 +566,7 @@ const Todo = (props) => {
               paddingLeft: 1,
               fontFamily: 'Roboto',
             }}>
-            {getRepeatValueString(newRepeat)}
+            {getRepeatValueString(newRepeat || props.todo.recurring)}
           </Text>
         )}
       </View>
@@ -601,7 +608,7 @@ const Todo = (props) => {
             style={{flex: 1}}
             onPress={() => {
               setModalVisible(true);
-              getSubTasks(props.todo.id).then((res) => {
+              getSubTasks(props.todo.id, props.token).then((res) => {
                 setSubTasks(res);
               });
             }}>
@@ -610,24 +617,28 @@ const Todo = (props) => {
                 <TouchableOpacity
                   onPress={() => {
                     let updatedTodo = props.todo;
-                    updatedTodo.state = updatedTodo.state === 0 ? 1 : 0;
-                    updateTodo(updatedTodo).then(props.todoListUpdater());
+                    let newState = updatedTodo.state === 0 ? 1 : 0;
+                    updateTodoState(props.todo.id, newState, props.token).then(
+                      () => {
+                        console.warn('update');
+                        props.todoListUpdater();
+                      },
+                    );
+                    //updateTodo(updatedTodo).then(props.todoListUpdater());
                     if (props.todo.recurring) {
                       let copy = props.todo;
                       if (copy.recurring === 30) {
                         copy.due_date = moment(copy.due_date).add(1, 'months');
-                  } else if (copy.recurring === 365) {
-
+                      } else if (copy.recurring === 365) {
                         copy.due_date = moment(copy.due_date).add(1, 'years');
-                  } else {
-
-                      copy.due_date = moment(copy.due_date).add(
-                        props.todo.recurring,
-                        'days',
-                      );
-                  }
-                      copyTodo(props.todo).then(() => {
-                        updateTodo(updatedTodo).then(props.todoListUpdater());
+                      } else {
+                        copy.due_date = moment(copy.due_date).add(
+                          props.todo.recurring,
+                          'days',
+                        );
+                      }
+                      copyTodo(props.todo, props.token).then(() => {
+                        props.todoListUpdater();
                       });
                     }
                   }}>
@@ -643,7 +654,7 @@ const Todo = (props) => {
                     />
                   ) : (
                     <Icon
-                      name="recycle"
+                      name="refresh"
                       size={30}
                       color={COLORS.mainLight}
                       onPress={() => {
@@ -951,9 +962,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   bar: {
-    alignSelf: 'center',
     color: COLORS.mainDark,
     marginTop: 5,
+    alignSelf: 'center',
     backgroundColor: COLORS.mainSuperLight,
     height: 40,
     width: '100%',

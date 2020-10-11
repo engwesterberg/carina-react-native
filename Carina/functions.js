@@ -10,6 +10,7 @@ const getRequestConfig = (token) => {
     },
   };
 };
+const API_ADDRESS = 'http://172.16.11.253:5000';
 
 export const dbDate = (moment) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -39,7 +40,7 @@ export const signUp = async (userId, email, fullname, secret) => {
     secret: secret,
   };
   let results = await axios
-    .post('http://172.16.11.253:5000/api/createuser', body)
+    .post(`${API_ADDRESS}/api/createuser`, body)
     .then((res) => res.data)
     .catch((err) => console.error("Wasn't able to update property.", err));
   return results;
@@ -51,7 +52,7 @@ export const signIn = async (email, secret) => {
     secret: secret,
   };
   let results = await axios
-    .post('http://172.16.11.253:5000/api/signin', body)
+    .post(`${API_ADDRESS}/api/signin`, body)
     .then((res) => {
       console.log('userinfo: ', res.data.userInfo);
       console.log('token: ', res.data.token);
@@ -68,7 +69,7 @@ export const addGoogleUser = async (googleId, email, name) => {
     name: name,
   };
   let results = await axios
-    .post('http://172.16.11.253:5000/api/user', body)
+    .post(`${API_ADDRESS}/api/user`, body)
     .then((res) => res.data)
     .catch((err) => console.error("Wasn't able to update property.", err));
   return results;
@@ -76,7 +77,7 @@ export const addGoogleUser = async (googleId, email, name) => {
 
 export const getUserIdByGoogleId = async (google_id) => {
   let res = await axios
-    .get(`http://172.16.11.253:5000/api/id/${google_id}`)
+    .get(`${API_ADDRESS}/api/id/${google_id}`)
     .then((res) => {
       console.log('getgoogleuser: ', res.data);
       return res;
@@ -87,10 +88,7 @@ export const getUserIdByGoogleId = async (google_id) => {
 
 export const getTodos = async (user_id, token) => {
   let results = await axios
-    .get(
-      `http://172.16.11.253:5000/api/todos/${user_id}`,
-      getRequestConfig(token),
-    )
+    .get(`${API_ADDRESS}/api/todos/${user_id}`, getRequestConfig(token))
     .then((results) => results.data)
     .catch((error) => console.error(error));
   return results;
@@ -98,10 +96,7 @@ export const getTodos = async (user_id, token) => {
 
 export const getSubTasks = async (todo_id, token) => {
   let results = await axios
-    .get(
-      `http://172.16.11.253:5000/api/subtask/${todo_id}`,
-      getRequestConfig(token),
-    )
+    .get(`${API_ADDRESS}/api/subtask/${todo_id}`, getRequestConfig(token))
     .then((results) => {
       return results.data[0];
     })
@@ -111,10 +106,7 @@ export const getSubTasks = async (todo_id, token) => {
 
 export const getLists = async (user_id, token) => {
   let results = await axios
-    .get(
-      `http://172.16.11.253:5000/api/list/${user_id}`,
-      getRequestConfig(token),
-    )
+    .get(`${API_ADDRESS}/api/list/${user_id}`, getRequestConfig(token))
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -125,7 +117,7 @@ export const getLists = async (user_id, token) => {
 
 export const incPomo = async (user_id, todo_id) => {
   let results = await axios
-    .put('http://172.16.11.253:5000/api/incpomo/', {
+    .put(`${API_ADDRESS}/api/incpomo/`, {
       user_id: user_id,
       todo_id: todo_id,
     })
@@ -137,7 +129,7 @@ export const incPomo = async (user_id, todo_id) => {
 
 export const getPomosToday = async (user_id) => {
   let results = await axios
-    .put(`http://172.16.11.253:5000/api/pomotoday/${user_id}`)
+    .put(`${API_ADDRESS}/api/pomotoday/${user_id}`)
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
@@ -147,7 +139,7 @@ export const getPomosToday = async (user_id) => {
 export const addTodo = async (user_id, query, list_id, token) => {
   let results = await axios
     .post(
-      'http://172.16.11.253:5000/api/todo',
+      `${API_ADDRESS}/api/todo`,
       {
         user_id: user_id,
         query: query,
@@ -163,7 +155,7 @@ export const addTodo = async (user_id, query, list_id, token) => {
 export const addSubTask = async (todo_id, title, token) => {
   let results = await axios
     .post(
-      'http://172.16.11.253:5000/api/subtask',
+      `${API_ADDRESS}/api/subtask`,
       {
         todo_id: todo_id,
         title: title,
@@ -177,10 +169,7 @@ export const addSubTask = async (todo_id, title, token) => {
 
 export const deleteSubTask = async (id, token) => {
   let results = await axios
-    .delete(
-      `http://172.16.11.253:5000/api/subtask/${id}`,
-      getRequestConfig(token),
-    )
+    .delete(`${API_ADDRESS}/api/subtask/${id}`, getRequestConfig(token))
     .then((res) => res.data)
     .catch((e) => console.error(e));
   return results[0];
@@ -189,7 +178,7 @@ export const deleteSubTask = async (id, token) => {
 export const editSubTask = async (subtask_id, title, state, token) => {
   let results = await axios
     .put(
-      'http://172.16.11.253:5000/api/subtask',
+      `${API_ADDRESS}/api/subtask`,
       {
         subtask_id: subtask_id,
         title: title,
@@ -205,7 +194,7 @@ export const editSubTask = async (subtask_id, title, state, token) => {
 export const copyTodo = async (todo, token) => {
   let results = await axios
     .post(
-      'http://172.16.11.253:5000/api/todocopy',
+      `${API_ADDRESS}/api/todocopy`,
       {
         user_id: todo.user_id,
         list_id: todo.list_id,
@@ -238,7 +227,7 @@ export const updateTodo = async (todo) => {
     recurring: todo.recurring,
   };
   let results = await axios
-    .put('http://172.16.11.253:5000/api/todo/', body)
+    .put(`${API_ADDRESS}/api/todo/`, body)
     .then((res) => {
       return res.data;
     })
@@ -249,10 +238,7 @@ export const updateTodo = async (todo) => {
 
 export const deleteTodo = async (todo_id, token) => {
   let results = await axios
-    .delete(
-      `http://172.16.11.253:5000/api/todo/${todo_id}`,
-      getRequestConfig(token),
-    )
+    .delete(`${API_ADDRESS}/api/todo/${todo_id}`, getRequestConfig(token))
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -263,10 +249,7 @@ export const deleteTodo = async (todo_id, token) => {
 
 export const emptyTrash = async (user_id, token) => {
   let results = await axios
-    .delete(
-      `http://172.16.11.253:5000/api/emptytrash/${user_id}`,
-      getRequestConfig(token),
-    )
+    .delete(`${API_ADDRESS}/api/emptytrash/${user_id}`, getRequestConfig(token))
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -278,7 +261,7 @@ export const emptyTrash = async (user_id, token) => {
 export const createList = async (user_id, listName, token) => {
   let results = await axios
     .post(
-      'http://172.16.11.253:5000/api/list/',
+      `${API_ADDRESS}/api/list/`,
       {
         user_id: user_id,
         title: listName,
@@ -293,7 +276,7 @@ export const createList = async (user_id, listName, token) => {
 export const shareList = async (list_id, share_email, owner_id, token) => {
   let results = await axios
     .post(
-      'http://172.16.11.253:5000/api/shared_list/',
+      `${API_ADDRESS}/api/shared_list/`,
       {
         list_id: list_id,
         shared_with: share_email,
@@ -309,7 +292,7 @@ export const shareList = async (list_id, share_email, owner_id, token) => {
 export const stopSharingList = async (list_id, shared_with, token) => {
   let results = await axios
     .post(
-      'http://172.16.11.253:5000/api/stopsharinglist/',
+      `${API_ADDRESS}/api/stopsharinglist/`,
       {
         list_id: list_id,
         shared_with: shared_with,
@@ -323,10 +306,7 @@ export const stopSharingList = async (list_id, shared_with, token) => {
 
 export const getSharedWith = async (list_id, token) => {
   let results = await axios
-    .get(
-      `http://172.16.11.253:5000/api/sharedwith/${list_id}`,
-      getRequestConfig(token),
-    )
+    .get(`${API_ADDRESS}/api/sharedwith/${list_id}`, getRequestConfig(token))
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -353,10 +333,7 @@ export const updateList = async (list_id, title, token) => {
 
 export const deleteList = async (list_id, token) => {
   let results = axios
-    .delete(
-      `http://172.16.11.253:5000/api/list/${list_id}`,
-      getRequestConfig(token),
-    )
+    .delete(`${API_ADDRESS}/api/list/${list_id}`, getRequestConfig(token))
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
@@ -367,7 +344,7 @@ export const deleteList = async (list_id, token) => {
 export const updateTodoState = async (todo_id, newState, token) => {
   let results = axios
     .put(
-      'http://172.16.11.253:5000/api/todostate/',
+      `${API_ADDRESS}/api/todostate/`,
       {
         todo_id: todo_id,
         state: newState,
@@ -383,7 +360,7 @@ export const updateTodoState = async (todo_id, newState, token) => {
 export const updateTodoTitle = async (todo_id, newTitle, token) => {
   let results = axios
     .put(
-      'http://172.16.11.253:5000/api/todotitle/',
+      `${API_ADDRESS}/api/todotitle/`,
       {
         todo_id: todo_id,
         newTitle: newTitle,
@@ -399,7 +376,7 @@ export const updateTodoTitle = async (todo_id, newTitle, token) => {
 export const updateTodoNote = async (todo_id, newNote, token) => {
   let results = axios
     .put(
-      'http://172.16.11.253:5000/api/todonote/',
+      `${API_ADDRESS}/api/todonote/`,
       {
         todo_id: todo_id,
         newNote: newNote,
@@ -415,7 +392,7 @@ export const updateTodoNote = async (todo_id, newNote, token) => {
 export const updatePomoEstimate = async (todo_id, newPomoEstimate, token) => {
   let results = axios
     .put(
-      'http://172.16.11.253:5000/api/todopomoestimate/',
+      `${API_ADDRESS}/api/todopomoestimate/`,
       {
         todo_id: todo_id,
         newPomoEstimate: newPomoEstimate,
@@ -431,7 +408,7 @@ export const updatePomoEstimate = async (todo_id, newPomoEstimate, token) => {
 export const updateTodoDate = async (todo_id, newDate, token) => {
   let results = axios
     .put(
-      'http://172.16.11.253:5000/api/tododate/',
+      `${API_ADDRESS}/api/tododate/`,
       {
         todo_id: todo_id,
         newDate: newDate,
@@ -447,7 +424,7 @@ export const updateTodoDate = async (todo_id, newDate, token) => {
 export const updateTodoTime = async (todo_id, newTime, token) => {
   let results = axios
     .put(
-      'http://172.16.11.253:5000/api/todotime/',
+      `${API_ADDRESS}/api/todotime/`,
       {
         todo_id: todo_id,
         newTime: newTime,
@@ -463,7 +440,7 @@ export const updateTodoTime = async (todo_id, newTime, token) => {
 export const updateTodoRecurring = async (todo_id, newRecurring, token) => {
   let results = axios
     .put(
-      'http://172.16.11.253:5000/api/todorecurring/',
+      `${API_ADDRESS}/api/todorecurring/`,
       {
         todo_id: todo_id,
         newRecurring: newRecurring,

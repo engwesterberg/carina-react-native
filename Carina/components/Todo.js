@@ -57,6 +57,8 @@ const Todo = (props) => {
   );
   const [hasTime, setHasTime] = useState(false);
   const [newDate, setNewDate] = useState(null);
+  const [hour, setHour] = useState(0);
+  const [minute, setMinute] = useState(0);
   const [newRepeat, setNewRepeat] = useState(null);
   const [subTasks, setSubTasks] = useState([]);
   const [newSubTask, setNewSubTask] = useState('');
@@ -117,7 +119,7 @@ const Todo = (props) => {
 
   const onModalClose = () => {
     if (newNote !== '') {
-      updateTodoNote(props.todo.id, newNote).then((res) => {
+      updateTodoNote(props.todo.id, newNote, props.token).then((res) => {
         props.todoListUpdater();
       });
     } else {
@@ -162,15 +164,18 @@ const Todo = (props) => {
             if (props.todo.due_date === null) {
               deadline = moment([yy, mm, dd, hour || 18, minute || 0]);
             } else if (props.todo.due_date || newDate) {
-              deadline = moment(props.todo.due_date || newDate).set({
+              deadline = moment(newDate || props.todo.due_date).set({
                 year: yy,
                 month: mm,
                 date: dd,
               });
-              updateTodoDate(props.todo.id, moment(date).format('YYYY-MM-DD'));
+              updateTodoDate(
+                props.todo.id,
+                moment(date).format('YYYY-MM-DD'),
+                props.token,
+              );
             }
             setNewDate(deadline);
-            syncTodoToDatabase(deadline);
           }}
           onCancel={() => {
             setShowDatePicker(false);
@@ -201,7 +206,9 @@ const Todo = (props) => {
             if (props.todo.due_date || newDate) {
               let h = moment(date).hour();
               let m = moment(date).minute();
-              deadline = moment(props.todo.due_date || newDate)
+              setHour(h);
+              setMinute(m);
+              deadline = moment(newDate || props.todo.due_date)
                 .set('hour', h)
                 .set('minute', m);
               setNewDate(deadline);
@@ -209,6 +216,7 @@ const Todo = (props) => {
               updateTodoTime(
                 props.todo.id,
                 moment(deadline).format('YYYY-MM-DD HH:mm'),
+                props.token,
               );
             }
           }}
@@ -267,7 +275,7 @@ const Todo = (props) => {
                   }
                 }}
                 onEndEditing={() => {
-                  updateTodoTitle(props.todo.id, newTitle);
+                  updateTodoTitle(props.todo.id, newTitle, props.token);
                 }}
               />
             </View>
@@ -304,7 +312,11 @@ const Todo = (props) => {
                     setNewPomoEstimate(Number(text));
                   }}
                   onEndEditing={() => {
-                    updatePomoEstimate(props.todo.id, newPomoEstimate);
+                    updatePomoEstimate(
+                      props.todo.id,
+                      newPomoEstimate,
+                      props.token,
+                    );
                   }}
                 />
               </View>
@@ -337,6 +349,7 @@ const Todo = (props) => {
                               updateTodoRecurring(
                                 props.todo.id,
                                 item.value,
+                                props.token,
                               ).then((res) => {
                                 console.log(res);
                                 setNewRepeat(item.value);
@@ -417,7 +430,7 @@ const Todo = (props) => {
             }}
             onBlur={() => {
               if (newSubTask !== '') {
-                addSubTask(props.todo.id, newSubTask).then(() => {
+                addSubTask(props.todo.id, newSubTask, props.token).then(() => {
                   getSubTasks(props.todo.id, props.token).then((res) => {
                     setSubTasks(res);
                   });
@@ -444,6 +457,7 @@ const Todo = (props) => {
                             item.id,
                             item.title,
                             item.state === 0 ? 1 : 0,
+                            props.token,
                           ).then(() => {
                             getSubTasks(props.todo.id, props.token).then(
                               (res) => {
@@ -468,6 +482,7 @@ const Todo = (props) => {
                             item.id,
                             item.title,
                             item.state === 0 ? 1 : 0,
+                            props.token,
                           ).then(() => {
                             getSubTasks(props.todo.id, props.token).then(
                               (res) => {
@@ -488,7 +503,7 @@ const Todo = (props) => {
                         size={25}
                         color={COLORS.mainLight}
                         onPress={() => {
-                          deleteSubTask(item.id).then(() => {
+                          deleteSubTask(item.id, props.token).then(() => {
                             getSubTasks(props.todo.id, props.token).then(
                               (res) => {
                                 setSubTasks(res);
@@ -594,13 +609,13 @@ const Todo = (props) => {
           </View>
         }
         onRightActionRelease={() => {
-          deleteTodo(props.todo.id).then(() => {
+          deleteTodo(props.todo.id, props.token).then(() => {
             props.todoListUpdater();
           });
           props.removeFromList(props.todo.id);
         }}
         onLeftActionRelease={() => {
-          deleteTodo(props.todo.id).then(props.todoListUpdater());
+          deleteTodo(props.todo.id, props.token).then(props.todoListUpdater());
           props.removeFromList(props.todo.id);
         }}>
         <View style={styles.todoContainer} key={props.id}>
@@ -660,7 +675,7 @@ const Todo = (props) => {
                       onPress={() => {
                         let updatedTodo = props.todo;
                         updatedTodo.state = 0;
-                        updateTodo(updatedTodo).then(props.todoListUpdater());
+                        updateTodoState(props.todo.id, 0, props.token).then(props.todoListUpdater());
                       }}
                     />
                   )}

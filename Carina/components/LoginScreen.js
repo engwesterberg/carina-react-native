@@ -74,9 +74,13 @@ const LoginScreen = (props) => {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       let user = userInfo.user;
-      addGoogleUser(user.id, user.email, user.name).then(() => {
+      addGoogleUser(user.id, user.email, user.name).then((result) => {
         getUserIdByGoogleId(user.id).then((res) => {
-          props.signInHandler(res);
+          console.log('asså: ', res);
+          let id = res.result[0].id;
+          let token = res.token;
+          console.log('KOMIGEN', id, token);
+          props.signInHandler(id, token);
         });
       });
     } catch (error) {

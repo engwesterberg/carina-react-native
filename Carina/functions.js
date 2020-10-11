@@ -77,9 +77,12 @@ export const addGoogleUser = async (googleId, email, name) => {
 export const getUserIdByGoogleId = async (google_id) => {
   let res = await axios
     .get(`http://172.16.11.253:5000/api/id/${google_id}`)
-    .then((res) => res.data)
+    .then((res) => {
+      console.log('getgoogleuser: ', res.data);
+      return res;
+    })
     .catch((err) => console.error(err));
-  return res[0].id;
+  return res.data;
 };
 
 export const getTodos = async (user_id, token) => {
@@ -141,44 +144,59 @@ export const getPomosToday = async (user_id) => {
   return results[0];
 };
 
-export const addTodo = async (user_id, query, list_id) => {
+export const addTodo = async (user_id, query, list_id, token) => {
   let results = await axios
-    .post('http://172.16.11.253:5000/api/todo', {
-      user_id: user_id,
-      query: query,
-      list_id: list_id,
-    })
+    .post(
+      'http://172.16.11.253:5000/api/todo',
+      {
+        user_id: user_id,
+        query: query,
+        list_id: list_id,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
   return results[0];
 };
 
-export const addSubTask = async (todo_id, title) => {
+export const addSubTask = async (todo_id, title, token) => {
   let results = await axios
-    .post('http://172.16.11.253:5000/api/subtask', {
-      todo_id: todo_id,
-      title: title,
-    })
+    .post(
+      'http://172.16.11.253:5000/api/subtask',
+      {
+        todo_id: todo_id,
+        title: title,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
   return results[0];
 };
 
-export const deleteSubTask = async (id) => {
+export const deleteSubTask = async (id, token) => {
   let results = await axios
-    .delete(`http://172.16.11.253:5000/api/subtask/${id}`)
+    .delete(
+      `http://172.16.11.253:5000/api/subtask/${id}`,
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
   return results[0];
 };
 
-export const editSubTask = async (subtask_id, title, state) => {
+export const editSubTask = async (subtask_id, title, state, token) => {
   let results = await axios
-    .put('http://172.16.11.253:5000/api/subtask', {
-      subtask_id: subtask_id,
-      title: title,
-      state: state,
-    })
+    .put(
+      'http://172.16.11.253:5000/api/subtask',
+      {
+        subtask_id: subtask_id,
+        title: title,
+        state: state,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
   return results[0];
@@ -229,9 +247,12 @@ export const updateTodo = async (todo) => {
   return results[0];
 };
 
-export const deleteTodo = async (todo_id) => {
+export const deleteTodo = async (todo_id, token) => {
   let results = await axios
-    .delete(`http://172.16.11.253:5000/api/todo/${todo_id}`)
+    .delete(
+      `http://172.16.11.253:5000/api/todo/${todo_id}`,
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -240,9 +261,12 @@ export const deleteTodo = async (todo_id) => {
   return results[0];
 };
 
-export const emptyTrash = async (user_id) => {
+export const emptyTrash = async (user_id, token) => {
   let results = await axios
-    .delete(`http://172.16.11.253:5000/api/emptytrash/${user_id}`)
+    .delete(
+      `http://172.16.11.253:5000/api/emptytrash/${user_id}`,
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -251,43 +275,58 @@ export const emptyTrash = async (user_id) => {
   return results[0];
 };
 
-export const createList = async (user_id, listName) => {
+export const createList = async (user_id, listName, token) => {
   let results = await axios
-    .post('http://172.16.11.253:5000/api/list/', {
-      user_id: user_id,
-      title: listName,
-    })
+    .post(
+      'http://172.16.11.253:5000/api/list/',
+      {
+        user_id: user_id,
+        title: listName,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
   return results[0];
 };
 
-export const shareList = async (list_id, share_email, owner_id) => {
+export const shareList = async (list_id, share_email, owner_id, token) => {
   let results = await axios
-    .post('http://172.16.11.253:5000/api/shared_list/', {
-      list_id: list_id,
-      shared_with: share_email,
-      owner_id: owner_id,
-    })
+    .post(
+      'http://172.16.11.253:5000/api/shared_list/',
+      {
+        list_id: list_id,
+        shared_with: share_email,
+        owner_id: owner_id,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
   return results[0];
 };
 
-export const stopSharingList = async (list_id, shared_with) => {
+export const stopSharingList = async (list_id, shared_with, token) => {
   let results = await axios
-    .post('http://172.16.11.253:5000/api/stopsharinglist/', {
-      list_id: list_id,
-      shared_with: shared_with,
-    })
+    .post(
+      'http://172.16.11.253:5000/api/stopsharinglist/',
+      {
+        list_id: list_id,
+        shared_with: shared_with,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
   return results[0];
 };
 
-export const getSharedWith = async (list_id) => {
+export const getSharedWith = async (list_id, token) => {
   let results = await axios
-    .get(`http://172.16.11.253:5000/api/sharedwith/${list_id}`)
+    .get(
+      `http://172.16.11.253:5000/api/sharedwith/${list_id}`,
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
@@ -296,21 +335,28 @@ export const getSharedWith = async (list_id) => {
   return results[0];
 };
 
-export const updateList = async (list_id, title) => {
+export const updateList = async (list_id, title, token) => {
   let results = axios
-    .put('http://172.16.11.253:5000/api/list/', {
-      list_id: list_id,
-      title: title,
-    })
+    .put(
+      'http://172.16.11.253:5000/api/list/',
+      {
+        list_id: list_id,
+        title: title,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
   return results[0];
 };
 
-export const deleteList = async (list_id) => {
+export const deleteList = async (list_id, token) => {
   let results = axios
-    .delete(`http://172.16.11.253:5000/api/list/${list_id}`)
+    .delete(
+      `http://172.16.11.253:5000/api/list/${list_id}`,
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
@@ -334,72 +380,96 @@ export const updateTodoState = async (todo_id, newState, token) => {
   return results[0];
 };
 
-export const updateTodoTitle = async (todo_id, newTitle) => {
+export const updateTodoTitle = async (todo_id, newTitle, token) => {
   let results = axios
-    .put('http://172.16.11.253:5000/api/todotitle/', {
-      todo_id: todo_id,
-      newTitle: newTitle,
-    })
+    .put(
+      'http://172.16.11.253:5000/api/todotitle/',
+      {
+        todo_id: todo_id,
+        newTitle: newTitle,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
   return results[0];
 };
 
-export const updateTodoNote = async (todo_id, newNote) => {
+export const updateTodoNote = async (todo_id, newNote, token) => {
   let results = axios
-    .put('http://172.16.11.253:5000/api/todonote/', {
-      todo_id: todo_id,
-      newNote: newNote,
-    })
+    .put(
+      'http://172.16.11.253:5000/api/todonote/',
+      {
+        todo_id: todo_id,
+        newNote: newNote,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
   return results[0];
 };
 
-export const updatePomoEstimate = async (todo_id, newPomoEstimate) => {
+export const updatePomoEstimate = async (todo_id, newPomoEstimate, token) => {
   let results = axios
-    .put('http://172.16.11.253:5000/api/todopomoestimate/', {
-      todo_id: todo_id,
-      newPomoEstimate: newPomoEstimate,
-    })
+    .put(
+      'http://172.16.11.253:5000/api/todopomoestimate/',
+      {
+        todo_id: todo_id,
+        newPomoEstimate: newPomoEstimate,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
   return results[0];
 };
 
-export const updateTodoDate = async (todo_id, newDate) => {
+export const updateTodoDate = async (todo_id, newDate, token) => {
   let results = axios
-    .put('http://172.16.11.253:5000/api/tododate/', {
-      todo_id: todo_id,
-      newDate: newDate,
-    })
+    .put(
+      'http://172.16.11.253:5000/api/tododate/',
+      {
+        todo_id: todo_id,
+        newDate: newDate,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
   return results[0];
 };
 
-export const updateTodoTime = async (todo_id, newTime) => {
+export const updateTodoTime = async (todo_id, newTime, token) => {
   let results = axios
-    .put('http://172.16.11.253:5000/api/todotime/', {
-      todo_id: todo_id,
-      newTime: newTime,
-    })
+    .put(
+      'http://172.16.11.253:5000/api/todotime/',
+      {
+        todo_id: todo_id,
+        newTime: newTime,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
   return results[0];
 };
 
-export const updateTodoRecurring = async (todo_id, newRecurring) => {
+export const updateTodoRecurring = async (todo_id, newRecurring, token) => {
   let results = axios
-    .put('http://172.16.11.253:5000/api/todorecurring/', {
-      todo_id: todo_id,
-      newRecurring: newRecurring,
-    })
+    .put(
+      'http://172.16.11.253:5000/api/todorecurring/',
+      {
+        todo_id: todo_id,
+        newRecurring: newRecurring,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
 

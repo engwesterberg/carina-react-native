@@ -68,7 +68,7 @@ const Header = (props) => {
                   }
                 }}
                 onEndEditing={() => {
-                  updateList(props.selectedList.id, newListName).then(() => {
+                  updateList(props.selectedList.id, newListName, props.token).then(() => {
                     props.listUpdater();
                     props.selectedListUpdater({
                       id: props.selectedList.id,
@@ -101,7 +101,7 @@ const Header = (props) => {
                   title: 'YES',
                   onPress: () => {
                     setShowDeleteDialog(false);
-                    deleteList(props.selectedList.id).then(() => {
+                    deleteList(props.selectedList.id, props.token).then(() => {
                       setModalVisible(false);
                       props.listUpdater();
                     });
@@ -130,11 +130,14 @@ const Header = (props) => {
             }}
             onBlur={() => {
               console.warn(shareWith);
-              shareList(props.selectedList.id, shareWith, props.userId).then(
-                (res) => {
-                  setSharedWithUsers(res);
-                },
-              );
+              shareList(
+                props.selectedList.id,
+                shareWith,
+                props.userId,
+                props.token,
+              ).then((res) => {
+                setSharedWithUsers(res);
+              });
             }}
           />
           <Text style={styles.guide}>
@@ -146,11 +149,13 @@ const Header = (props) => {
                 icon="delete"
                 key={item.id}
                 onPress={() => {
-                  stopSharingList(props.selectedList.id, item.id).then(
-                    (res) => {
-                      setSharedWithUsers(res);
-                    },
-                  );
+                  stopSharingList(
+                    props.selectedList.id,
+                    item.id,
+                    props.token,
+                  ).then((res) => {
+                    setSharedWithUsers(res);
+                  });
                 }}>
                 {item.fullname}
               </Chip>
@@ -258,7 +263,7 @@ const Header = (props) => {
         message={'Type the name of the new list'}
         hintInput={'List Name'}
         submitInput={(inputText) => {
-          createList(props.userId, inputText).then(() => {
+          createList(props.userId, inputText, props.token).then(() => {
             props.listUpdater();
           });
           setShowPrompt(false);
@@ -274,7 +279,7 @@ const Header = (props) => {
           onPress={() => {
             if (props.selectedList.id > 0) {
               setModalVisible(true);
-              getSharedWith(props.selectedList.id).then((res) => {
+              getSharedWith(props.selectedList.id, props.token).then((res) => {
                 setSharedWithUsers(res);
                 console.warn(res);
               });

@@ -78,7 +78,8 @@ const App = () => {
 
   const todoListUpdater = () => {
     getTodos(userId, token).then((res) => {
-console.warn("Update lists");
+      console.warn('Update lists');
+      console.log('todos', res);
       setTodos(res);
     });
   };
@@ -117,7 +118,7 @@ console.warn("Update lists");
             />
             {selectedList.id !== DELETED_LIST_ID && (
               <CarinaBar
-              token={token}
+                token={token}
                 userId={userId}
                 todoListUpdater={todoListUpdater}
                 listId={selectedList ? selectedList.id : null}
@@ -126,7 +127,7 @@ console.warn("Update lists");
             <View style={{flex: 1, marginBottom: pomoActive ? 60 : 0}}>
               <ScrollView>
                 <TodoList
-              token={token}
+                  token={token}
                   todos={todos.filter(
                     (obj) =>
                       obj.state === NOT_DONE && obj.list_id === selectedList.id,
@@ -152,7 +153,7 @@ console.warn("Update lists");
                 )}
                 {showDone && (
                   <TodoList
-              token={token}
+                    token={token}
                     todos={todos.filter(
                       (obj) =>
                         obj.state === DONE && obj.list_id === selectedList.id,
@@ -166,7 +167,7 @@ console.warn("Update lists");
                 )}
                 {selectedList.id === DELETED_LIST_ID && (
                   <TodoList
-              token={token}
+                    token={token}
                     todos={todos.filter((obj) => obj.state === DELETED)}
                     state={DELETED}
                     removeFromList={removeFromList}
@@ -215,7 +216,7 @@ console.warn("Update lists");
                     title: 'YES',
                     onPress: () => {
                       setShowTrashDialog(false);
-                      emptyTrash(userId).then(() => {
+                      emptyTrash(userId, token).then(() => {
                         todoListUpdater();
                       });
                     },

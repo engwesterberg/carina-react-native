@@ -104,7 +104,11 @@ const daySeparator = (curr, prev) => {
         }
       }}>
       <View style={styles.daySeparatorContainer}>
-        <Icon name="calendar" size={22} color={color} />
+        <Icon
+          name={text === 'No Date' ? 'warning' : 'calendar-o'}
+          size={22}
+          color={color}
+        />
         <Text
           style={[
             {

@@ -78,8 +78,6 @@ const App = () => {
 
   const todoListUpdater = () => {
     getTodos(userId, token).then((res) => {
-      console.warn('Update lists');
-      console.log('todos', res);
       setTodos(res);
     });
   };
@@ -255,10 +253,11 @@ const styles = StyleSheet.create({
   showDoneView: {
     alignItems: 'center',
     marginTop: 15,
+    padding: 15,
   },
   showDoneText: {
     color: COLORS.mainLight,
-    fontSize: 14,
+    fontSize: 18,
     fontFamily: 'Roboto',
   },
   listSpecificButton: {

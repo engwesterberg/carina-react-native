@@ -26,6 +26,7 @@ import {
   updateTodoTime,
   updateTodoRecurring,
   updatePomoEstimate,
+  updateTodosList,
 } from '../functions';
 
 import Swipeable from 'react-native-swipeable-row';
@@ -169,12 +170,12 @@ const Todo = (props) => {
                 month: mm,
                 date: dd,
               });
-              updateTodoDate(
-                props.todo.id,
-                moment(date).format('YYYY-MM-DD'),
-                props.token,
-              );
             }
+            updateTodoDate(
+              props.todo.id,
+              moment(date).format('YYYY-MM-DD'),
+              props.token,
+            );
             setNewDate(deadline);
           }}
           onCancel={() => {
@@ -247,14 +248,301 @@ const Todo = (props) => {
     );
   };
 
-  const expandedTodo = () => {
+  //Expanded todo components
+  const modalHeader = () => {
+    return (
+      <View style={styles.modalHeader}>
+        <TextInput
+          style={styles.todoTitle}
+          defaultValue={newTitle || props.todo.title}
+          onChangeText={(text) => {
+            if (text) {
+              setNewTitle(text);
+            }
+          }}
+          onEndEditing={() => {
+            updateTodoTitle(props.todo.id, newTitle, props.token);
+          }}
+        />
+      </View>
+    );
+  };
+  const modalDateRow = () => {
+    return (
+      <View style={styles.dateRowView}>
+        {(props.todo.due_date || newDate) && dateOnly()}
+      </View>
+    );
+  };
+  const modalToolbar = () => {
+    return (
+      <View style={styles.expandedTools}>
+        <View style={styles.pomoContainer}>
+          <Icon
+            name="play"
+            size={TOOLBAR_ICON_SIZE}
+            style={styles.button}
+            color={COLORS.mainLight}
+            onPress={() => {
+              props.updatePomoActive(props.todo);
+              setModalVisible(false);
+            }}
+          />
+          <TextInput
+            style={styles.pomosDoneText}
+            value={String(props.todo.pomo_done)}
+            editable={false}
+          />
+          <TextInput
+            style={styles.pomoSeparator}
+            value={'/'}
+            editable={false}
+          />
+          <TextInput
+            style={styles.pomoEstimateText}
+            value={String(newPomoEstimate)}
+            keyboardType="number-pad"
+            onChangeText={(text) => {
+              setNewPomoEstimate(Number(text));
+            }}
+            onEndEditing={() => {
+              updatePomoEstimate(props.todo.id, newPomoEstimate, props.token);
+            }}
+          />
+        </View>
+        <View style={styles.todoTools}>
+          {datePicker()}
+          {(props.todo.due_date || newDate) && timePicker()}
+          {(props.todo.due_date || newDate) && (
+            <View>
+              <Menu
+                ref={setRepeatMenuRef}
+                button={
+                  <Button
+                    icon={
+                      <Icon
+                        name="repeat"
+                        size={TOOLBAR_ICON_SIZE}
+                        color={COLORS.mainLight}
+                        onPress={showRepeatMenu}
+                      />
+                    }
+                    buttonStyle={styles.settingsButton}
+                  />
+                }>
+                {repeatValues.map((item) => {
+                  return (
+                    <MenuItem
+                      onPress={() => {
+                        hideRepeatMenu();
+                        console.warn(item.value);
+                        updateTodoRecurring(
+                          props.todo.id,
+                          item.value,
+                          props.token,
+                        ).then((res) => {
+                          console.log(res);
+                          setNewRepeat(item.value);
+                        });
+                      }}>
+                      <Text>{item.text}</Text>
+                    </MenuItem>
+                  );
+                })}
+              </Menu>
+            </View>
+          )}
+          <View>
+            <Menu
+              ref={setListMenuRef}
+              button={
+                <Button
+                  icon={
+                    <MaterialCommunityIconsI
+                      name="folder-move-outline"
+                      size={TOOLBAR_ICON_SIZE}
+                      color={COLORS.mainLight}
+                      onPress={showListMenu}
+                    />
+                  }
+                  buttonStyle={styles.settingsButton}
+                />
+              }>
+              <MenuItem
+                onPress={() => {
+                  hideListMenu();
+                  updateTodosList(props.todo.id, null, props.token).then(() => {
+                    props.todoListUpdater();
+                    setModalVisible(false);
+                  });
+                }}>
+                <Text
+                  style={{
+                    fontWeight: !props.todo.list_id ? 'bold' : 'normal',
+                  }}>
+                  Carina (default)
+                </Text>
+              </MenuItem>
+              <MenuDivider />
+              {props.lists.map((item) => {
+                return (
+                  <MenuItem
+                    onPress={() => {
+                      hideListMenu();
+                      console.warn(item.id);
+                      updateTodosList(props.todo.id, item.id, props.token).then(
+                        () => {
+                          props.todoListUpdater();
+                          setModalVisible(false);
+                        },
+                      );
+                    }}>
+                    <Text
+                      style={{
+                        fontWeight:
+                          item.id === props.todo.list_id ? 'bold' : 'normal',
+                      }}>
+                      {item.title}
+                    </Text>
+                  </MenuItem>
+                );
+              })}
+            </Menu>
+          </View>
+        </View>
+      </View>
+    );
+  };
+  const modalSubTaskView = () => {
+    return (
+      <View>
+        <TextInput
+          value={newSubTask}
+          style={styles.bar}
+          placeholder="+ Add Subtask"
+          placeholderTextColor={COLORS.mainLight}
+          onChangeText={(text) => {
+            setNewSubTask(text);
+          }}
+          onBlur={() => {
+            if (newSubTask !== '') {
+              addSubTask(props.todo.id, newSubTask, props.token).then(() => {
+                getSubTasks(props.todo.id, props.token).then((res) => {
+                  setSubTasks(res);
+                });
+              });
+              console.warn(props.todo.id, newSubTask);
+              setNewSubTask('');
+            }
+          }}
+        />
+        {subTasks.length > 0 && (
+          <View
+            style={{
+              maxHeight: 150,
+              borderBottomWidth: 1,
+              borderBottomColor: COLORS.mainLight,
+            }}>
+            <ScrollView>
+              {subTasks.map((item) => {
+                return (
+                  <View style={styles.subTaskContainer}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        editSubTask(
+                          item.id,
+                          item.title,
+                          item.state === 0 ? 1 : 0,
+                          props.token,
+                        ).then(() => {
+                          getSubTasks(props.todo.id, props.token).then(
+                            (res) => {
+                              setSubTasks(res);
+                            },
+                          );
+                        });
+                      }}>
+                      <MaterialCommunityIconsI
+                        size={25}
+                        name={
+                          item.state === 0
+                            ? 'checkbox-blank-circle-outline'
+                            : 'checkbox-marked-circle-outline'
+                        }
+                        color={COLORS.mainLight}
+                      />
+                    </TouchableOpacity>
+                    <Text
+                      onPress={() => {
+                        editSubTask(
+                          item.id,
+                          item.title,
+                          item.state === 0 ? 1 : 0,
+                          props.token,
+                        ).then(() => {
+                          getSubTasks(props.todo.id, props.token).then(
+                            (res) => {
+                              setSubTasks(res);
+                            },
+                          );
+                        });
+                      }}
+                      style={{
+                        textDecorationLine:
+                          item.state === 0 ? null : 'line-through',
+                      }}>
+                      {item.title}{' '}
+                    </Text>
+                    <Icon
+                      style={{marginLeft: 'auto', marginRight: 10}}
+                      name="trash"
+                      size={25}
+                      color={COLORS.mainLight}
+                      onPress={() => {
+                        deleteSubTask(item.id, props.token).then(() => {
+                          getSubTasks(props.todo.id, props.token).then(
+                            (res) => {
+                              setSubTasks(res);
+                            },
+                          );
+                        });
+                      }}
+                    />
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </View>
+        )}
+      </View>
+    );
+  };
+
+  const modalNoteView = () => {
+    return (
+      <View style={{flex: 2}}>
+        <TextInput
+          style={styles.note}
+          placeholder="Write a note"
+          defaultValue={props.todo.note}
+          placeholderTextColor="gray"
+          multiline={true}
+          onChangeText={(text) => {
+            setNewNote(text);
+          }}
+        />
+      </View>
+    );
+  };
+
+  const todoModal = () => {
     return (
       <Modal
         useNativeDriver={true}
         style={styles.modal}
         isVisible={modalVisible}
         coverScreen={true}
-        backdropOpacity={0.8}
+        backdropOpacity={0.4}
         onBackButtonPress={() => {
           onModalClose();
           setModalVisible(false);
@@ -264,272 +552,11 @@ const Todo = (props) => {
           setModalVisible(false);
         }}>
         <View style={styles.modalView}>
-          <View>
-            <View style={styles.modalHeader}>
-              <TextInput
-                style={styles.todoTitle}
-                defaultValue={newTitle || props.todo.title}
-                onChangeText={(text) => {
-                  if (text) {
-                    setNewTitle(text);
-                  }
-                }}
-                onEndEditing={() => {
-                  updateTodoTitle(props.todo.id, newTitle, props.token);
-                }}
-              />
-            </View>
-            <View style={styles.dateRowView}>
-              {(props.todo.due_date || newDate) && dateOnly()}
-            </View>
-            <View style={styles.expandedTools}>
-              <View style={styles.pomoContainer}>
-                <Icon
-                  name="play"
-                  size={TOOLBAR_ICON_SIZE}
-                  style={styles.button}
-                  color={COLORS.mainLight}
-                  onPress={() => {
-                    props.updatePomoActive(props.todo);
-                    setModalVisible(false);
-                  }}
-                />
-                <TextInput
-                  style={styles.pomosDoneText}
-                  value={String(props.todo.pomo_done)}
-                  editable={false}
-                />
-                <TextInput
-                  style={styles.pomoSeparator}
-                  value={'/'}
-                  editable={false}
-                />
-                <TextInput
-                  style={styles.pomoEstimateText}
-                  value={String(newPomoEstimate)}
-                  keyboardType="number-pad"
-                  onChangeText={(text) => {
-                    setNewPomoEstimate(Number(text));
-                  }}
-                  onEndEditing={() => {
-                    updatePomoEstimate(
-                      props.todo.id,
-                      newPomoEstimate,
-                      props.token,
-                    );
-                  }}
-                />
-              </View>
-              <View style={styles.todoTools}>
-                {datePicker()}
-                {(props.todo.due_date || newDate) && timePicker()}
-                {(props.todo.due_date || newDate) && (
-                  <View>
-                    <Menu
-                      ref={setRepeatMenuRef}
-                      button={
-                        <Button
-                          icon={
-                            <Icon
-                              name="repeat"
-                              size={TOOLBAR_ICON_SIZE}
-                              color={COLORS.mainLight}
-                              onPress={showRepeatMenu}
-                            />
-                          }
-                          buttonStyle={styles.settingsButton}
-                        />
-                      }>
-                      {repeatValues.map((item) => {
-                        return (
-                          <MenuItem
-                            onPress={() => {
-                              hideRepeatMenu();
-                              console.warn(item.value);
-                              updateTodoRecurring(
-                                props.todo.id,
-                                item.value,
-                                props.token,
-                              ).then((res) => {
-                                console.log(res);
-                                setNewRepeat(item.value);
-                              });
-                            }}>
-                            <Text>{item.text}</Text>
-                          </MenuItem>
-                        );
-                      })}
-                    </Menu>
-                  </View>
-                )}
-                <View>
-                  <Menu
-                    ref={setListMenuRef}
-                    button={
-                      <Button
-                        icon={
-                          <MaterialCommunityIconsI
-                            name="folder-move-outline"
-                            size={TOOLBAR_ICON_SIZE}
-                            color={COLORS.mainLight}
-                            onPress={showListMenu}
-                          />
-                        }
-                        buttonStyle={styles.settingsButton}
-                      />
-                    }>
-                    <MenuItem
-                      onPress={() => {
-                        hideListMenu();
-                        let updated = props.todo;
-                        updated.list_id = null;
-                        updateTodo(updated).then((res) => {});
-                      }}>
-                      <Text
-                        style={{
-                          fontWeight: !props.todo.list_id ? 'bold' : 'normal',
-                        }}>
-                        Carina (default)
-                      </Text>
-                    </MenuItem>
-                    <MenuDivider />
-                    {props.lists.map((item) => {
-                      return (
-                        <MenuItem
-                          onPress={() => {
-                            console.warn(item);
-                            hideListMenu();
-                            let updated = props.todo;
-                            updated.list_id = item.id;
-                            updateTodo(updated).then((res) => {});
-                          }}>
-                          <Text
-                            style={{
-                              fontWeight:
-                                item.id === props.todo.list_id
-                                  ? 'bold'
-                                  : 'normal',
-                            }}>
-                            {item.title}
-                          </Text>
-                        </MenuItem>
-                      );
-                    })}
-                  </Menu>
-                </View>
-              </View>
-            </View>
-          </View>
-          <TextInput
-            value={newSubTask}
-            style={styles.bar}
-            placeholder="+ Add Subtask"
-            placeholderTextColor={COLORS.mainLight}
-            onChangeText={(text) => {
-              setNewSubTask(text);
-            }}
-            onBlur={() => {
-              if (newSubTask !== '') {
-                addSubTask(props.todo.id, newSubTask, props.token).then(() => {
-                  getSubTasks(props.todo.id, props.token).then((res) => {
-                    setSubTasks(res);
-                  });
-                });
-                console.warn(props.todo.id, newSubTask);
-                setNewSubTask('');
-              }
-            }}
-          />
-          {subTasks.length > 0 && (
-            <View
-              style={{
-                maxHeight: 150,
-                borderBottomWidth: 1,
-                borderBottomColor: COLORS.mainLight,
-              }}>
-              <ScrollView>
-                {subTasks.map((item) => {
-                  return (
-                    <View style={styles.subTaskContainer}>
-                      <TouchableOpacity
-                        onPress={() => {
-                          editSubTask(
-                            item.id,
-                            item.title,
-                            item.state === 0 ? 1 : 0,
-                            props.token,
-                          ).then(() => {
-                            getSubTasks(props.todo.id, props.token).then(
-                              (res) => {
-                                setSubTasks(res);
-                              },
-                            );
-                          });
-                        }}>
-                        <MaterialCommunityIconsI
-                          size={25}
-                          name={
-                            item.state === 0
-                              ? 'checkbox-blank-circle-outline'
-                              : 'checkbox-marked-circle-outline'
-                          }
-                          color={COLORS.mainLight}
-                        />
-                      </TouchableOpacity>
-                      <Text
-                        onPress={() => {
-                          editSubTask(
-                            item.id,
-                            item.title,
-                            item.state === 0 ? 1 : 0,
-                            props.token,
-                          ).then(() => {
-                            getSubTasks(props.todo.id, props.token).then(
-                              (res) => {
-                                setSubTasks(res);
-                              },
-                            );
-                          });
-                        }}
-                        style={{
-                          textDecorationLine:
-                            item.state === 0 ? null : 'line-through',
-                        }}>
-                        {item.title}{' '}
-                      </Text>
-                      <Icon
-                        style={{marginLeft: 'auto', marginRight: 10}}
-                        name="trash"
-                        size={25}
-                        color={COLORS.mainLight}
-                        onPress={() => {
-                          deleteSubTask(item.id, props.token).then(() => {
-                            getSubTasks(props.todo.id, props.token).then(
-                              (res) => {
-                                setSubTasks(res);
-                              },
-                            );
-                          });
-                        }}
-                      />
-                    </View>
-                  );
-                })}
-              </ScrollView>
-            </View>
-          )}
-          <View style={{flex: 2}}>
-            <TextInput
-              style={styles.note}
-              placeholder="Write a note"
-              defaultValue={props.todo.note}
-              placeholderTextColor="gray"
-              multiline={true}
-              onChangeText={(text) => {
-                setNewNote(text);
-              }}
-            />
-          </View>
+          {modalHeader()}
+          {modalDateRow()}
+          {modalToolbar()}
+          {modalSubTaskView()}
+          {modalNoteView()}
         </View>
       </Modal>
     );
@@ -588,9 +615,10 @@ const Todo = (props) => {
     );
   };
 
+// Actual todo
   return (
     <View>
-      {expandedTodo()}
+      {todoModal()}
       <Swipeable
         rightContent={
           <View style={styles.swipeRight}>
@@ -675,7 +703,9 @@ const Todo = (props) => {
                       onPress={() => {
                         let updatedTodo = props.todo;
                         updatedTodo.state = 0;
-                        updateTodoState(props.todo.id, 0, props.token).then(props.todoListUpdater());
+                        updateTodoState(props.todo.id, 0, props.token).then(
+                          props.todoListUpdater(),
+                        );
                       }}
                     />
                   )}

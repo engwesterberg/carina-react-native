@@ -11,6 +11,7 @@ const getRequestConfig = (token) => {
   };
 };
 const API_ADDRESS = 'http://172.16.11.253:5000';
+//const API_ADDRESS = 'http://139.162.196.99:5000';
 
 export const dbDate = (moment) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -444,6 +445,23 @@ export const updateTodoRecurring = async (todo_id, newRecurring, token) => {
       {
         todo_id: todo_id,
         newRecurring: newRecurring,
+      },
+      getRequestConfig(token),
+    )
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};
+
+export const updateTodosList = async (todo_id, list_id, token) => {
+console.log(todo_id, list_id);
+  let results = axios
+    .put(
+      `${API_ADDRESS}/api/todoslist/`,
+      {
+        todo_id: todo_id,
+        list_id: list_id,
       },
       getRequestConfig(token),
     )

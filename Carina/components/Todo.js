@@ -615,7 +615,7 @@ const Todo = (props) => {
     );
   };
 
-// Actual todo
+  // Actual todo
   return (
     <View>
       {todoModal()}
@@ -663,7 +663,6 @@ const Todo = (props) => {
                     let newState = updatedTodo.state === 0 ? 1 : 0;
                     updateTodoState(props.todo.id, newState, props.token).then(
                       () => {
-                        console.warn('update');
                         props.todoListUpdater();
                       },
                     );
@@ -717,19 +716,28 @@ const Todo = (props) => {
                       textDecorationLine:
                         props.todo.state === 1 ? 'line-through' : 'none',
                       marginLeft: 5,
+                      marginRight: 5,
                     },
                   ]}>
                   {props.todo.title}
                 </Text>
+                {props.todo.recurring > 0 ? (
+                  <Icon
+                    name="repeat"
+                    size={15}
+                    color={COLORS.mainLight}
+                    onPress={showRepeatMenu}
+                    style={styles.repeatIcon}
+                  />
+                ) : null}
               </View>
               <View style={styles.row2}>
                 {props.todo.due_date && timeLabel(props.todo)}
-                <Text style={globalStyles.coloredTextMedium}>
-                  {getRepeatValueString(
-                    props.todo.recurring,
-                    props.todo.due_date,
-                  )}
-                </Text>
+                {props.todo.completed && props.todo.completed && (
+                  <Text style={styles.completedText}>
+                    {moment(props.todo.completed).format('YYYY-MM-DD')}
+                  </Text>
+                )}
               </View>
             </View>
           </TouchableOpacity>
@@ -748,26 +756,14 @@ const Todo = (props) => {
   );
 };
 const timeLabel = (todo) => {
-  let time, daysAgoString;
+  console.log(todo);
+  let time, completedDate;
   if (todo.has_time) {
     time = moment(todo.due_date).format('HH:mm');
   }
 
   if (todo.state === 1) {
-    let daysAgo = moment()
-      .startOf('day')
-      .diff(moment(todo.completed).startOf('day'), 'days');
-    switch (daysAgo) {
-      case 0:
-        daysAgoString = 'Done Today';
-        break;
-      case 1:
-        daysAgoString = 'Done Yesterday';
-        break;
-      default:
-        daysAgoString = `Done ${daysAgo} days ago`;
-        break;
-    }
+    completedDate = moment(todo.completed);
   }
   return todo.state === 0 ? (
     <View style={styles.todoLabelContainer}>
@@ -795,7 +791,7 @@ const timeLabel = (todo) => {
       ) : null}
     </View>
   ) : (
-    <Text style={styles.daysAgo}>{daysAgoString}</Text>
+    <Text style={styles.daysAgo}>{completedDate}</Text>
   );
 };
 const dateLabel = (todo) => {
@@ -1026,6 +1022,13 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontSize: 14,
     fontFamily: 'Roboto',
+  },
+  repeatIcon: {
+    marginTop: 4,
+  },
+  completedText: {
+    color: COLORS.mainLight,
+    marginLeft: 30,
   },
 });
 

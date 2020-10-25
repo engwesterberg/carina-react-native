@@ -1,4 +1,5 @@
 import {COLORS} from '../colors.js';
+import {globalStyles} from '../globalstyles.js';
 import React, {useState, useEffect} from 'react';
 import AppButton from './AppButton.js';
 import {
@@ -35,6 +36,7 @@ const LoginScreen = (props) => {
   const [secret, setSecret] = useState('');
   const [repeatSecret, setRepeatSecret] = useState('');
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -53,8 +55,14 @@ const LoginScreen = (props) => {
   const signUpHandler = () => {
     if (name && email && secret && repeatSecret && secret === repeatSecret) {
       if (validateEmail(email)) {
-        signUp(null, email, name, secret);
-        setSignupSuccess(true);
+        signUp(null, email, name, secret)
+          .then((res) => {
+            setSignupSuccess(true);
+            setErrorMessage(null);
+          })
+          .catch((err) => {
+            setErrorMessage(err.response.data);
+          });
       } else {
         Toast.show('Please enter a valid email');
       }
@@ -205,6 +213,9 @@ const LoginScreen = (props) => {
                   Welcome to Carina {name}
                 </Text>
               </View>
+            )}
+            {errorMessage && (
+              <Text style={globalStyles.errorMessage}>{errorMessage}</Text>
             )}
             <View>
               {!signupSuccess ? (

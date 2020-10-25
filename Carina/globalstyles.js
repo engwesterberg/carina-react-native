@@ -24,4 +24,5 @@ export const globalStyles = StyleSheet.create({
   menuTopRow: {paddingTop: 10},
   menuDivider: {borderBottomWidth: 1, borderBottomColor: COLORS.mainSuperLight},
   menuItemtext: {fontSize: 16, fontFamily: 'Roboto'},
+errorMessage: {fontFamily: 'Roboto', color: COLORS.red}
 });

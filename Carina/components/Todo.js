@@ -646,101 +646,96 @@ const Todo = (props) => {
           deleteTodo(props.todo.id, props.token).then(props.todoListUpdater());
           props.removeFromList(props.todo.id);
         }}>
-        <View style={styles.todoContainer} key={props.id}>
-          <TouchableOpacity
-            style={{flex: 1}}
-            onPress={() => {
-              setModalVisible(true);
-              getSubTasks(props.todo.id, props.token).then((res) => {
-                setSubTasks(res);
-              });
-            }}>
-            <View style={styles.todoInfoContainer}>
-              <View style={styles.row1}>
-                <TouchableOpacity
+        <TouchableOpacity
+          style={styles.todoContainer}
+          key={props.id}
+          onPress={() => {
+            setModalVisible(true);
+            getSubTasks(props.todo.id, props.token).then((res) => {
+              setSubTasks(res);
+            });
+          }}>
+          <View style={styles.todoCheckboxContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                let updatedTodo = props.todo;
+                let newState = updatedTodo.state === 0 ? 1 : 0;
+                updateTodoState(props.todo.id, newState, props.token).then(
+                  () => {
+                    props.todoListUpdater();
+                  },
+                );
+                //updateTodo(updatedTodo).then(props.todoListUpdater());
+                if (props.todo.recurring) {
+                  let copy = props.todo;
+                  if (copy.recurring === 30) {
+                    copy.due_date = moment(copy.due_date).add(1, 'months');
+                  } else if (copy.recurring === 365) {
+                    copy.due_date = moment(copy.due_date).add(1, 'years');
+                  } else {
+                    copy.due_date = moment(copy.due_date).add(
+                      props.todo.recurring,
+                      'days',
+                    );
+                  }
+                  copyTodo(props.todo, props.token).then(() => {
+                    props.todoListUpdater();
+                  });
+                }
+              }}>
+              {props.todo.state !== 2 ? (
+                <MaterialCommunityIconsI
+                  size={25}
+                  name={
+                    props.todo.state === 0
+                      ? 'checkbox-blank-circle-outline'
+                      : 'checkbox-marked-circle-outline'
+                  }
+                  color={COLORS.gray}
+                />
+              ) : (
+                <Icon
+                  name="refresh"
+                  size={30}
+                  color={COLORS.mainLight}
                   onPress={() => {
                     let updatedTodo = props.todo;
-                    let newState = updatedTodo.state === 0 ? 1 : 0;
-                    updateTodoState(props.todo.id, newState, props.token).then(
-                      () => {
-                        props.todoListUpdater();
-                      },
+                    updatedTodo.state = 0;
+                    updateTodoState(props.todo.id, 0, props.token).then(
+                      props.todoListUpdater(),
                     );
-                    //updateTodo(updatedTodo).then(props.todoListUpdater());
-                    if (props.todo.recurring) {
-                      let copy = props.todo;
-                      if (copy.recurring === 30) {
-                        copy.due_date = moment(copy.due_date).add(1, 'months');
-                      } else if (copy.recurring === 365) {
-                        copy.due_date = moment(copy.due_date).add(1, 'years');
-                      } else {
-                        copy.due_date = moment(copy.due_date).add(
-                          props.todo.recurring,
-                          'days',
-                        );
-                      }
-                      copyTodo(props.todo, props.token).then(() => {
-                        props.todoListUpdater();
-                      });
-                    }
-                  }}>
-                  {props.todo.state !== 2 ? (
-                    <MaterialCommunityIconsI
-                      size={25}
-                      name={
-                        props.todo.state === 0
-                          ? 'checkbox-blank-circle-outline'
-                          : 'checkbox-marked-circle-outline'
-                      }
-                      color={COLORS.gray}
-                    />
-                  ) : (
-                    <Icon
-                      name="refresh"
-                      size={30}
-                      color={COLORS.mainLight}
-                      onPress={() => {
-                        let updatedTodo = props.todo;
-                        updatedTodo.state = 0;
-                        updateTodoState(props.todo.id, 0, props.token).then(
-                          props.todoListUpdater(),
-                        );
-                      }}
-                    />
-                  )}
-                </TouchableOpacity>
-                <Text
-                  style={[
-                    styles.text,
-                    {
-                      textDecorationLine:
-                        props.todo.state === 1 ? 'line-through' : 'none',
-                      marginLeft: 5,
-                      marginRight: 5,
-                    },
-                  ]}>
-                  {props.todo.title}
-                </Text>
-                {props.todo.recurring > 0 ? (
-                  <Icon
-                    name="repeat"
-                    size={15}
-                    color={COLORS.mainLight}
-                    onPress={showRepeatMenu}
-                    style={styles.repeatIcon}
-                  />
-                ) : null}
-              </View>
-              <View style={styles.row2}>
-                {props.todo.due_date && timeLabel(props.todo)}
-                {props.todo.completed && props.todo.completed && (
-                  <Text style={styles.completedText}>
-                    {moment(props.todo.completed).format('YYYY-MM-DD')}
-                  </Text>
-                )}
-              </View>
+                  }}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+          <View style={styles.todoInfoContainer}>
+            <View style={styles.row1}>
+              <Text
+                style={[
+                  styles.text,
+                  {
+                    textDecorationLine:
+                      props.todo.state === 1 ? 'line-through' : 'none',
+                    marginRight: 5,
+                  },
+                ]}>
+                {props.todo.title}
+              </Text>
+              {props.todo.recurring > 0 ? (
+                <Icon
+                  name="repeat"
+                  size={15}
+                  color={COLORS.mainLight}
+                  onPress={showRepeatMenu}
+                  style={styles.repeatIcon}
+                />
+              ) : null}
             </View>
-          </TouchableOpacity>
+            <View style={styles.row2}>
+              {props.todo.due_date !== null ? timeLabel(props.todo) : null}
+            </View>
+          </View>
           <View style={styles.noteContainer}>
             {props.todo.note && (
               <MaterialCommunityIconsI
@@ -750,7 +745,7 @@ const Todo = (props) => {
               />
             )}
           </View>
-        </View>
+        </TouchableOpacity>
       </Swipeable>
     </View>
   );
@@ -763,7 +758,7 @@ const timeLabel = (todo) => {
   }
 
   if (todo.state === 1) {
-    completedDate = moment(todo.completed);
+    completedDate = moment(todo.completed).format('YYYY-MM-DD');
   }
   return todo.state === 0 ? (
     <View style={styles.todoLabelContainer}>
@@ -794,96 +789,34 @@ const timeLabel = (todo) => {
     <Text style={styles.daysAgo}>{completedDate}</Text>
   );
 };
-const dateLabel = (todo) => {
-  const one_day = 1000 * 60 * 60 * 24;
-  let color;
-  let days;
-  let diff = moment(todo.due_date) - moment();
-  if (diff === 0) {
-    color = COLORS.orange;
-    days = 'Today';
-  } else if (diff === 1) {
-    color = COLORS.yellow;
-    days = 'Tomorrow';
-  } else if (diff === -1) {
-    color = COLORS.red;
-    days = 'Yesterday';
-  } else if (diff >= 2) {
-    color = COLORS.green;
-    days = `Due in ${Math.floor(
-      (moment(todo.due_date) - moment()) / one_day,
-    )} days`;
-  } else if (moment(todo.due_date) < moment().set('hour', 0)) {
-    color = COLORS.red;
-    days = `${Math.floor(
-      (moment() - moment(todo.due_date)) / one_day,
-    )} days overdue`;
-  }
-  if (todo.has_time) {
-    days =
-      days +
-      ' at ' +
-      moment(todo.due_date).hour() +
-      ':' +
-      moment(todo.due_date).minute();
-    if (moment(todo.due_date).minute() === 0) {
-      days = days + '0';
-    }
-  }
-
-  return (
-    <View style={styles.todoLabelContainer}>
-      <Text
-        style={{
-          color: color,
-          fontSize: 12,
-          fontFamily: 'Roboto',
-        }}>
-        {days}
-      </Text>
-      {todo.pomo_estimate !== 0 ? (
-        <View style={{}}>
-          <Text
-            style={{
-              color: 'black',
-              fontFamily: 'Roboto-Bold',
-              fontSize: 12,
-            }}>
-            {' '}
-            {`${todo.pomo_done}/${todo.pomo_estimate}🍅`}
-          </Text>
-        </View>
-      ) : null}
-    </View>
-  );
-};
 
 const styles = StyleSheet.create({
   todoContainer: {
     flexDirection: 'row',
-    marginLeft: 10,
-    height: 45,
+    height: 40,
+    marginTop: 5,
+  },
+  todoCheckboxContainer: {
+    width: 40,
+    height: 40,
+    paddingRight: 5,
+    alignSelf: 'flex-start',
+    alignItems: 'flex-end',
   },
   todoInfoContainer: {
-    justifyContent: 'center',
-    flexGrow: 1,
-    marginLeft: 5,
+    flexDirection: 'column',
+    flex: 1,
   },
   row1: {
-    flex: 4,
-    paddingTop: 5,
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    flex: 4,
   },
   row2: {
     flex: 3,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
   },
   recurringText: {color: COLORS.mainLight},
   noteContainer: {
-    justifyContent: 'center',
     alignItems: 'center',
     width: 60,
   },
@@ -997,7 +930,6 @@ const styles = StyleSheet.create({
   todoLabelContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 32,
   },
   todoTools: {
     flexDirection: 'row',
@@ -1018,8 +950,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.mainLight,
   },
   daysAgo: {
-    marginLeft: 30,
-    color: COLORS.gray,
+    color: COLORS.mainLight,
     fontSize: 14,
     fontFamily: 'Roboto',
   },

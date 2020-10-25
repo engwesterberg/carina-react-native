@@ -31,8 +31,10 @@ const Header = (props) => {
   const [shareWith, setShareWith] = useState('');
   const [sharedWithUsers, setSharedWithUsers] = useState([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const onModalClose = () => {
+          setErrorMessage(null);
     props.listUpdater();
   };
 
@@ -68,7 +70,11 @@ const Header = (props) => {
                   }
                 }}
                 onEndEditing={() => {
-                  updateList(props.selectedList.id, newListName, props.token).then(() => {
+                  updateList(
+                    props.selectedList.id,
+                    newListName,
+                    props.token,
+                  ).then(() => {
                     props.listUpdater();
                     props.selectedListUpdater({
                       id: props.selectedList.id,
@@ -123,6 +129,7 @@ const Header = (props) => {
           <TextInput
             label="Email Address"
             style={styles.bar}
+            value={shareWith}
             placeholder="Email Address"
             placeholderTextColor={COLORS.mainLight}
             onChangeText={(text) => {
@@ -135,11 +142,20 @@ const Header = (props) => {
                 shareWith,
                 props.userId,
                 props.token,
-              ).then((res) => {
-                setSharedWithUsers(res);
-              });
+              )
+                .then((res) => {
+                  setSharedWithUsers(res);
+                  setErrorMessage(null);
+                  setShareWith('');
+                })
+                .catch((err) => {
+                  setErrorMessage(err.response.data);
+                });
             }}
           />
+          {errorMessage !== null ? (
+            <Text style={globalStyles.errorMessage}>{errorMessage}</Text>
+          ) : null}
           <Text style={styles.guide}>
             {sharedWithUsers.length > 0 && 'Currently shared with'}
           </Text>

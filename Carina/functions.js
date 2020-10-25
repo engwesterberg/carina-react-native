@@ -43,7 +43,9 @@ export const signUp = async (userId, email, fullname, secret) => {
   let results = await axios
     .post(`${API_ADDRESS}/api/createuser`, body)
     .then((res) => res.data)
-    .catch((err) => console.error("Wasn't able to update property.", err));
+.catch((err) => {
+throw err;
+});
   return results;
 };
 
@@ -92,7 +94,7 @@ export const getTodos = async (user_id, token) => {
     .get(`${API_ADDRESS}/api/todos/${user_id}`, getRequestConfig(token))
     .then((results) => results.data)
     .catch((error) => console.error(error));
-  return results;
+  return results[0];
 };
 
 export const getSubTasks = async (todo_id, token) => {
@@ -285,9 +287,11 @@ export const shareList = async (list_id, share_email, owner_id, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
-    .catch((e) => console.error(e));
-  return results[0];
+    .then((res) => res.data[0])
+    .catch((e) => {
+      throw e;
+    });
+  return results;
 };
 
 export const stopSharingList = async (list_id, shared_with, token) => {
@@ -416,7 +420,9 @@ export const updateTodoDate = async (todo_id, newDate, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => {
+      return res.data;
+    })
     .catch((e) => console.error(e));
 
   return results[0];
@@ -455,7 +461,7 @@ export const updateTodoRecurring = async (todo_id, newRecurring, token) => {
 };
 
 export const updateTodosList = async (todo_id, list_id, token) => {
-console.log(todo_id, list_id);
+  console.log(todo_id, list_id);
   let results = axios
     .put(
       `${API_ADDRESS}/api/todoslist/`,

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import Swipeable from 'react-native-swipeable-row';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
+import Toast from 'react-native-simple-toast';
 import {addTodo} from '../functions.js';
 
 const leftContent = <Text />;
@@ -48,20 +49,24 @@ class CarinaBar extends Component {
           }}
           placeholderTextColor={COLORS.mainLight}
           onSubmitEditing={(text) => {
-            addTodo(
-              this.props.userId,
-              this.state.planningMode
-                ? this.state.query + ' ' + this.state.planningAttributes
-                : this.state.query,
-              this.props.listId,
-              this.props.token,
-            ).then(() => {
-              this.props.todoListUpdater();
-              if (this.state.planningMode) {
-                this.refs.textinput.focus();
-              }
-            });
-            this.setState({query: ''});
+            if (this.state.query !== '') {
+              addTodo(
+                this.props.userId,
+                this.state.planningMode
+                  ? this.state.query + ' ' + this.state.planningAttributes
+                  : this.state.query,
+                this.props.listId,
+                this.props.token,
+              ).then(() => {
+                this.props.todoListUpdater();
+                if (this.state.planningMode) {
+                  this.refs.textinput.focus();
+                }
+              });
+              this.setState({query: ''});
+          } else {
+          Toast.show("A todos title cannot be empty");
+          }
           }}
           onChangeText={(text) => {
             this.setState({query: text});

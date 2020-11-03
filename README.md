@@ -7,7 +7,7 @@ Before running, make sure the required Express API is running alongside its corr
 npm install
 ```
 
-To run, connect a Android Phone with USB-debugging enabled, or launch a Android Emulator and run the following command
+To run, connect a Android Phone with USB-debugging enabled, or launch a Android Emulator and run the following command:
 
 ```bash
 react-native run-android

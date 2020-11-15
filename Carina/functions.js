@@ -43,9 +43,9 @@ export const signUp = async (userId, email, fullname, secret) => {
   let results = await axios
     .post(`${API_ADDRESS}/api/createuser`, body)
     .then((res) => res.data)
-.catch((err) => {
-throw err;
-});
+    .catch((err) => {
+      throw err;
+    });
   return results;
 };
 
@@ -461,7 +461,6 @@ export const updateTodoRecurring = async (todo_id, newRecurring, token) => {
 };
 
 export const updateTodosList = async (todo_id, list_id, token) => {
-  console.log(todo_id, list_id);
   let results = axios
     .put(
       `${API_ADDRESS}/api/todoslist/`,
@@ -471,6 +470,34 @@ export const updateTodosList = async (todo_id, list_id, token) => {
       },
       getRequestConfig(token),
     )
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};
+
+export const beginResetPassword = async (email) => {
+  let results = axios
+    .post(`${API_ADDRESS}/api/beginresetpassword/`, {
+      email: email,
+    })
+    .then((res) => res.data)
+    .catch((e) => console.error(e));
+
+  return results[0];
+};
+
+export const confirmResetPassword = async (
+  email,
+  new_password,
+  confirmation_code,
+) => {
+  let results = axios
+    .put(`${API_ADDRESS}/api/confirmresetpassword/`, {
+      email: email,
+      new_password: new_password,
+      confirmation_code: confirmation_code,
+    })
     .then((res) => res.data)
     .catch((e) => console.error(e));
 

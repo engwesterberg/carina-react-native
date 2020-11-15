@@ -10,7 +10,7 @@ import {
   StatusBar,
 } from 'react-native';
 import Header from './components/Header';
-import LoginScreen from './components/LoginScreen';
+  import LoginScreen from './components/LoginScreen';
 import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
 import PomodoroBar from './components/PomodoroBar';

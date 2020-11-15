@@ -7,6 +7,8 @@ import {
   signIn,
   addGoogleUser,
   getUserIdByGoogleId,
+  beginResetPassword,
+  confirmResetPassword,
 } from '../functions.js';
 import {TextInput as PaperTextInput} from 'react-native-paper';
 
@@ -30,11 +32,16 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const LoginScreen = (props) => {
-  const [signupOpen, setSignupOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [secret, setSecret] = useState('');
   const [repeatSecret, setRepeatSecret] = useState('');
+  const [confirmationCode, setConfirmationCode] = useState(false);
+
+  // For displaying visual elements
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [confirmationSent, setConfirmationSent] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -111,7 +118,7 @@ const LoginScreen = (props) => {
       resizeMode="cover"
       source={require('../assets/note.jpg')}>
       <KeyboardAvoidingView style={styles.container} behavior="padding">
-        {!signupOpen ? (
+        {!signupOpen && !resetOpen ? (
           <View style={styles.loginContainer}>
             <Text style={styles.title}> Carina </Text>
             <TextInput
@@ -142,7 +149,13 @@ const LoginScreen = (props) => {
                   Sign Up
                 </Text>
               )}
-              <Text style={styles.textButton}>Reset Password</Text>
+              <Text
+                style={styles.textButton}
+                onPress={() => {
+                  setResetOpen(true);
+                }}>
+                Reset Password
+              </Text>
             </View>
             <AppButton
               title="Sign In"
@@ -167,7 +180,8 @@ const LoginScreen = (props) => {
               onPress={googleSignIn}
             />
           </View>
-        ) : (
+        ) : null}
+        {signupOpen && !resetOpen ? (
           <View style={styles.loginContainer}>
             <Text style={styles.title}> Register </Text>
             <TextInput
@@ -241,14 +255,99 @@ const LoginScreen = (props) => {
               )}
             </View>
           </View>
-        )}
-        {/*<Hr
-          lineColor="#eee"
-          width={1}
-          hrPadding={20}
-          text="Sign in with"
-          textStyles={{color: 'white'}}
-        />*/}
+        ) : null}
+        {resetOpen ? (
+          <View style={styles.loginContainer}>
+            <Text style={styles.titleSmaller}> Reset Password </Text>
+            {!confirmationSent ? (
+              <View style={{width: '100%', alignItems: 'center'}}>
+                <Text style={styles.infoText}>
+                  A confirmation code will be sent{'\n'} to your email
+                </Text>
+                <TextInput
+                  value={email}
+                  style={styles.bar}
+                  placeholder="Email"
+                  placeholderTextColor="black"
+                  onChangeText={(text) => {
+                    setEmail(text);
+                  }}
+                />
+                <View style={styles.displayRow}>
+                  <AppButton
+                    title="Send Code"
+                    onPress={() => {
+                      setConfirmationSent(true);
+                      beginResetPassword(email);
+                    }}
+                  />
+                  <AppButton
+                    title="Cancel"
+                    onPress={() => {
+                      setResetOpen(false);
+                    }}
+                  />
+                </View>
+              </View>
+            ) : (
+              <View style={{width: '100%', alignItems: 'center'}}>
+                <Text style={styles.infoText}>
+                  Enter the confirmation code sent to you by email
+                </Text>
+                <TextInput
+                  value={confirmationCode}
+                  style={styles.bar}
+                  placeholder="Confirmation Code"
+                  placeholderTextColor="black"
+                  onChangeText={(text) => {
+                    setConfirmationCode(text);
+                  }}
+                />
+                <Text style={styles.infoText}>Choose a new password</Text>
+                <TextInput
+                  value={secret}
+                  style={styles.bar}
+                  placeholder="New Password"
+                  placeholderTextColor="black"
+                  secureTextEntry={true}
+                  onChangeText={(text) => {
+                    setSecret(text);
+                  }}
+                />
+                <TextInput
+                  value={repeatSecret}
+                  style={styles.bar}
+                  placeholder="Repeat New Password"
+                  placeholderTextColor="black"
+                  secureTextEntry={true}
+                  onChangeText={(text) => {
+                    setRepeatSecret(text);
+                  }}
+                />
+                <View style={styles.displayRow}>
+                  <AppButton
+                    title="Change Password"
+                    onPress={() => {
+                      if (repeatSecret === secret) {
+                        setConfirmationSent(true);
+                        confirmResetPassword(
+                          email,
+                          secret,
+                          confirmationCode,
+                        ).then(() => {
+                          setResetOpen(false);
+                          setConfirmationSent(false);
+                        });
+                      } else {
+                        Toast.show("Passwords doesn't match");
+                      }
+                    }}
+                  />
+                </View>
+              </View>
+            )}
+          </View>
+        ) : null}
       </KeyboardAvoidingView>
     </ImageBackground>
   );
@@ -290,6 +389,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 50,
+    fontFamily: 'sans-serif-thin',
+    marginTop: 10,
+    marginBottom: 10,
+    color: 'white',
+  },
+  titleSmaller: {
+    fontSize: 30,
     fontFamily: 'sans-serif-thin',
     marginTop: 10,
     marginBottom: 10,

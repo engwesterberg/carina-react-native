@@ -128,20 +128,6 @@ const Todo = (props) => {
     }
   };
 
-  const syncTodoToDatabase = (date, addTime) => {
-    let updated = props.todo;
-    updated.title = newTitle || updated.title;
-    updated.note = newNote || updated.note;
-    updated.pomo_estimate = newPomoEstimate || updated.pomo_estimate;
-    if (date) {
-      updated.due_date = date;
-    }
-    updated.has_time = addTime || updated.has_time;
-
-    updateTodo(updated);
-    return updated;
-  };
-
   const datePicker = () => {
     return (
       <View style={styles.button}>
@@ -335,13 +321,11 @@ const Todo = (props) => {
                     <MenuItem
                       onPress={() => {
                         hideRepeatMenu();
-                        console.warn(item.value);
                         updateTodoRecurring(
                           props.todo.id,
                           item.value,
                           props.token,
                         ).then((res) => {
-                          console.log(res);
                           setNewRepeat(item.value);
                         });
                       }}>
@@ -389,7 +373,6 @@ const Todo = (props) => {
                   <MenuItem
                     onPress={() => {
                       hideListMenu();
-                      console.warn(item.id);
                       updateTodosList(props.todo.id, item.id, props.token).then(
                         () => {
                           props.todoListUpdater();
@@ -410,6 +393,33 @@ const Todo = (props) => {
             </Menu>
           </View>
         </View>
+        <TouchableOpacity
+          onPress={() => {
+            let updatedTodo = props.todo;
+            let newState = updatedTodo.state === 0 ? 1 : 0;
+            updateTodoState(props.todo.id, newState, props.token).then(() => {
+              onModalClose();
+              setModalVisible(false);
+            });
+            if (props.todo.recurring) {
+              let copy = props.todo;
+              if (copy.recurring === 30) {
+                copy.due_date = moment(copy.due_date).add(1, 'months');
+              } else if (copy.recurring === 365) {
+                copy.due_date = moment(copy.due_date).add(1, 'years');
+              } else {
+                copy.due_date = moment(copy.due_date).add(
+                  props.todo.recurring,
+                  'days',
+                );
+              }
+              copyTodo(props.todo, props.token).then(() => {
+                props.todoListUpdater();
+              });
+            }
+          }}>
+          <Text>{props.todo.state === 1 ? 'Uncheck' : 'Check'}</Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -431,7 +441,6 @@ const Todo = (props) => {
                   setSubTasks(res);
                 });
               });
-              console.warn(props.todo.id, newSubTask);
               setNewSubTask('');
             }
           }}
@@ -542,7 +551,7 @@ const Todo = (props) => {
         style={styles.modal}
         isVisible={modalVisible}
         coverScreen={true}
-        backdropOpacity={0.4}
+        backdropOpacity={0.8}
         onBackButtonPress={() => {
           onModalClose();
           setModalVisible(false);
@@ -665,7 +674,6 @@ const Todo = (props) => {
                     props.todoListUpdater();
                   },
                 );
-                //updateTodo(updatedTodo).then(props.todoListUpdater());
                 if (props.todo.recurring) {
                   let copy = props.todo;
                   if (copy.recurring === 30) {
@@ -751,7 +759,6 @@ const Todo = (props) => {
   );
 };
 const timeLabel = (todo) => {
-  console.log(todo);
   let time, completedDate;
   if (todo.has_time) {
     time = moment(todo.due_date).format('HH:mm');
@@ -851,7 +858,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flex: 1,
   },
-  modalHeader: {flexDirection: 'row'},
+  modalHeader: {flexDirection: 'row', alignItems: 'center'},
 
   dateRowView: {justifyContent: 'center'},
   expandedTools: {

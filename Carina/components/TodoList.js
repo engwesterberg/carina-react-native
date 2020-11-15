@@ -27,10 +27,9 @@ const TodoList = (props) => {
                 item.due_date,
                 index !== 0 && props.todos[index - 1].due_date,
               )}
-            {index !== 0 &&
+            {index === 0 &&
               props.state === 0 &&
               !item.due_date &&
-              props.todos[index - 1].due_date &&
               daySeparator('No Date')}
             <Todo
               todo={item}

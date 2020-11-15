@@ -90,6 +90,7 @@ const LoginScreen = (props) => {
       const userInfo = await GoogleSignin.signIn();
       let user = userInfo.user;
       addGoogleUser(user.id, user.email, user.name).then((result) => {
+        console.log('login by google');
         getUserIdByGoogleId(user.id).then((res) => {
           console.log('asså: ', res);
           let id = res.result[0].id;

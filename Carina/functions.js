@@ -1,7 +1,10 @@
 import axios from 'axios';
 import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const dbFormat = 'YYYY-MM-DD HH:mm:ss';
+
+// --------------------------- Helper Functions------------------------------------------
 
 const getRequestConfig = (token) => {
   return {
@@ -32,6 +35,35 @@ export function replaceLast(find, replace, string) {
 
   return beginString + replace + endString;
 }
+
+export const storageHelper = {
+  set: async (key, value) => {
+    console.log('set');
+    try {
+      return await AsyncStorage.setItem(key, value);
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  get: async (key) => {
+    console.log('get');
+    try {
+      return await AsyncStorage.getItem(key);
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  remove: (key) => {
+    console.log('remove');
+    try {
+      AsyncStorage.removeItem(key);
+    } catch (e) {
+      console.error(e);
+    }
+  },
+};
+
+// --------------------------- Database Functions ------------------------------------------
 
 export const signUp = async (userId, email, fullname, secret) => {
   let body = {

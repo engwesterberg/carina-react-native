@@ -161,7 +161,7 @@ const LoginScreen = (props) => {
             <AppButton
               title="Sign In"
               onPress={() => {
-                signIn(email, secret)
+                signIn(email.trim(), secret)
                   .then((res) => {
                     let userInfo = res.userInfo[0][0];
                     let token = res.token;

@@ -10,7 +10,7 @@ import {
   StatusBar,
 } from 'react-native';
 import Header from './components/Header';
-  import LoginScreen from './components/LoginScreen';
+import LoginScreen from './components/LoginScreen';
 import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
 import PomodoroBar from './components/PomodoroBar';
@@ -19,7 +19,7 @@ import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunity
 import {MenuProvider} from 'react-native-popup-menu';
 import {ConfirmDialog} from 'react-native-simple-dialogs';
 
-import {getTodos, getLists, emptyTrash, deleteTodo} from './functions';
+import {getTodos, getLists, emptyTrash, storageHelper} from './functions';
 
 const NOT_DONE = 0;
 const DONE = 1;
@@ -40,6 +40,22 @@ const App = () => {
 
   useEffect(() => {
     //setDevelopmentUserState();
+    storageHelper.get('token').then((tok) => {
+      if (tok) {
+        setToken(tok);
+        storageHelper.get('user_id').then((id) => {
+          if (id) {
+            setUserId(id);
+            getTodos(id, tok).then((res) => {
+              setTodos(res);
+            });
+            getLists(id, tok).then((res) => {
+              setLists(res);
+            });
+          }
+        });
+      }
+    });
   }, []);
 
   const pomoBreakUpdater = () => {
@@ -63,11 +79,15 @@ const App = () => {
     setSelectedList({id: null, title: 'Carina'});
     setShowDone(false);
     setPomoActive(false);
+    storageHelper.remove('token');
+    storageHelper.remove('user_id');
   };
 
   const signInHandler = (aId, aToken) => {
     setUserId(aId);
     setToken(aToken);
+    storageHelper.set('token', aToken);
+    storageHelper.set('user_id', String(aId));
     getTodos(aId, aToken).then((res) => {
       setTodos(res);
     });

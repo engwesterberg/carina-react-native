@@ -1,8 +1,10 @@
 import axios from 'axios';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import PushNotification from 'react-native-push-notification';
 const dbFormat = 'YYYY-MM-DD HH:mm:ss';
+
+// --------------------------- Push notifications ------------------------------------------
 
 // --------------------------- Helper Functions------------------------------------------
 

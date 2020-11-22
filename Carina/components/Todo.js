@@ -12,7 +12,6 @@ import {
   ScrollView,
 } from 'react-native';
 import {
-  updateTodo,
   deleteTodo,
   copyTodo,
   getSubTasks,

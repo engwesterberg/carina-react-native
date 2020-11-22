@@ -1,8 +1,8 @@
 import axios from 'axios';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import PushNotification from 'react-native-push-notification';
 const dbFormat = 'YYYY-MM-DD HH:mm:ss';
+import {send, schedule, scheduleAll} from './NotificationHandler.js';
 
 // --------------------------- Push notifications ------------------------------------------
 
@@ -126,9 +126,13 @@ export const getUserIdByGoogleId = async (google_id) => {
 export const getTodos = async (user_id, token) => {
   let results = await axios
     .get(`${API_ADDRESS}/api/todos/${user_id}`, getRequestConfig(token))
-    .then((results) => results.data)
+    .then((results) => {
+      let todos = results.data[0];
+      scheduleAll(todos);
+      return todos;
+    })
     .catch((error) => console.error(error));
-  return results[0];
+  return results;
 };
 
 export const getSubTasks = async (todo_id, token) => {
@@ -184,9 +188,16 @@ export const addTodo = async (user_id, query, list_id, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => {
+      let todo = res.data[0][0];
+      //if (todo.due_date) {
+      //  schedule(todo);
+      //}
+      return todo;
+    })
     .catch((e) => console.error(e));
-  return results[0];
+  console.log('Festmanenn: ', results);
+  return results;
 };
 
 export const addSubTask = async (todo_id, title, token) => {

@@ -3,8 +3,7 @@ import Header from './components/Header';
 import LoginScreen from './components/LoginScreen';
 import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
-import PomodoroBar from './components/PomodoroBar';
-import {send, schedule, scheduleAll} from './NotificationHandler.js';
+//import PomodoroBar from './components/PomodoroBar';
 
 import React, {useState, useEffect} from 'react';
 import {
@@ -20,7 +19,6 @@ import Icon from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
 import {MenuProvider} from 'react-native-popup-menu';
 import {ConfirmDialog} from 'react-native-simple-dialogs';
-import moment from 'moment';
 
 import {getTodos, getLists, emptyTrash, storageHelper} from './functions';
 

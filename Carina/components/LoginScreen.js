@@ -160,6 +160,7 @@ const LoginScreen = (props) => {
             </View>
             <AppButton
               title="Sign In"
+              wide={true}
               onPress={() => {
                 signIn(email.trim(), secret)
                   .then((res) => {
@@ -237,7 +238,9 @@ const LoginScreen = (props) => {
                 <View style={styles.displayRow}>
                   <AppButton title="Sign Up" onPress={signUpHandler} />
                   <AppButton
-                    title="Abort"
+                    bgColor={COLORS.red}
+                    textColor={'white'}
+                    title="Cancel"
                     onPress={() => {
                       setSignupOpen(false);
                       setSignupSuccess(false);
@@ -284,6 +287,8 @@ const LoginScreen = (props) => {
                   />
                   <AppButton
                     title="Cancel"
+                    bgColor={COLORS.red}
+                    textColor={'white'}
                     onPress={() => {
                       setResetOpen(false);
                     }}

@@ -234,6 +234,58 @@ const Todo = (props) => {
   const modalHeader = () => {
     return (
       <View style={styles.modalHeader}>
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              let updatedTodo = props.todo;
+              let newState = updatedTodo.state === 0 ? 1 : 0;
+              updateTodoState(props.todo.id, newState, props.token).then(() => {
+                props.todoListUpdater();
+                setModalVisible(false);
+              });
+              if (props.todo.recurring) {
+                let copy = props.todo;
+                if (copy.recurring === 30) {
+                  copy.due_date = moment(copy.due_date).add(1, 'months');
+                } else if (copy.recurring === 365) {
+                  copy.due_date = moment(copy.due_date).add(1, 'years');
+                } else {
+                  copy.due_date = moment(copy.due_date).add(
+                    props.todo.recurring,
+                    'days',
+                  );
+                }
+                copyTodo(props.todo, props.token).then(() => {
+                  props.todoListUpdater();
+                });
+              }
+            }}>
+            {props.todo.state !== 2 ? (
+              <MaterialCommunityIconsI
+                size={25}
+                name={
+                  props.todo.state === 0
+                    ? 'checkbox-blank-circle-outline'
+                    : 'checkbox-marked-circle-outline'
+                }
+                color={COLORS.mainLight}
+              />
+            ) : (
+              <Icon
+                name="refresh"
+                size={30}
+                color={COLORS.mainLight}
+                onPress={() => {
+                  let updatedTodo = props.todo;
+                  updatedTodo.state = 0;
+                  updateTodoState(props.todo.id, 0, props.token).then(
+                    props.todoListUpdater(),
+                  );
+                }}
+              />
+            )}
+          </TouchableOpacity>
+        </View>
         <TextInput
           style={styles.todoTitle}
           defaultValue={newTitle || props.todo.title}
@@ -389,33 +441,6 @@ const Todo = (props) => {
             </Menu>
           </View>
         </View>
-        <TouchableOpacity
-          onPress={() => {
-            let updatedTodo = props.todo;
-            let newState = updatedTodo.state === 0 ? 1 : 0;
-            updateTodoState(props.todo.id, newState, props.token).then(() => {
-              onModalClose();
-              setModalVisible(false);
-            });
-            if (props.todo.recurring) {
-              let copy = props.todo;
-              if (copy.recurring === 30) {
-                copy.due_date = moment(copy.due_date).add(1, 'months');
-              } else if (copy.recurring === 365) {
-                copy.due_date = moment(copy.due_date).add(1, 'years');
-              } else {
-                copy.due_date = moment(copy.due_date).add(
-                  props.todo.recurring,
-                  'days',
-                );
-              }
-              copyTodo(props.todo, props.token).then(() => {
-                props.todoListUpdater();
-              });
-            }
-          }}>
-          <Text>{props.todo.state === 1 ? 'Uncheck' : 'Check'}</Text>
-        </TouchableOpacity>
       </View>
     );
   };
@@ -854,9 +879,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flex: 1,
   },
-  modalHeader: {flexDirection: 'row', alignItems: 'center'},
+  modalHeader: {flexDirection: 'row', alignItems: 'center', paddingLeft: 10},
 
-  dateRowView: {justifyContent: 'center'},
+  dateRowView: {justifyContent: 'center', paddingLeft: 10},
   expandedTools: {
     height: 40,
     alignSelf: 'center',

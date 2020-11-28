@@ -1,5 +1,5 @@
 import {COLORS} from '../colors.js';
-import React, {useState, useRef, useEffect, Component, setState} from 'react';
+import React, {Component, setState} from 'react';
 import {
   View,
   Text,
@@ -97,8 +97,8 @@ class CarinaBar extends Component {
               }}>
               <TextInput
                 style={styles.planningModeBar}
-                placeholder="Enter todo attributes"
-                placeholderTextColor={COLORS.mainLight}
+                placeholder="Enter todo attributes (swipe to close)"
+                placeholderTextColor={COLORS.lightGray}
                 onChangeText={(text) => {
                   this.setState({planningAttributes: text});
                 }}

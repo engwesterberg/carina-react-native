@@ -5,9 +5,13 @@ const dbFormat = 'YYYY-MM-DD HH:mm:ss';
 import {send, schedule, scheduleAll} from './NotificationHandler.js';
 import {carinaParser} from './CarinaParser.js';
 
-// --------------------------- Push notifications ------------------------------------------
+//Local Ip------------------------------------------------------------------------------------------------------------------------
+//const API_ADDRESS = 'http://172.16.11.253:5000';
+//------------------------------------------------------------------------------------------------------------------------
 
-// --------------------------- Helper Functions------------------------------------------
+// Linode Ip ------------------------------------------------------------------------------------------------------------------------
+const API_ADDRESS = 'http://139.162.196.99:5000';
+// ------------------------------------------------------------------------------------------------------------------------
 
 const getRequestConfig = (token) => {
   return {
@@ -16,8 +20,6 @@ const getRequestConfig = (token) => {
     },
   };
 };
-const API_ADDRESS = 'http://172.16.11.253:5000';
-//const API_ADDRESS = 'http://139.162.196.99:5000';
 
 export const dbDate = (moment) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -323,9 +325,9 @@ export const createList = async (user_id, listName, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0][0])
     .catch((e) => console.error(e));
-  return results[0];
+  return results;
 };
 
 export const shareList = async (list_id, share_email, owner_id, token) => {

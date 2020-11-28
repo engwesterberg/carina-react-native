@@ -55,6 +55,9 @@ export const send = (todo) => {
 
 export const schedule = (todo) => {
   PushNotification.localNotificationSchedule({
+    largeIcon: 'ic_launcher',
+    largeIconUrl: 'ic_notification',
+    smallIcon: 'ic_notification',
     channelId: CHANNEL_ID,
     color: COLORS.mainLight,
     id: todo.id,

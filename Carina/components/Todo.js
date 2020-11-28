@@ -158,7 +158,7 @@ const Todo = (props) => {
             }
             updateTodoDate(
               props.todo.id,
-              moment(date).format('YYYY-MM-DD'),
+              moment.utc(date).format('YYYY-MM-DD'),
               props.token,
             );
             setNewDate(deadline);
@@ -199,11 +199,8 @@ const Todo = (props) => {
                 .set('minute', m);
               setNewDate(deadline);
               setHasTime(true);
-              updateTodoTime(
-                props.todo.id,
-                moment(deadline).format('YYYY-MM-DD HH:mm'),
-                props.token,
-              );
+              let mom = moment.utc(deadline).format('YYYY-MM-DD HH:mm');
+              updateTodoTime(props.todo.id, mom, props.token);
             }
           }}
           onCancel={() => {

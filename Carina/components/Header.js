@@ -34,7 +34,7 @@ const Header = (props) => {
   const [errorMessage, setErrorMessage] = useState(null);
 
   const onModalClose = () => {
-          setErrorMessage(null);
+    setErrorMessage(null);
     props.listUpdater();
   };
 
@@ -110,6 +110,7 @@ const Header = (props) => {
                     deleteList(props.selectedList.id, props.token).then(() => {
                       setModalVisible(false);
                       props.listUpdater();
+                      props.selectedListUpdater({id: null, title: 'Carina'});
                     });
                   },
                 }}
@@ -279,8 +280,9 @@ const Header = (props) => {
         message={'Type the name of the new list'}
         hintInput={'List Name'}
         submitInput={(inputText) => {
-          createList(props.userId, inputText, props.token).then(() => {
+          createList(props.userId, inputText, props.token).then((list) => {
             props.listUpdater();
+            props.selectedListUpdater(list);
           });
           setShowPrompt(false);
         }}

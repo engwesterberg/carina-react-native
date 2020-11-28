@@ -43,7 +43,6 @@ const App = () => {
 
   useEffect(() => {
     //setDevelopmentUserState();
-    //console.log("yeah");
     storageHelper.get('token').then((tok) => {
       if (tok) {
         setToken(tok);

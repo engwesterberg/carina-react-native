@@ -3,6 +3,7 @@ import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const dbFormat = 'YYYY-MM-DD HH:mm:ss';
 import {send, schedule, scheduleAll} from './NotificationHandler.js';
+import {carinaParser} from './CarinaParser.js';
 
 // --------------------------- Push notifications ------------------------------------------
 
@@ -15,8 +16,8 @@ const getRequestConfig = (token) => {
     },
   };
 };
-//const API_ADDRESS = 'http://172.16.11.253:5000';
-const API_ADDRESS = 'http://139.162.196.99:5000';
+const API_ADDRESS = 'http://172.16.11.253:5000';
+//const API_ADDRESS = 'http://139.162.196.99:5000';
 
 export const dbDate = (moment) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -178,22 +179,27 @@ export const getPomosToday = async (user_id) => {
 };
 
 export const addTodo = async (user_id, query, list_id, token) => {
+  let parsed = carinaParser(query);
+  console.log('bajs: ', parsed);
   let results = await axios
     .post(
       `${API_ADDRESS}/api/todo`,
       {
         user_id: user_id,
-        query: query,
         list_id: list_id,
+        title: parsed.newQuery,
+        note: null,
+        due_date: parsed.due_date ? parsed.due_date : null,
+        has_time: parsed.has_time,
+        pomo_estimate: parsed.pomo_estimate,
+        recurring: parsed.recurring,
       },
       getRequestConfig(token),
     )
     .then((res) => {
       let todo = res.data[0][0];
       console.log(todo.due_date);
-      //if (todo.due_date) {
-      //  schedule(todo);
-      //}
+
       return todo;
     })
     .catch((e) => console.error(e));

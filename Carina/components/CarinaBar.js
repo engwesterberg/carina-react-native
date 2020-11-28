@@ -64,9 +64,9 @@ class CarinaBar extends Component {
                 }
               });
               this.setState({query: ''});
-          } else {
-          Toast.show("A todos title cannot be empty");
-          }
+            } else {
+              Toast.show('A todos title cannot be empty');
+            }
           }}
           onChangeText={(text) => {
             this.setState({query: text});

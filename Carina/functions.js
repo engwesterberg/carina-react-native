@@ -15,8 +15,8 @@ const getRequestConfig = (token) => {
     },
   };
 };
-const API_ADDRESS = 'http://172.16.11.253:5000';
-//const API_ADDRESS = 'http://139.162.196.99:5000';
+//const API_ADDRESS = 'http://172.16.11.253:5000';
+const API_ADDRESS = 'http://139.162.196.99:5000';
 
 export const dbDate = (moment) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -190,6 +190,7 @@ export const addTodo = async (user_id, query, list_id, token) => {
     )
     .then((res) => {
       let todo = res.data[0][0];
+      console.log(todo.due_date);
       //if (todo.due_date) {
       //  schedule(todo);
       //}

@@ -60,7 +60,14 @@ const LoginScreen = (props) => {
     return re.test(String(email).toLowerCase());
   }
   const signUpHandler = () => {
-    if (name && email && secret && repeatSecret && secret === repeatSecret) {
+    if (
+      name &&
+      email &&
+      secret &&
+      repeatSecret &&
+      secret === repeatSecret &&
+      secret.length >= 8
+    ) {
       if (validateEmail(email)) {
         signUp(null, email, name, secret)
           .then((res) => {
@@ -81,6 +88,8 @@ const LoginScreen = (props) => {
       Toast.show('Please enter your email');
     } else if (!secret) {
       Toast.show('Please enter your password');
+    } else if (secret.length >= 8) {
+      Toast.show('Password needs to be at least 8 characters long');
     }
   };
 
@@ -239,7 +248,7 @@ const LoginScreen = (props) => {
                   <AppButton title="Sign Up" onPress={signUpHandler} />
                   <AppButton
                     bgColor={COLORS.red}
-                    textColor={'white'}
+                    textColor="white"
                     title="Cancel"
                     onPress={() => {
                       setSignupOpen(false);
@@ -334,19 +343,44 @@ const LoginScreen = (props) => {
                   <AppButton
                     title="Change Password"
                     onPress={() => {
-                      if (repeatSecret === secret) {
-                        setConfirmationSent(true);
-                        confirmResetPassword(
-                          email,
-                          secret,
-                          confirmationCode,
-                        ).then(() => {
-                          setResetOpen(false);
-                          setConfirmationSent(false);
-                        });
+                      if (
+                        repeatSecret === secret &&
+                        repeatSecret &&
+                        secret &&
+                        confirmationCode
+                      ) {
+                        if (secret.length >= 8) {
+                          setConfirmationSent(true);
+                          confirmResetPassword(
+                            email,
+                            secret,
+                            confirmationCode,
+                          ).then(() => {
+                            setResetOpen(false);
+                            setConfirmationSent(false);
+                          });
+                        } else {
+                          Toast.show(
+                            'Password needs to be at least 8 characters long',
+                          );
+                        }
                       } else {
-                        Toast.show("Passwords doesn't match");
+                        Toast.show(
+                          'Some field is empty or the passwords do not match',
+                        );
                       }
+                    }}
+                  />
+                  <AppButton
+                    title="Cancel"
+                    bgColor={COLORS.red}
+                    textColor="white"
+                    onPress={() => {
+                      setResetOpen(false);
+                      setConfirmationSent(false);
+                      setSecret('');
+                      setRepeatSecret('');
+                      setConfirmationCode('');
                     }}
                   />
                 </View>

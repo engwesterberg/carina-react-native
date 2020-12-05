@@ -5,12 +5,13 @@ import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
 //import PomodoroBar from './components/PomodoroBar';
 
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
+  RefreshControl,
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
@@ -38,26 +39,43 @@ const App = () => {
   const [pomoActive, setPomoActive] = useState(false);
   const [pomoBreak, setPomoBreak] = useState(false);
   const [showTrashDialog, setShowTrashDialog] = useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
     //setDevelopmentUserState();
+    fetchLocalStorageAndData();
+  }, []);
+
+  const fetchLocalStorageAndData = () => {
     storageHelper.get('token').then((tok) => {
       if (tok) {
         setToken(tok);
         storageHelper.get('user_id').then((id) => {
           if (id) {
             setUserId(id);
-            getTodos(id, tok).then((res) => {
-              setTodos(res);
-            });
-            getLists(id, tok).then((res) => {
-              setLists(res);
-            });
+            getTodos(id, tok)
+              .then((res) => {
+                setTodos(res);
+              })
+              .catch((err) => {
+                console.error(err);
+                signOut();
+              });
+            getLists(id, tok)
+              .then((res) => {
+                setLists(res);
+              })
+              .catch((err) => {
+                console.error(err);
+                signOut();
+              });
+          } else {
+            signOut();
           }
         });
       }
     });
-  }, []);
+  };
 
   const pomoBreakUpdater = () => {
     setPomoBreak(!pomoBreak);
@@ -85,6 +103,7 @@ const App = () => {
   };
 
   const signInHandler = (aId, aToken) => {
+    console.log('signin handler');
     setUserId(aId);
     setToken(aToken);
     storageHelper.set('token', aToken);
@@ -98,11 +117,13 @@ const App = () => {
   };
 
   const todoListUpdater = () => {
+    console.log('todolist token:', token);
     getTodos(userId, token).then((res) => {
       setTodos(res);
     });
   };
   const listUpdater = () => {
+    console.log('list token:', token);
     getLists(userId, token).then((res) => {
       setLists(res);
       todoListUpdater();
@@ -115,6 +136,20 @@ const App = () => {
 
   const updatePomoActive = (todo) => {
     setPomoActive(todo);
+  };
+
+  const onRefresh = React.useCallback(() => {
+    fetchLocalStorageAndData();
+    setRefreshing(true);
+    wait(2000).then(() => {
+      setRefreshing(false);
+    });
+  }, []);
+
+  const wait = (timeout) => {
+    return new Promise((resolve) => {
+      setTimeout(resolve, timeout);
+    });
   };
 
   return (
@@ -144,7 +179,14 @@ const App = () => {
               />
             )}
             <View style={{flex: 1, marginBottom: pomoActive ? 60 : 0}}>
-              <ScrollView>
+              <ScrollView
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    title="Fetching todos"
+                  />
+                }>
                 <TodoList
                   token={token}
                   todos={todos.filter(

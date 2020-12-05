@@ -8,6 +8,7 @@ import DialogInput from 'react-native-dialog-input';
 import Modal from 'react-native-modal';
 import {TextInput as PaperTextInput, Chip} from 'react-native-paper';
 import {ConfirmDialog} from 'react-native-simple-dialogs';
+import Toast from 'react-native-simple-toast';
 import {
   Menu,
   MenuOptions,
@@ -138,20 +139,24 @@ const Header = (props) => {
             }}
             onBlur={() => {
               console.warn(shareWith);
-              shareList(
-                props.selectedList.id,
-                shareWith,
-                props.userId,
-                props.token,
-              )
-                .then((res) => {
-                  setSharedWithUsers(res);
-                  setErrorMessage(null);
-                  setShareWith('');
-                })
-                .catch((err) => {
-                  setErrorMessage(err.response.data);
-                });
+              if (shareWith !== '') {
+                shareList(
+                  props.selectedList.id,
+                  shareWith,
+                  props.userId,
+                  props.token,
+                )
+                  .then((res) => {
+                    setSharedWithUsers(res);
+                    setErrorMessage(null);
+                    setShareWith('');
+                  })
+                  .catch((err) => {
+                    setErrorMessage(err.response.data);
+                  });
+              } else {
+                Toast.show('Email cannot be empty');
+              }
             }}
           />
           {errorMessage !== null ? (
@@ -186,7 +191,7 @@ const Header = (props) => {
     return (
       <Menu>
         <MenuTrigger>
-          <Icon name="menu" size={30} color="white" />
+          <Icon style={{marginLeft: 10}} name="menu" size={30} color="white" />
         </MenuTrigger>
         <MenuOptions>
           <MenuOption
@@ -248,7 +253,12 @@ const Header = (props) => {
     return (
       <Menu>
         <MenuTrigger>
-          <Icon name="person-circle-sharp" size={25} color="white" />
+          <Icon
+            style={{marginRight: 10}}
+            name="person-circle-sharp"
+            size={25}
+            color="white"
+          />
         </MenuTrigger>
         <MenuOptions>
           <MenuOption
@@ -299,12 +309,14 @@ const Header = (props) => {
               setModalVisible(true);
               getSharedWith(props.selectedList.id, props.token).then((res) => {
                 setSharedWithUsers(res);
-                console.warn(res);
               });
             }
           }}>
           {' '}
-          {stringWithMaxLength(props.selectedList.title, 20)}
+          {stringWithMaxLength(props.selectedList.title, 20)}{' '}
+          {props.selectedList.id > 0 ? (
+            <Icon name="ios-pencil" size={20} color="white" />
+          ) : null}
         </Text>
         {listSettings()}
       </View>

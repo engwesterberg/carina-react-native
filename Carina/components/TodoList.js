@@ -1,6 +1,6 @@
 /* eslint react-native/no-inline-styles: 0 */
 import {COLORS} from '../colors.js';
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Todo from './Todo';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -83,7 +83,7 @@ const daySeparator = (curr, prev) => {
   } else if (wasYesterday) {
     text = 'Yesterday';
   } else {
-    text = current.format('MMMM Do ');
+    text = current.format('MMM Do ');
   }
   let separatorText = (
     <TouchableOpacity
@@ -93,12 +93,14 @@ const daySeparator = (curr, prev) => {
           case 0:
             Toast.show("It's today, get on it mate");
             break;
+          default:
+            Toast.show('These tasks are not planned yet');
         }
         if (dayDiff === 0) {
           Toast.show("It's today, get on it mate");
         } else if (dayDiff > 0) {
           Toast.show(`${dayDiff} days left`);
-        } else {
+        } else if (dayDiff) {
           Toast.show(`${Math.abs(dayDiff)} days ago, get on it`);
         }
       }}>

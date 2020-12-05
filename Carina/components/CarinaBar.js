@@ -57,7 +57,7 @@ class CarinaBar extends Component {
                   : this.state.query,
                 this.props.listId,
                 this.props.token,
-              ).then(() => {
+              ).then((todo) => {
                 this.props.todoListUpdater();
                 if (this.state.planningMode) {
                   this.refs.textinput.focus();

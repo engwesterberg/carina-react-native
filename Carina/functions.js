@@ -2,16 +2,16 @@ import axios from 'axios';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const dbFormat = 'YYYY-MM-DD HH:mm:ss';
-import {send, schedule, scheduleAll} from './NotificationHandler.js';
+import {scheduleAll} from './NotificationHandler.js';
 import {carinaParser} from './CarinaParser.js';
 
-//Local Ip------------------------------------------------------------------------------------------------------------------------
-//const API_ADDRESS = 'http://172.16.11.253:5000';
-//------------------------------------------------------------------------------------------------------------------------
+//PROD -----------------------------------------------------------------------------
+//const API_ADDRESS = 'http://139.162.196.99:5000';
+//-----------------------------------------------------------------------------
 
-// Linode Ip ------------------------------------------------------------------------------------------------------------------------
-const API_ADDRESS = 'http://139.162.196.99:5000';
-// ------------------------------------------------------------------------------------------------------------------------
+//DEV -----------------------------------------------------------------------------
+const API_ADDRESS = 'http://172.16.11.253:5000';
+//-----------------------------------------------------------------------------
 
 const getRequestConfig = (token) => {
   return {
@@ -21,11 +21,11 @@ const getRequestConfig = (token) => {
   };
 };
 
-export const dbDate = (moment) => {
+export const dbDate = (date) => {
   if (process.env.NODE_ENV !== 'production') {
-    return moment.format(dbFormat);
+    return date.format(dbFormat);
   }
-  return moment.toISOString().slice(0, 19).replace('T', ' ');
+  return date.toISOString().slice(0, 19).replace('T', ' ');
 };
 
 export function replaceLast(find, replace, string) {
@@ -69,7 +69,6 @@ export const storageHelper = {
 };
 
 // --------------------------- Database Functions ------------------------------------------
-
 export const signUp = async (userId, email, fullname, secret) => {
   let body = {
     user_id: null,
@@ -119,7 +118,6 @@ export const getUserIdByGoogleId = async (google_id) => {
   let res = await axios
     .get(`${API_ADDRESS}/api/id/${google_id}`)
     .then((res) => {
-      console.log('getgoogleuser: ', res.data);
       return res;
     })
     .catch((err) => console.error(err));
@@ -200,12 +198,10 @@ export const addTodo = async (user_id, query, list_id, token) => {
     )
     .then((res) => {
       let todo = res.data[0][0];
-      console.log(todo.due_date);
 
       return todo;
     })
     .catch((e) => console.error(e));
-  console.log('Festmanenn: ', results);
   return results;
 };
 
@@ -227,9 +223,9 @@ export const addSubTask = async (todo_id, title, token) => {
 export const deleteSubTask = async (id, token) => {
   let results = await axios
     .delete(`${API_ADDRESS}/api/subtask/${id}`, getRequestConfig(token))
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
-  return results[0];
+  return results;
 };
 
 export const editSubTask = async (subtask_id, title, state, token) => {
@@ -243,9 +239,9 @@ export const editSubTask = async (subtask_id, title, state, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
-  return results[0];
+  return results;
 };
 
 export const copyTodo = async (todo, token) => {
@@ -264,9 +260,9 @@ export const copyTodo = async (todo, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
-  return results[0];
+  return results;
 };
 
 export const updateTodo = async (todo) => {
@@ -286,33 +282,33 @@ export const updateTodo = async (todo) => {
   let results = await axios
     .put(`${API_ADDRESS}/api/todo/`, body)
     .then((res) => {
-      return res.data;
+      return res.data[0];
     })
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const deleteTodo = async (todo_id, token) => {
   let results = await axios
     .delete(`${API_ADDRESS}/api/todo/${todo_id}`, getRequestConfig(token))
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => {
       console.error(e);
     });
 
-  return results[0];
+  return results;
 };
 
 export const emptyTrash = async (user_id, token) => {
   let results = await axios
     .delete(`${API_ADDRESS}/api/emptytrash/${user_id}`, getRequestConfig(token))
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => {
       console.error(e);
     });
 
-  return results[0];
+  return results;
 };
 
 export const createList = async (user_id, listName, token) => {
@@ -358,9 +354,9 @@ export const stopSharingList = async (list_id, shared_with, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
-  return results[0];
+  return results;
 };
 
 export const getSharedWith = async (list_id, token) => {
@@ -377,26 +373,26 @@ export const getSharedWith = async (list_id, token) => {
 export const updateList = async (list_id, title, token) => {
   let results = axios
     .put(
-      'http://172.16.11.253:5000/api/list/',
+      `${API_ADDRESS}/api/list/`,
       {
         list_id: list_id,
         title: title,
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const deleteList = async (list_id, token) => {
   let results = axios
     .delete(`${API_ADDRESS}/api/list/${list_id}`, getRequestConfig(token))
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 //Update todos
@@ -410,10 +406,10 @@ export const updateTodoState = async (todo_id, newState, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const updateTodoTitle = async (todo_id, newTitle, token) => {
@@ -426,10 +422,10 @@ export const updateTodoTitle = async (todo_id, newTitle, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const updateTodoNote = async (todo_id, newNote, token) => {
@@ -442,10 +438,10 @@ export const updateTodoNote = async (todo_id, newNote, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const updatePomoEstimate = async (todo_id, newPomoEstimate, token) => {
@@ -458,10 +454,10 @@ export const updatePomoEstimate = async (todo_id, newPomoEstimate, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const updateTodoDate = async (todo_id, newDate, token) => {
@@ -474,12 +470,10 @@ export const updateTodoDate = async (todo_id, newDate, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => {
-      return res.data;
-    })
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const updateTodoTime = async (todo_id, newTime, token) => {
@@ -492,10 +486,10 @@ export const updateTodoTime = async (todo_id, newTime, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const updateTodoRecurring = async (todo_id, newRecurring, token) => {
@@ -508,10 +502,10 @@ export const updateTodoRecurring = async (todo_id, newRecurring, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const updateTodosList = async (todo_id, list_id, token) => {
@@ -524,10 +518,10 @@ export const updateTodosList = async (todo_id, list_id, token) => {
       },
       getRequestConfig(token),
     )
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const beginResetPassword = async (email) => {
@@ -535,10 +529,10 @@ export const beginResetPassword = async (email) => {
     .post(`${API_ADDRESS}/api/beginresetpassword/`, {
       email: email,
     })
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };
 
 export const confirmResetPassword = async (
@@ -552,8 +546,8 @@ export const confirmResetPassword = async (
       new_password: new_password,
       confirmation_code: confirmation_code,
     })
-    .then((res) => res.data)
+    .then((res) => res.data[0])
     .catch((e) => console.error(e));
 
-  return results[0];
+  return results;
 };

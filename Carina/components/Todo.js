@@ -40,6 +40,10 @@ import moment from 'moment';
 
 const TOOLBAR_ICON_SIZE = 25;
 const MODAL_LEFT_MARGIN = 5;
+const DATE_FORMATS = {
+  mmdd: 'MMM Do',
+  mmddyy: 'MMM Do YYYY',
+};
 
 const Todo = (props) => {
   //gui
@@ -304,14 +308,19 @@ const Todo = (props) => {
   const modalDateRow = () => {
     return (
       <View style={styles.dateRowView}>
-        {(props.todo.due_date || newDate) && dateOnly()}
+        {(props.todo.due_date || newDate) &&
+          dateOnly(
+            moment(props.todo.due_date).isSame(moment(), 'year')
+              ? DATE_FORMATS.mmdd
+              : DATE_FORMATS.mmddyy,
+          )}
       </View>
     );
   };
   const modalToolbar = () => {
     return (
       <View style={styles.expandedTools}>
-        <View style={styles.pomoContainer}>
+        {/*<View style={styles.pomoContainer}>
           <Icon
             name="play"
             size={TOOLBAR_ICON_SIZE}
@@ -343,7 +352,7 @@ const Todo = (props) => {
               updatePomoEstimate(props.todo.id, newPomoEstimate, props.token);
             }}
           />
-        </View>
+        </View>*/}
         <View style={styles.todoTools}>
           {datePicker()}
           {(props.todo.due_date || newDate) && timePicker()}
@@ -591,8 +600,8 @@ const Todo = (props) => {
       </Modal>
     );
   };
-  const dateOnly = () => {
-    let date = moment(newDate || props.todo.due_date).format('MMM Do');
+  const dateOnly = (dateFormat) => {
+    let date = moment(newDate || props.todo.due_date).format(dateFormat);
     let time;
     if (props.todo.has_time || hasTime) {
       time = moment(newDate || props.todo.due_date).format('HH:mm');
@@ -652,18 +661,12 @@ const Todo = (props) => {
       <Swipeable
         rightContent={
           <View style={styles.swipeRight}>
-            <Image
-              style={styles.noteImg}
-              source={require('../assets/trash-white.png')}
-            />
+            <Icon name="trash" size={25} color="white" />
           </View>
         }
         leftContent={
           <View style={styles.swipeLeft}>
-            <Image
-              style={styles.noteImg}
-              source={require('../assets/trash-white.png')}
-            />
+            <Icon name="trash" size={25} color="white" />
           </View>
         }
         onRightActionRelease={() => {
@@ -861,12 +864,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.red,
     flex: 1,
     justifyContent: 'center',
+    paddingLeft: 10,
   },
   swipeLeft: {
     backgroundColor: COLORS.red,
     flex: 1,
     alignItems: 'flex-end',
     justifyContent: 'center',
+    paddingRight: 10,
   },
   swipeText: {
     color: 'white',

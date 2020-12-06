@@ -11,6 +11,7 @@ import Swipeable from 'react-native-swipeable-row';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import Toast from 'react-native-simple-toast';
 import {addTodo} from '../functions.js';
+import PlanningModeButton from './PlanningModeButton';
 
 const leftContent = <Text />;
 
@@ -20,12 +21,27 @@ const rightButtons = [
   </TouchableHighlight>,
 ];
 
+const planningModeAttributes = [
+  {
+    title: 'Today',
+    attribute: ' today ',
+  },
+  {
+    title: 'Tomorrow',
+    attribute: ' tomorrow ',
+  },
+];
+
 class CarinaBar extends Component {
   state = {
     planningMode: false,
     planningModeButton: false,
     query: '',
     planningAttributes: '',
+  };
+
+  addAttribute = (attr) => {
+    console.log(attr);
   };
 
   render() {
@@ -104,6 +120,17 @@ class CarinaBar extends Component {
                 }}
               />
             </Swipeable>
+            <View style={{flexDirection: 'row'}}>
+              {planningModeAttributes.map((elem) => {
+                return (
+                  <PlanningModeButton
+                    title={elem.title}
+                    attribute={elem.attribute}
+                    onPress={this.addAttribute}
+                  />
+                );
+              })}
+            </View>
           </View>
         )}
       </View>

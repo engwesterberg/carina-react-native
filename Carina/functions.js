@@ -132,7 +132,9 @@ export const getTodos = async (user_id, token) => {
       scheduleAll(todos);
       return todos;
     })
-    .catch((error) => console.error(error));
+    .catch((error) => {
+      console.error(error);
+    });
   return results;
 };
 

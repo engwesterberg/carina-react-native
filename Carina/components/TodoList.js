@@ -32,6 +32,7 @@ const TodoList = (props) => {
               !item.due_date &&
               daySeparator('No Date')}
             <Todo
+              key={index}
               todo={item}
               todoListUpdater={props.todoListUpdater}
               removeFromList={props.removeFromList}

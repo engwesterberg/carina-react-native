@@ -9,12 +9,9 @@ const DELETED = 2;
 
 PushNotification.configure({
   onNotification: function (notification) {
-    console.log('NOTIFICATION:', notification);
   },
 
   onAction: function (notification) {
-    console.log('ACTION:', notification.action);
-    console.log('NOTIFICATION:', notification);
   },
   onRegistrationError: function (err) {
     console.error(err.message, err);
@@ -70,7 +67,9 @@ export const schedule = (todo) => {
 };
 
 export const getNotifications = () => {
-  console.log('notifications:');
+};
+export const cancelNotification = (todo_id) => {
+  PushNotification.cancelLocalNotifications({id: todo_id});
 };
 
 export const scheduleAll = (todos) => {

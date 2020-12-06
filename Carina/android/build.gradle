@@ -8,6 +8,8 @@ buildscript {
         targetSdkVersion = 29
         googlePlayServicesAuthVersion = "16.0.1" // <--- use this version or newer
         firebaseMessagingVersion = "+" // default: "+"
+        # Only using Android Support libraries
+        supportLibVersion = "28.0.0"
 
     }
     repositories {

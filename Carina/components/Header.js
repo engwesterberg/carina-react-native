@@ -1,12 +1,12 @@
 import {COLORS} from '../colors.js';
 import {globalStyles} from '../globalstyles.js';
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Platform, TextInput} from 'react-native';
+import {View, Text, StyleSheet, TextInput} from 'react-native';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import {Button} from 'react-native-elements';
 import DialogInput from 'react-native-dialog-input';
 import Modal from 'react-native-modal';
-import {TextInput as PaperTextInput, Chip} from 'react-native-paper';
+import {Chip} from 'react-native-paper';
 import {ConfirmDialog} from 'react-native-simple-dialogs';
 import Toast from 'react-native-simple-toast';
 import {
@@ -165,24 +165,27 @@ const Header = (props) => {
           <Text style={styles.guide}>
             {sharedWithUsers.length > 0 && 'Currently shared with'}
           </Text>
-          {sharedWithUsers.map((item) => {
-            return (
-              <Chip
-                icon="delete"
-                key={item.id}
-                onPress={() => {
-                  stopSharingList(
-                    props.selectedList.id,
-                    item.id,
-                    props.token,
-                  ).then((res) => {
-                    setSharedWithUsers(res);
-                  });
-                }}>
-                {item.fullname}
-              </Chip>
-            );
-          })}
+          <View style={styles.chipView}>
+            {sharedWithUsers.map((item) => {
+              return (
+                <Chip
+                  icon="delete"
+                  key={item.id}
+                  style={{margin: 2}}
+                  onPress={() => {
+                    stopSharingList(
+                      props.selectedList.id,
+                      item.id,
+                      props.token,
+                    ).then((res) => {
+                      setSharedWithUsers(res);
+                    });
+                  }}>
+                  {item.fullname}
+                </Chip>
+              );
+            })}
+          </View>
         </View>
       </Modal>
     );
@@ -372,6 +375,7 @@ const styles = StyleSheet.create({
   },
   guide: {
     fontSize: 18,
+    marginTop: 25,
     marginLeft: 5,
   },
   bold: {fontWeight: 'bold', color: COLORS.mainLight},
@@ -390,6 +394,11 @@ const styles = StyleSheet.create({
     borderTopColor: COLORS.mainLight,
     fontSize: 14,
     borderColor: COLORS.mainLight,
+  },
+  chipView: {
+    flexDirection: 'row',
+    flex: 1,
+    flexWrap: 'wrap',
   },
 });
 

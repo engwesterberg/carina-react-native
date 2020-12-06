@@ -5,7 +5,7 @@ import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
 //import PomodoroBar from './components/PomodoroBar';
 
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
+  AppState,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -40,11 +41,36 @@ const App = () => {
   const [pomoBreak, setPomoBreak] = useState(false);
   const [showTrashDialog, setShowTrashDialog] = useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   useEffect(() => {
     //setDevelopmentUserState();
     fetchLocalStorageAndData();
+
+    AppState.addEventListener('change', _handleAppStateChange);
+    return () => {
+      AppState.removeEventListener('change', _handleAppStateChange);
+    };
   }, []);
+
+  const _handleAppStateChange = (nextAppState) => {
+    if (
+      appState.current.match(/inactive|background/) &&
+      nextAppState === 'active'
+    ) {
+      console.log('App has come to the foreground!');
+    }
+
+    appState.current = nextAppState;
+    setAppStateVisible(appState.current);
+    console.log('AppState', appState.current);
+    if (appState.current === 'background') {
+      let jsonString = JSON.stringify({todos: todos, lists: lists});
+      console.log(jsonString);
+      storageHelper.set('offlineData', jsonString);
+    }
+  };
 
   const fetchLocalStorageAndData = () => {
     storageHelper.get('token').then((tok) => {
@@ -103,7 +129,6 @@ const App = () => {
   };
 
   const signInHandler = (aId, aToken) => {
-    console.log('signin handler');
     setUserId(aId);
     setToken(aToken);
     storageHelper.set('token', aToken);
@@ -117,13 +142,11 @@ const App = () => {
   };
 
   const todoListUpdater = () => {
-    console.log('todolist token:', token);
     getTodos(userId, token).then((res) => {
       setTodos(res);
     });
   };
   const listUpdater = () => {
-    console.log('list token:', token);
     getLists(userId, token).then((res) => {
       setLists(res);
       todoListUpdater();

@@ -27,6 +27,7 @@ import {
   updatePomoEstimate,
   updateTodosList,
 } from '../functions';
+import {cancelNotification} from '../NotificationHandler';
 
 import Swipeable from 'react-native-swipeable-row';
 import {Button} from 'react-native-elements';
@@ -671,13 +672,15 @@ const Todo = (props) => {
         }
         onRightActionRelease={() => {
           deleteTodo(props.todo.id, props.token).then(() => {
-            props.todoListUpdater();
+            props.removeFromList(props.todo.id);
+            cancelNotification(props.todo.id);
           });
-          props.removeFromList(props.todo.id);
         }}
         onLeftActionRelease={() => {
-          deleteTodo(props.todo.id, props.token).then(props.todoListUpdater());
-          props.removeFromList(props.todo.id);
+          deleteTodo(props.todo.id, props.token).then(() => {
+            props.removeFromList(props.todo.id);
+            cancelNotification(props.todo.id);
+          });
         }}>
         <TouchableOpacity
           style={styles.todoContainer}

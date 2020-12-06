@@ -26,6 +26,7 @@ import {
   updateTodoRecurring,
   updatePomoEstimate,
   updateTodosList,
+  checkInternetConnection,
 } from '../functions';
 import {cancelNotification} from '../NotificationHandler';
 
@@ -695,17 +696,17 @@ const Todo = (props) => {
         <TouchableOpacity
           style={styles.todoContainer}
           key={props.id}
-          onPress={() => {
-            if (props.online) {
+          onPress={async () => {
+            if (props.online && (await checkInternetConnection())) {
               setModalVisible(true);
               getSubTasks(props.todo.id, props.token)
                 .then((res) => {
                   setSubTasks(res);
                 })
                 .catch((err) => {
-                  setSubTasks([]);
-                  onModalClose();
+                  console.error(err);
                 });
+            } else {
             }
           }}>
           {props.online ? (

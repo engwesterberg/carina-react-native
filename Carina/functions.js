@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const dbFormat = 'YYYY-MM-DD HH:mm:ss';
 import {scheduleAll} from './NotificationHandler.js';
 import {carinaParser} from './CarinaParser.js';
+import NetInfo from '@react-native-community/netinfo';
 
 //PROD -----------------------------------------------------------------------------
 //const API_ADDRESS = 'http://139.162.196.99:5000';
@@ -19,6 +20,12 @@ const getRequestConfig = (token) => {
       Authorization: 'Bearer ' + token,
     },
   };
+};
+
+export const checkInternetConnection = async () => {
+  let connection = await NetInfo.fetch();
+  console.log('isconnted: ', connection.isConnected);
+  return connection.isConnected;
 };
 
 export const dbDate = (date) => {

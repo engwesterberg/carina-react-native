@@ -29,6 +29,7 @@ import {
   emptyTrash,
   storageHelper,
   localDataHandler,
+  checkInternetConnection,
 } from './functions';
 
 const NOT_DONE = 0;
@@ -81,6 +82,7 @@ const App = () => {
   };
 
   const fetchLocalStorageAndData = () => {
+    checkInternetConnection();
     storageHelper.get('token').then((tok) => {
       if (tok) {
         setToken(tok);

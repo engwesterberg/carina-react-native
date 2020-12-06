@@ -245,10 +245,18 @@ const Todo = (props) => {
             onPress={() => {
               let updatedTodo = props.todo;
               let newState = updatedTodo.state === 0 ? 1 : 0;
-              updateTodoState(props.todo.id, newState, props.token).then(() => {
-                props.todoListUpdater();
-                setModalVisible(false);
-              });
+              updateTodoState(props.todo.id, newState, props.token)
+                .then(() => {
+                  props.todoListUpdater();
+                  setModalVisible(false);
+                })
+                .catch((err) => {
+                  if (err.response) {
+                    if (err.response.status === 403) {
+                      props.signOut();
+                    }
+                  }
+                });
               if (props.todo.recurring) {
                 let copy = props.todo;
                 if (copy.recurring === 30) {
@@ -261,9 +269,17 @@ const Todo = (props) => {
                     'days',
                   );
                 }
-                copyTodo(props.todo, props.token).then(() => {
-                  props.todoListUpdater();
-                });
+                copyTodo(props.todo, props.token)
+                  .then(() => {
+                    props.todoListUpdater();
+                  })
+                  .catch((err) => {
+                    if (err.response) {
+                      if (err.response.status === 403) {
+                        props.signOut();
+                      }
+                    }
+                  });
               }
             }}>
             {props.todo.state !== 2 ? (
@@ -284,9 +300,15 @@ const Todo = (props) => {
                 onPress={() => {
                   let updatedTodo = props.todo;
                   updatedTodo.state = 0;
-                  updateTodoState(props.todo.id, 0, props.token).then(
-                    props.todoListUpdater(),
-                  );
+                  updateTodoState(props.todo.id, 0, props.token)
+                    .then(props.todoListUpdater())
+                    .catch((err) => {
+                      if (err.response) {
+                        if (err.response.status === 403) {
+                          props.signOut();
+                        }
+                      }
+                    });
                 }}
               />
             )}
@@ -384,9 +406,17 @@ const Todo = (props) => {
                           props.todo.id,
                           item.value,
                           props.token,
-                        ).then((res) => {
-                          setNewRepeat(item.value);
-                        });
+                        )
+                          .then((res) => {
+                            setNewRepeat(item.value);
+                          })
+                          .catch((err) => {
+                            if (err.response) {
+                              if (err.response.status === 403) {
+                                props.signOut();
+                              }
+                            }
+                          });
                       }}>
                       <Text>{item.text}</Text>
                     </MenuItem>
@@ -468,16 +498,19 @@ const Todo = (props) => {
           }}
           onBlur={() => {
             if (newSubTask !== '') {
-              addSubTask(props.todo.id, newSubTask, props.token).then(() => {
-                getSubTasks(props.todo.id, props.token)
-                  .then((res) => {
+              addSubTask(props.todo.id, newSubTask, props.token)
+                .then(() => {
+                  getSubTasks(props.todo.id, props.token).then((res) => {
                     setSubTasks(res);
-                  })
-                  .catch((err) => {
-                    setSubTasks([]);
-                    setModalVisible(false);
                   });
-              });
+                })
+                .catch((err) => {
+                  if (err.response) {
+                    if (err.response.status === 403) {
+                      props.signOut();
+                    }
+                  }
+                });
               setNewSubTask('');
             }
           }}
@@ -509,8 +542,11 @@ const Todo = (props) => {
                             );
                           })
                           .catch((err) => {
-                            setSubTasks([]);
-                            setModalVisible(false);
+                            if (err.response) {
+                              if (err.response.status === 403) {
+                                props.signOut();
+                              }
+                            }
                           });
                       }}>
                       <MaterialCommunityIconsI
@@ -530,13 +566,21 @@ const Todo = (props) => {
                           item.title,
                           item.state === 0 ? 1 : 0,
                           props.token,
-                        ).then(() => {
-                          getSubTasks(props.todo.id, props.token).then(
-                            (res) => {
-                              setSubTasks(res);
-                            },
-                          );
-                        });
+                        )
+                          .then(() => {
+                            getSubTasks(props.todo.id, props.token).then(
+                              (res) => {
+                                setSubTasks(res);
+                              },
+                            );
+                          })
+                          .catch((err) => {
+                            if (err.response) {
+                              if (err.response.status === 403) {
+                                props.signOut();
+                              }
+                            }
+                          });
                       }}
                       style={{
                         textDecorationLine:
@@ -550,13 +594,21 @@ const Todo = (props) => {
                       size={25}
                       color={COLORS.mainLight}
                       onPress={() => {
-                        deleteSubTask(item.id, props.token).then(() => {
-                          getSubTasks(props.todo.id, props.token).then(
-                            (res) => {
-                              setSubTasks(res);
-                            },
-                          );
-                        });
+                        deleteSubTask(item.id, props.token)
+                          .then(() => {
+                            getSubTasks(props.todo.id, props.token).then(
+                              (res) => {
+                                setSubTasks(res);
+                              },
+                            );
+                          })
+                          .catch((err) => {
+                            if (err.response) {
+                              if (err.response.status === 403) {
+                                props.signOut();
+                              }
+                            }
+                          });
                       }}
                     />
                   </View>
@@ -682,16 +734,32 @@ const Todo = (props) => {
           </View>
         }
         onRightActionRelease={() => {
-          deleteTodo(props.todo.id, props.token).then(() => {
-            props.removeFromList(props.todo.id);
-            cancelNotification(props.todo.id);
-          });
+          deleteTodo(props.todo.id, props.token)
+            .then(() => {
+              props.removeFromList(props.todo.id);
+              cancelNotification(props.todo.id);
+            })
+            .catch((err) => {
+              if (err.response) {
+                if (err.response.status === 403) {
+                  props.signOut();
+                }
+              }
+            });
         }}
         onLeftActionRelease={() => {
-          deleteTodo(props.todo.id, props.token).then(() => {
-            props.removeFromList(props.todo.id);
-            cancelNotification(props.todo.id);
-          });
+          deleteTodo(props.todo.id, props.token)
+            .then(() => {
+              props.removeFromList(props.todo.id);
+              cancelNotification(props.todo.id);
+            })
+            .catch((err) => {
+              if (err.response) {
+                if (err.response.status === 403) {
+                  props.signOut();
+                }
+              }
+            });
         }}>
         <TouchableOpacity
           style={styles.todoContainer}
@@ -715,11 +783,18 @@ const Todo = (props) => {
                 onPress={() => {
                   let updatedTodo = props.todo;
                   let newState = updatedTodo.state === 0 ? 1 : 0;
-                  updateTodoState(props.todo.id, newState, props.token).then(
-                    () => {
+                  updateTodoState(props.todo.id, newState, props.token)
+                    .then(() => {
                       props.todoListUpdater();
-                    },
-                  );
+                    })
+                    .catch((err) => {
+                      if (err.response) {
+                        if (err.response.status === 403) {
+                          props.signOut();
+                          return;
+                        }
+                      }
+                    });
                   if (props.todo.recurring) {
                     let copy = props.todo;
                     if (copy.recurring === 30) {
@@ -755,9 +830,16 @@ const Todo = (props) => {
                     onPress={() => {
                       let updatedTodo = props.todo;
                       updatedTodo.state = 0;
-                      updateTodoState(props.todo.id, 0, props.token).then(
-                        props.todoListUpdater(),
-                      );
+                      updateTodoState(props.todo.id, 0, props.token)
+                        .then(props.todoListUpdater())
+                        .catch((err) => {
+                          if (err.response) {
+                            if (err.response.status === 403) {
+                              props.signOut();
+                              return;
+                            }
+                          }
+                        });
                     }}
                   />
                 )}

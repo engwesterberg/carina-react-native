@@ -41,6 +41,7 @@ const TodoList = (props) => {
               lists={props.lists}
               token={props.token}
               online={props.online}
+              signOut={props.signOut}
             />
           </View>
         );

@@ -73,12 +73,20 @@ class CarinaBar extends Component {
                   : this.state.query,
                 this.props.listId,
                 this.props.token,
-              ).then((todo) => {
-                this.props.todoListUpdater();
-                if (this.state.planningMode) {
-                  this.refs.textinput.focus();
-                }
-              });
+              )
+                .then((todo) => {
+                  this.props.todoListUpdater();
+                  if (this.state.planningMode) {
+                    this.refs.textinput.focus();
+                  }
+                })
+                .catch((err) => {
+                  if (err.response) {
+                    if (err.response.status === 403) {
+                      this.props.signOut();
+                    }
+                  }
+                });
               this.setState({query: ''});
             } else {
               Toast.show('A todos title cannot be empty');
@@ -120,7 +128,7 @@ class CarinaBar extends Component {
                 }}
               />
             </Swipeable>
-            <View style={{flexDirection: 'row'}}>
+            {/*<View style={{flexDirection: 'row'}}>
               {planningModeAttributes.map((elem) => {
                 return (
                   <PlanningModeButton
@@ -130,7 +138,7 @@ class CarinaBar extends Component {
                   />
                 );
               })}
-            </View>
+            </View>*/}
           </View>
         )}
       </View>

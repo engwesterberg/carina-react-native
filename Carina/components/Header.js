@@ -71,17 +71,23 @@ const Header = (props) => {
                   }
                 }}
                 onEndEditing={() => {
-                  updateList(
-                    props.selectedList.id,
-                    newListName,
-                    props.token,
-                  ).then(() => {
-                    props.listUpdater();
-                    props.selectedListUpdater({
-                      id: props.selectedList.id,
-                      title: newListName,
+                  updateList(props.selectedList.id, newListName, props.token)
+                    .then(() => {
+                      props.listUpdater();
+                      props.selectedListUpdater({
+                        id: props.selectedList.id,
+                        title: newListName,
+                      });
+                    })
+                    .catch((err) => {
+                      if (err.response) {
+                        if (err.response.status === 403) {
+                          props.signOut();
+                          return;
+                        }
+                      }
+                      setErrorMessage(err.response.data);
                     });
-                  });
                 }}
               />
             </View>
@@ -108,11 +114,20 @@ const Header = (props) => {
                   title: 'YES',
                   onPress: () => {
                     setShowDeleteDialog(false);
-                    deleteList(props.selectedList.id, props.token).then(() => {
-                      setModalVisible(false);
-                      props.listUpdater();
-                      props.selectedListUpdater({id: null, title: 'Carina'});
-                    });
+                    deleteList(props.selectedList.id, props.token)
+                      .then(() => {
+                        setModalVisible(false);
+                        props.listUpdater();
+                        props.selectedListUpdater({id: null, title: 'Carina'});
+                      })
+                      .catch((err) => {
+                        if (err.response) {
+                          if (err.response.status === 403) {
+                            props.signOut();
+                            return;
+                          }
+                        }
+                      });
                   },
                 }}
                 negativeButton={{
@@ -152,6 +167,12 @@ const Header = (props) => {
                     setShareWith('');
                   })
                   .catch((err) => {
+                    if (err.response) {
+                      if (err.response.status === 403) {
+                        props.signOut();
+                        return;
+                      }
+                    }
                     setErrorMessage(err.response.data);
                   });
               } else {
@@ -268,7 +289,7 @@ const Header = (props) => {
         <MenuOptions>
           <MenuOption
             onSelect={() => {
-              props.signOutHandler();
+              props.signOut(true);
             }}>
             <View style={[globalStyles.menuRow, globalStyles.menuTopRow]}>
               <Icon name="ios-log-out" size={20} color={COLORS.mainLight} />
@@ -295,10 +316,18 @@ const Header = (props) => {
         message={'Type the name of the new list'}
         hintInput={'List Name'}
         submitInput={(inputText) => {
-          createList(props.userId, inputText, props.token).then((list) => {
-            props.listUpdater();
-            props.selectedListUpdater(list);
-          });
+          createList(props.userId, inputText, props.token)
+            .then((list) => {
+              props.listUpdater();
+              props.selectedListUpdater(list);
+            })
+            .catch((err) => {
+              if (err.response) {
+                if (err.response.status === 403) {
+                  props.signOut();
+                }
+              }
+            });
           setShowPrompt(false);
         }}
         closeDialog={() => {
@@ -312,9 +341,17 @@ const Header = (props) => {
           onPress={() => {
             if (props.selectedList.id > 0 && props.online) {
               setModalVisible(true);
-              getSharedWith(props.selectedList.id, props.token).then((res) => {
-                setSharedWithUsers(res);
-              });
+              getSharedWith(props.selectedList.id, props.token)
+                .then((res) => {
+                  setSharedWithUsers(res);
+                })
+                .catch((err) => {
+                  if (err.response) {
+                    if (err.response.status === 403) {
+                      props.signOut();
+                    }
+                  }
+                });
             }
           }}>
           {' '}

@@ -6,6 +6,7 @@ import TodoList from './components/TodoList';
 import Banner from './components/Banner';
 //import PomodoroBar from './components/PomodoroBar';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Toast from 'react-native-simple-toast';
 
 import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {
@@ -95,12 +96,16 @@ const App = () => {
                 setOnline(true);
               })
               .catch(async (err) => {
-                console.error('error', err);
+                console.log('bajs', err.response);
+                if (err.response) {
+                  if (err.response.status === 403) {
+                    signOut();
+                    return;
+                  }
+                }
                 let offlineTodos = await localDataHandler.getTodos();
-                console.log('sprittmatutt: ', offlineTodos);
-                setTodos(offlineTodos);
                 setOnline(false);
-                //signOut();
+                setTodos(offlineTodos);
               });
             getLists(id, tok)
               .then((res) => {
@@ -108,12 +113,15 @@ const App = () => {
                 setOnline(true);
               })
               .catch(async (err) => {
-                console.error('error', err);
+                if (err.response) {
+                  if (err.response.status === 403) {
+                    signOut();
+                    return;
+                  }
+                }
                 let offlineLists = await localDataHandler.getLists();
-                console.log('sprittmatutt: ', offlineLists);
                 setLists(offlineLists);
                 setOnline(false);
-                //signOut();
               });
           } else {
             signOut();
@@ -137,7 +145,10 @@ const App = () => {
     });
   };
 
-  const signOut = () => {
+  const signOut = (userSignedOut) => {
+    if (!userSignedOut) {
+      Toast.show('Refresh token has expired, please sign in again');
+    }
     setUserId(null);
     setTodos([]);
     setLists([]);
@@ -146,6 +157,8 @@ const App = () => {
     setPomoActive(false);
     storageHelper.remove('token');
     storageHelper.remove('user_id');
+    storageHelper.remove('offlineTodos');
+    storageHelper.remove('offlineLists');
   };
 
   const signInHandler = (aId, aToken) => {
@@ -167,6 +180,12 @@ const App = () => {
         setTodos(res);
       })
       .catch((err) => {
+        if (err.response) {
+          if (err.response.status === 403) {
+            signOut();
+            return;
+          }
+        }
         setOnline(false);
       });
   };
@@ -177,6 +196,12 @@ const App = () => {
         todoListUpdater();
       })
       .catch((err) => {
+        if (err.response) {
+          if (err.response.status === 403) {
+            signOut();
+            return;
+          }
+        }
         setOnline(false);
       });
   };
@@ -219,7 +244,7 @@ const App = () => {
               selectedListUpdater={(list) => {
                 setSelectedList(list);
               }}
-              signOutHandler={signOut}
+              signOut={signOut}
               online={online}
             />
             {selectedList.id !== DELETED_LIST_ID && online ? (
@@ -229,6 +254,7 @@ const App = () => {
                 todoListUpdater={todoListUpdater}
                 listId={selectedList ? selectedList.id : null}
                 online={online}
+                signOut={signOut}
               />
             ) : null}
             {!online ? (
@@ -266,6 +292,7 @@ const App = () => {
                   updatePomoActive={updatePomoActive}
                   lists={lists}
                   online={online}
+                  signOut={signOut}
                 />
                 {selectedList.id !== DELETED_LIST_ID && (
                   <TouchableOpacity
@@ -292,6 +319,7 @@ const App = () => {
                     listId={selectedList ? selectedList.id : null}
                     lists={lists}
                     online={online}
+                    signOut={signOut}
                   />
                 )}
                 {selectedList.id === DELETED_LIST_ID && (
@@ -304,6 +332,7 @@ const App = () => {
                     lists={lists}
                     todoListUpdater={todoListUpdater}
                     online={online}
+                    signOut={signOut}
                     childAtTop={true}>
                     {todos.filter((obj) => obj.state === DELETED).length > 0 ? (
                       <View style={styles.listSpecificButton}>
@@ -346,9 +375,18 @@ const App = () => {
                     title: 'YES',
                     onPress: () => {
                       setShowTrashDialog(false);
-                      emptyTrash(userId, token).then(() => {
-                        todoListUpdater();
-                      });
+                      emptyTrash(userId, token)
+                        .then(() => {
+                          todoListUpdater();
+                        })
+                        .catch((err) => {
+                          if (err.response) {
+                            if (err.response.status === 403) {
+                              signOut();
+                              return;
+                            }
+                          }
+                        });
                     },
                   }}
                   negativeButton={{

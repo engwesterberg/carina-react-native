@@ -7,11 +7,11 @@ import {carinaParser} from './CarinaParser.js';
 import NetInfo from '@react-native-community/netinfo';
 
 //PROD -----------------------------------------------------------------------------
-//const API_ADDRESS = 'http://139.162.196.99:5000';
+const API_ADDRESS = 'http://139.162.196.99:5000';
 //-----------------------------------------------------------------------------
 
 //DEV -----------------------------------------------------------------------------
-const API_ADDRESS = 'http://172.16.11.253:5000';
+//const API_ADDRESS = 'http://172.16.11.253:5000';
 //-----------------------------------------------------------------------------
 
 const getRequestConfig = (token) => {
@@ -233,7 +233,9 @@ export const addTodo = async (user_id, query, list_id, token) => {
 
       return todo;
     })
-    .catch((e) => console.error(e));
+    .catch((err) => {
+      throw err;
+    });
   return results;
 };
 
@@ -248,7 +250,10 @@ export const addSubTask = async (todo_id, title, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data)
-    .catch((e) => console.error(e));
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
   return results[0];
 };
 
@@ -256,7 +261,9 @@ export const deleteSubTask = async (id, token) => {
   let results = await axios
     .delete(`${API_ADDRESS}/api/subtask/${id}`, getRequestConfig(token))
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
   return results;
 };
 
@@ -272,7 +279,9 @@ export const editSubTask = async (subtask_id, title, state, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
   return results;
 };
 
@@ -293,7 +302,9 @@ export const copyTodo = async (todo, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
   return results;
 };
 
@@ -316,7 +327,9 @@ export const updateTodo = async (todo) => {
     .then((res) => {
       return res.data[0];
     })
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -327,6 +340,7 @@ export const deleteTodo = async (todo_id, token) => {
     .then((res) => res.data[0])
     .catch((e) => {
       console.error(e);
+      throw e;
     });
 
   return results;
@@ -338,6 +352,7 @@ export const emptyTrash = async (user_id, token) => {
     .then((res) => res.data[0])
     .catch((e) => {
       console.error(e);
+      throw e;
     });
 
   return results;
@@ -354,7 +369,9 @@ export const createList = async (user_id, listName, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0][0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
   return results;
 };
 
@@ -387,7 +404,9 @@ export const stopSharingList = async (list_id, shared_with, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
   return results;
 };
 
@@ -397,6 +416,7 @@ export const getSharedWith = async (list_id, token) => {
     .then((res) => res.data)
     .catch((e) => {
       console.error(e);
+      throw e;
     });
 
   return results[0];
@@ -413,7 +433,9 @@ export const updateList = async (list_id, title, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -422,7 +444,9 @@ export const deleteList = async (list_id, token) => {
   let results = axios
     .delete(`${API_ADDRESS}/api/list/${list_id}`, getRequestConfig(token))
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -439,7 +463,9 @@ export const updateTodoState = async (todo_id, newState, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -455,7 +481,9 @@ export const updateTodoTitle = async (todo_id, newTitle, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -471,7 +499,9 @@ export const updateTodoNote = async (todo_id, newNote, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -487,7 +517,9 @@ export const updatePomoEstimate = async (todo_id, newPomoEstimate, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -503,7 +535,9 @@ export const updateTodoDate = async (todo_id, newDate, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -519,7 +553,9 @@ export const updateTodoTime = async (todo_id, newTime, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -535,7 +571,9 @@ export const updateTodoRecurring = async (todo_id, newRecurring, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -551,7 +589,9 @@ export const updateTodosList = async (todo_id, list_id, token) => {
       getRequestConfig(token),
     )
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -562,7 +602,9 @@ export const beginResetPassword = async (email) => {
       email: email,
     })
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };
@@ -579,7 +621,9 @@ export const confirmResetPassword = async (
       confirmation_code: confirmation_code,
     })
     .then((res) => res.data[0])
-    .catch((e) => console.error(e));
+    .catch((e) => {
+      throw e;
+    });
 
   return results;
 };

@@ -68,6 +68,20 @@ export const storageHelper = {
   },
 };
 
+export const localDataHandler = {
+  getTodos: async () => {
+    let offlineTodos = await storageHelper.get('offlineTodos');
+    let obj = JSON.parse(offlineTodos);
+    let todos = obj.data;
+    return todos;
+  },
+  getLists: async () => {
+    let offlineLists = await storageHelper.get('offlineLists');
+    let obj = JSON.parse(offlineLists);
+    let lists = obj.data;
+    return lists;
+  },
+};
 // --------------------------- Database Functions ------------------------------------------
 export const signUp = async (userId, email, fullname, secret) => {
   let body = {
@@ -129,11 +143,14 @@ export const getTodos = async (user_id, token) => {
     .get(`${API_ADDRESS}/api/todos/${user_id}`, getRequestConfig(token))
     .then((results) => {
       let todos = results.data[0];
+
+      let jsonString = JSON.stringify({data: todos});
+      storageHelper.set('offlineTodos', jsonString);
       scheduleAll(todos);
       return todos;
     })
     .catch((error) => {
-      console.error(error);
+      throw error;
     });
   return results;
 };
@@ -151,12 +168,18 @@ export const getSubTasks = async (todo_id, token) => {
 export const getLists = async (user_id, token) => {
   let results = await axios
     .get(`${API_ADDRESS}/api/list/${user_id}`, getRequestConfig(token))
-    .then((res) => res.data)
-    .catch((e) => {
-      console.error(e);
+    .then((res) => {
+      let lists = res.data[0];
+      let jsonString = JSON.stringify({data: lists});
+      storageHelper.set('offlineLists', jsonString);
+      return lists;
+    })
+    .catch((error) => {
+      console.error(error);
+      throw error;
     });
 
-  return results[0];
+  return results;
 };
 
 export const incPomo = async (user_id, todo_id) => {

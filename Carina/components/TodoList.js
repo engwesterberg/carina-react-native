@@ -40,6 +40,7 @@ const TodoList = (props) => {
               showBorder={index !== props.todos.length}
               lists={props.lists}
               token={props.token}
+              online={props.online}
             />
           </View>
         );

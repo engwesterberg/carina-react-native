@@ -3,7 +3,9 @@ import Header from './components/Header';
 import LoginScreen from './components/LoginScreen';
 import CarinaBar from './components/CarinaBar';
 import TodoList from './components/TodoList';
+import Banner from './components/Banner';
 //import PomodoroBar from './components/PomodoroBar';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {
@@ -17,12 +19,17 @@ import {
   StatusBar,
   AppState,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/dist/Ionicons';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
 import {MenuProvider} from 'react-native-popup-menu';
 import {ConfirmDialog} from 'react-native-simple-dialogs';
 
-import {getTodos, getLists, emptyTrash, storageHelper} from './functions';
+import {
+  getTodos,
+  getLists,
+  emptyTrash,
+  storageHelper,
+  localDataHandler,
+} from './functions';
 
 const NOT_DONE = 0;
 const DONE = 1;
@@ -43,6 +50,7 @@ const App = () => {
   const [refreshing, setRefreshing] = React.useState(false);
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
+  const [online, setOnline] = useState(true);
 
   useEffect(() => {
     //setDevelopmentUserState();
@@ -82,18 +90,28 @@ const App = () => {
             getTodos(id, tok)
               .then((res) => {
                 setTodos(res);
+                setOnline(true);
               })
-              .catch((err) => {
-                console.error(err);
-                signOut();
+              .catch(async (err) => {
+                console.error('error', err);
+                let offlineTodos = await localDataHandler.getTodos();
+                console.log('sprittmatutt: ', offlineTodos);
+                setTodos(offlineTodos);
+                setOnline(false);
+                //signOut();
               });
             getLists(id, tok)
               .then((res) => {
                 setLists(res);
+                setOnline(true);
               })
-              .catch((err) => {
-                console.error(err);
-                signOut();
+              .catch(async (err) => {
+                console.error('error', err);
+                let offlineLists = await localDataHandler.getLists();
+                console.log('sprittmatutt: ', offlineLists);
+                setLists(offlineLists);
+                setOnline(false);
+                //signOut();
               });
           } else {
             signOut();
@@ -142,15 +160,23 @@ const App = () => {
   };
 
   const todoListUpdater = () => {
-    getTodos(userId, token).then((res) => {
-      setTodos(res);
-    });
+    getTodos(userId, token)
+      .then((res) => {
+        setTodos(res);
+      })
+      .catch((err) => {
+        setOnline(false);
+      });
   };
   const listUpdater = () => {
-    getLists(userId, token).then((res) => {
-      setLists(res);
-      todoListUpdater();
-    });
+    getLists(userId, token)
+      .then((res) => {
+        setLists(res);
+        todoListUpdater();
+      })
+      .catch((err) => {
+        setOnline(false);
+      });
   };
 
   const removeFromList = (todo_id) => {
@@ -192,15 +218,30 @@ const App = () => {
                 setSelectedList(list);
               }}
               signOutHandler={signOut}
+              online={online}
             />
-            {selectedList.id !== DELETED_LIST_ID && (
+            {selectedList.id !== DELETED_LIST_ID && online ? (
               <CarinaBar
                 token={token}
                 userId={userId}
                 todoListUpdater={todoListUpdater}
                 listId={selectedList ? selectedList.id : null}
+                online={online}
               />
-            )}
+            ) : null}
+            {!online ? (
+              <Banner
+                title="Carina is offline"
+                subtitle="Offline support is not here yet, but it's coming soon"
+                icon={
+                  <MaterialCommunityIconsI
+                    color={COLORS.red}
+                    size={30}
+                    name="wifi-off"
+                  />
+                }
+              />
+            ) : null}
             <View style={{flex: 1, marginBottom: pomoActive ? 60 : 0}}>
               <ScrollView
                 refreshControl={
@@ -222,6 +263,7 @@ const App = () => {
                   listId={selectedList ? selectedList.id : null}
                   updatePomoActive={updatePomoActive}
                   lists={lists}
+                  online={online}
                 />
                 {selectedList.id !== DELETED_LIST_ID && (
                   <TouchableOpacity
@@ -247,6 +289,7 @@ const App = () => {
                     removeFromList={removeFromList}
                     listId={selectedList ? selectedList.id : null}
                     lists={lists}
+                    online={online}
                   />
                 )}
                 {selectedList.id === DELETED_LIST_ID && (
@@ -258,6 +301,7 @@ const App = () => {
                     listId={selectedList ? selectedList.id : null}
                     lists={lists}
                     todoListUpdater={todoListUpdater}
+                    online={online}
                     childAtTop={true}>
                     {todos.filter((obj) => obj.state === DELETED).length > 0 ? (
                       <View style={styles.listSpecificButton}>
@@ -292,7 +336,7 @@ const App = () => {
                   message={
                     'Are you sure you want to empty the trash? Changes will be permanent.'
                   }
-                  visible={showTrashDialog}
+                  visible={showTrashDialog && online}
                   onTouchOutside={() => {
                     setShowTrashDialog(false);
                   }}

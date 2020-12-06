@@ -468,9 +468,14 @@ const Todo = (props) => {
           onBlur={() => {
             if (newSubTask !== '') {
               addSubTask(props.todo.id, newSubTask, props.token).then(() => {
-                getSubTasks(props.todo.id, props.token).then((res) => {
-                  setSubTasks(res);
-                });
+                getSubTasks(props.todo.id, props.token)
+                  .then((res) => {
+                    setSubTasks(res);
+                  })
+                  .catch((err) => {
+                    setSubTasks([]);
+                    setModalVisible(false);
+                  });
               });
               setNewSubTask('');
             }
@@ -494,13 +499,18 @@ const Todo = (props) => {
                           item.title,
                           item.state === 0 ? 1 : 0,
                           props.token,
-                        ).then(() => {
-                          getSubTasks(props.todo.id, props.token).then(
-                            (res) => {
-                              setSubTasks(res);
-                            },
-                          );
-                        });
+                        )
+                          .then(() => {
+                            getSubTasks(props.todo.id, props.token).then(
+                              (res) => {
+                                setSubTasks(res);
+                              },
+                            );
+                          })
+                          .catch((err) => {
+                            setSubTasks([]);
+                            setModalVisible(false);
+                          });
                       }}>
                       <MaterialCommunityIconsI
                         size={25}
@@ -686,65 +696,78 @@ const Todo = (props) => {
           style={styles.todoContainer}
           key={props.id}
           onPress={() => {
-            setModalVisible(true);
-            getSubTasks(props.todo.id, props.token).then((res) => {
-              setSubTasks(res);
-            });
+            if (props.online) {
+              setModalVisible(true);
+              getSubTasks(props.todo.id, props.token)
+                .then((res) => {
+                  setSubTasks(res);
+                })
+                .catch((err) => {
+                  setSubTasks([]);
+                  onModalClose();
+                });
+            }
           }}>
-          <View style={styles.todoCheckboxContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                let updatedTodo = props.todo;
-                let newState = updatedTodo.state === 0 ? 1 : 0;
-                updateTodoState(props.todo.id, newState, props.token).then(
-                  () => {
-                    props.todoListUpdater();
-                  },
-                );
-                if (props.todo.recurring) {
-                  let copy = props.todo;
-                  if (copy.recurring === 30) {
-                    copy.due_date = moment(copy.due_date).add(1, 'months');
-                  } else if (copy.recurring === 365) {
-                    copy.due_date = moment(copy.due_date).add(1, 'years');
-                  } else {
-                    copy.due_date = moment(copy.due_date).add(
-                      props.todo.recurring,
-                      'days',
-                    );
+          {props.online ? (
+            <View style={styles.todoCheckboxContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  let updatedTodo = props.todo;
+                  let newState = updatedTodo.state === 0 ? 1 : 0;
+                  updateTodoState(props.todo.id, newState, props.token).then(
+                    () => {
+                      props.todoListUpdater();
+                    },
+                  );
+                  if (props.todo.recurring) {
+                    let copy = props.todo;
+                    if (copy.recurring === 30) {
+                      copy.due_date = moment(copy.due_date).add(1, 'months');
+                    } else if (copy.recurring === 365) {
+                      copy.due_date = moment(copy.due_date).add(1, 'years');
+                    } else {
+                      copy.due_date = moment(copy.due_date).add(
+                        props.todo.recurring,
+                        'days',
+                      );
+                    }
+                    copyTodo(props.todo, props.token).then(() => {
+                      props.todoListUpdater();
+                    });
                   }
-                  copyTodo(props.todo, props.token).then(() => {
-                    props.todoListUpdater();
-                  });
-                }
-              }}>
-              {props.todo.state !== 2 ? (
-                <MaterialCommunityIconsI
-                  size={25}
-                  name={
-                    props.todo.state === 0
-                      ? 'checkbox-blank-circle-outline'
-                      : 'checkbox-marked-circle-outline'
-                  }
-                  color={COLORS.gray}
-                />
-              ) : (
-                <Icon
-                  name="refresh"
-                  size={30}
-                  color={COLORS.mainLight}
-                  onPress={() => {
-                    let updatedTodo = props.todo;
-                    updatedTodo.state = 0;
-                    updateTodoState(props.todo.id, 0, props.token).then(
-                      props.todoListUpdater(),
-                    );
-                  }}
-                />
-              )}
-            </TouchableOpacity>
-          </View>
-          <View style={styles.todoInfoContainer}>
+                }}>
+                {props.todo.state !== 2 ? (
+                  <MaterialCommunityIconsI
+                    size={25}
+                    name={
+                      props.todo.state === 0
+                        ? 'checkbox-blank-circle-outline'
+                        : 'checkbox-marked-circle-outline'
+                    }
+                    color={COLORS.gray}
+                  />
+                ) : (
+                  <Icon
+                    name="refresh"
+                    size={30}
+                    color={COLORS.mainLight}
+                    onPress={() => {
+                      let updatedTodo = props.todo;
+                      updatedTodo.state = 0;
+                      updateTodoState(props.todo.id, 0, props.token).then(
+                        props.todoListUpdater(),
+                      );
+                    }}
+                  />
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : null}
+          <View
+            style={[
+              styles.todoInfoContainer,
+              {marginLeft: props.online ? 0 : 20},
+            ]}>
             <View style={styles.row1}>
               <Text
                 style={[

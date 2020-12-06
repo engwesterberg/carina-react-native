@@ -232,12 +232,14 @@ const Header = (props) => {
               </MenuOption>
             );
           })}
-          <MenuOption onSelect={displayPrompt}>
-            <View style={globalStyles.menuRow}>
-              <Icon name="add" size={18} color={COLORS.mainLight} />
-              <Text style={globalStyles.menuItemtext}>New List </Text>
-            </View>
-          </MenuOption>
+          {props.online ? (
+            <MenuOption onSelect={displayPrompt}>
+              <View style={globalStyles.menuRow}>
+                <Icon name="add" size={18} color={COLORS.mainLight} />
+                <Text style={globalStyles.menuItemtext}>New List </Text>
+              </View>
+            </MenuOption>
+          ) : null}
           <MenuOption
             onSelect={() => {
               props.selectedListUpdater({id: -1, title: 'Trash'});
@@ -308,7 +310,7 @@ const Header = (props) => {
         <Text
           style={styles.text}
           onPress={() => {
-            if (props.selectedList.id > 0) {
+            if (props.selectedList.id > 0 && props.online) {
               setModalVisible(true);
               getSharedWith(props.selectedList.id, props.token).then((res) => {
                 setSharedWithUsers(res);

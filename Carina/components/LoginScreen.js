@@ -80,7 +80,7 @@ const LoginScreen = (props) => {
       } else {
         Toast.show('Please enter a valid email');
       }
-    } else if (name && email) {
+    } else if (name && email && secret && secret !== repeatSecret) {
       Toast.show("Passwords doesn't match");
     } else if (!name) {
       Toast.show('Please enter your name');

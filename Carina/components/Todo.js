@@ -30,7 +30,7 @@ import {
 } from '../functions';
 import {cancelNotification} from '../NotificationHandler';
 
-import Swipeable from 'react-native-swipeable-row';
+import Swipeable from 'react-native-swipeable';
 import {Button} from 'react-native-elements';
 import Modal from 'react-native-modal';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -219,20 +219,106 @@ const Todo = (props) => {
 
   const recurringMenu = () => {
     return (
-      <PopupMenu>
-        <MenuTrigger text="Select action" />
-        <MenuOptions>
-          <MenuOption onSelect={() => alert('Save')} text="Save" />
-          <MenuOption onSelect={() => alert('Delete')}>
-            <Text style={{color: 'red'}}>Delete</Text>
-          </MenuOption>
-          <MenuOption
-            onSelect={() => alert('Not called')}
-            disabled={true}
-            text="Disabled"
-          />
-        </MenuOptions>
-      </PopupMenu>
+      <View style={styles.button}>
+        <Menu
+          ref={setRepeatMenuRef}
+          button={
+            <Button
+              icon={
+                <Icon
+                  name="repeat"
+                  size={TOOLBAR_ICON_SIZE}
+                  color={COLORS.mainLight}
+                  onPress={showRepeatMenu}
+                />
+              }
+              buttonStyle={styles.settingsButton}
+            />
+          }>
+          {repeatValues.map((item) => {
+            return (
+              <MenuItem
+                onPress={() => {
+                  hideRepeatMenu();
+                  updateTodoRecurring(props.todo.id, item.value, props.token)
+                    .then((res) => {
+                      setNewRepeat(item.value);
+                    })
+                    .catch((err) => {
+                      if (err.response) {
+                        if (err.response.status === 403) {
+                          props.signOut();
+                        }
+                      }
+                    });
+                }}>
+                <Text>{item.text}</Text>
+              </MenuItem>
+            );
+          })}
+        </Menu>
+      </View>
+    );
+  };
+
+  const moveToListMenu = () => {
+    return (
+      <View style={styles.button} onPress={showListMenu}>
+        <Menu
+          ref={setListMenuRef}
+          button={
+            <Button
+              icon={
+                <MaterialCommunityIconsI
+                  name="folder-move-outline"
+                  size={TOOLBAR_ICON_SIZE}
+                  color={COLORS.mainLight}
+                  onPress={showListMenu}
+                />
+              }
+              buttonStyle={styles.settingsButton}
+            />
+          }>
+          <MenuItem
+            onPress={() => {
+              hideListMenu();
+              updateTodosList(props.todo.id, null, props.token).then(() => {
+                props.todoListUpdater();
+                setModalVisible(false);
+              });
+            }}>
+            <Text
+              style={{
+                fontWeight: !props.todo.list_id ? 'bold' : 'normal',
+              }}>
+              Carina (default)
+            </Text>
+          </MenuItem>
+          <MenuDivider />
+          {props.lists.map((item) => {
+            return (
+              <MenuItem
+                onPress={() => {
+                  hideListMenu();
+                  updateTodosList(props.todo.id, item.id, props.token).then(
+                    () => {
+                      props.todoListUpdater();
+                      setModalVisible(false);
+                    },
+                  );
+                }}>
+                <Text
+                  style={{
+                    fontWeight:
+                      item.id === props.todo.list_id ? 'bold' : 'normal',
+                  }}>
+                  {item.title}
+                </Text>
+              </MenuItem>
+            );
+          })}
+        </Menu>
+      </View>
     );
   };
 
@@ -380,107 +466,8 @@ const Todo = (props) => {
         <View style={styles.todoTools}>
           {datePicker()}
           {(props.todo.due_date || newDate) && timePicker()}
-          {(props.todo.due_date || newDate) && (
-            <View>
-              <Menu
-                ref={setRepeatMenuRef}
-                button={
-                  <Button
-                    icon={
-                      <Icon
-                        name="repeat"
-                        size={TOOLBAR_ICON_SIZE}
-                        color={COLORS.mainLight}
-                        onPress={showRepeatMenu}
-                      />
-                    }
-                    buttonStyle={styles.settingsButton}
-                  />
-                }>
-                {repeatValues.map((item) => {
-                  return (
-                    <MenuItem
-                      onPress={() => {
-                        hideRepeatMenu();
-                        updateTodoRecurring(
-                          props.todo.id,
-                          item.value,
-                          props.token,
-                        )
-                          .then((res) => {
-                            setNewRepeat(item.value);
-                          })
-                          .catch((err) => {
-                            if (err.response) {
-                              if (err.response.status === 403) {
-                                props.signOut();
-                              }
-                            }
-                          });
-                      }}>
-                      <Text>{item.text}</Text>
-                    </MenuItem>
-                  );
-                })}
-              </Menu>
-            </View>
-          )}
-          <View>
-            <Menu
-              ref={setListMenuRef}
-              button={
-                <Button
-                  icon={
-                    <MaterialCommunityIconsI
-                      name="folder-move-outline"
-                      size={TOOLBAR_ICON_SIZE}
-                      color={COLORS.mainLight}
-                      onPress={showListMenu}
-                    />
-                  }
-                  buttonStyle={styles.settingsButton}
-                />
-              }>
-              <MenuItem
-                onPress={() => {
-                  hideListMenu();
-                  updateTodosList(props.todo.id, null, props.token).then(() => {
-                    props.todoListUpdater();
-                    setModalVisible(false);
-                  });
-                }}>
-                <Text
-                  style={{
-                    fontWeight: !props.todo.list_id ? 'bold' : 'normal',
-                  }}>
-                  Carina (default)
-                </Text>
-              </MenuItem>
-              <MenuDivider />
-              {props.lists.map((item) => {
-                return (
-                  <MenuItem
-                    onPress={() => {
-                      hideListMenu();
-                      updateTodosList(props.todo.id, item.id, props.token).then(
-                        () => {
-                          props.todoListUpdater();
-                          setModalVisible(false);
-                        },
-                      );
-                    }}>
-                    <Text
-                      style={{
-                        fontWeight:
-                          item.id === props.todo.list_id ? 'bold' : 'normal',
-                      }}>
-                      {item.title}
-                    </Text>
-                  </MenuItem>
-                );
-              })}
-            </Menu>
-          </View>
+          {(props.todo.due_date || newDate) && recurringMenu()}
+          {moveToListMenu()}
         </View>
       </View>
     );
@@ -932,9 +919,10 @@ const timeLabel = (todo) => {
 
 const styles = StyleSheet.create({
   todoContainer: {
+    backgroundColor: 'white',
     flexDirection: 'row',
-    height: 40,
-    marginTop: 5,
+    height: 45,
+    paddingTop: 5,
   },
   todoCheckboxContainer: {
     width: 40,
@@ -1024,8 +1012,7 @@ const styles = StyleSheet.create({
     marginLeft: MODAL_LEFT_MARGIN,
   },
   button: {
-    marginLeft: 5,
-    marginRight: 10,
+    padding: 10,
     alignSelf: 'center',
   },
   pomoContainer: {
@@ -1058,8 +1045,8 @@ const styles = StyleSheet.create({
   },
 
   settingsButton: {
+    padding: 0,
     backgroundColor: 'transparent',
-    height: 100,
   },
   subTaskContainer: {flexDirection: 'row', alignItems: 'center', padding: 5},
   note: {

@@ -87,7 +87,7 @@ const Todo = (props) => {
 
   const getRepeatValueString = (value, date) => {
     let string;
-    if (value === 0) {
+    if (!value) {
       return null;
     } else if (date && value === 7) {
       return '  ' + 'Every ' + moment(date).format('dddd');
@@ -110,6 +110,9 @@ const Todo = (props) => {
     } else {
       props.todoListUpdater();
     }
+    setNewDate(null);
+    setNewRepeat(null);
+    setHasTime(false);
   };
 
   const datePicker = () => {
@@ -195,7 +198,7 @@ const Todo = (props) => {
     );
   };
 
-  const recurringMenuNew = () => {
+  const recurringMenu = () => {
     return (
       <View style={styles.button}>
         <Menu>
@@ -243,7 +246,7 @@ const Todo = (props) => {
     );
   };
 
-  const moveToListMenuNew = () => {
+  const moveToListMenu = () => {
     return (
       <View style={styles.button}>
         <Menu>
@@ -417,8 +420,8 @@ const Todo = (props) => {
         <View style={styles.todoTools}>
           {datePicker()}
           {(props.todo.due_date || newDate) && timePicker()}
-          {moveToListMenuNew()}
-          {(props.todo.due_date || newDate) && recurringMenuNew()}
+          {moveToListMenu()}
+          {(props.todo.due_date || newDate) && recurringMenu()}
         </View>
       </View>
     );

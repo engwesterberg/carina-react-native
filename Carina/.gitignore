@@ -52,3 +52,4 @@ buck-out/
 /ios/Pods/
 
 .env
+.temp

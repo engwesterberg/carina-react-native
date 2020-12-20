@@ -69,15 +69,12 @@ const App = () => {
       appState.current.match(/inactive|background/) &&
       nextAppState === 'active'
     ) {
-      console.log('App has come to the foreground!');
     }
 
     appState.current = nextAppState;
     setAppStateVisible(appState.current);
-    console.log('AppState', appState.current);
     if (appState.current === 'background') {
       let jsonString = JSON.stringify({todos: todos, lists: lists});
-      console.log(jsonString);
       storageHelper.set('offlineData', jsonString);
     }
   };
@@ -96,7 +93,6 @@ const App = () => {
                 setOnline(true);
               })
               .catch(async (err) => {
-                console.log('bajs', err.response);
                 if (err.response) {
                   if (err.response.status === 403) {
                     signOut();

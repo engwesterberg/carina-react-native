@@ -7,11 +7,10 @@ import {carinaParser} from './CarinaParser.js';
 import NetInfo from '@react-native-community/netinfo';
 
 //PROD -----------------------------------------------------------------------------
-//const API_ADDRESS = 'http://139.162.196.99:5000';
+const API_ADDRESS = 'http://139.162.196.99:5000';
 //-----------------------------------------------------------------------------
 
 //DEV -----------------------------------------------------------------------------
-const API_ADDRESS = 'http://172.16.11.253:5000';
 //-----------------------------------------------------------------------------
 
 const getRequestConfig = (token) => {
@@ -20,6 +19,11 @@ const getRequestConfig = (token) => {
       Authorization: 'Bearer ' + token,
     },
   };
+};
+
+export const validateEmail = (email) => {
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
 };
 
 export const checkInternetConnection = async () => {
@@ -459,6 +463,23 @@ export const updateTodoState = async (todo_id, newState, token) => {
       {
         todo_id: todo_id,
         state: newState,
+      },
+      getRequestConfig(token),
+    )
+    .then((res) => res.data[0])
+    .catch((e) => {
+      throw e;
+    });
+
+  return results;
+};
+
+export const completeTodo = async (todo_id, token) => {
+  let results = axios
+    .put(
+      `${API_ADDRESS}/api/completetodo/`,
+      {
+        todo_id: todo_id,
       },
       getRequestConfig(token),
     )

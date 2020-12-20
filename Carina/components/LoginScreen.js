@@ -9,7 +9,10 @@ import {
   getUserIdByGoogleId,
   beginResetPassword,
   confirmResetPassword,
+  validateEmail,
 } from '../functions.js';
+
+import LinearGradient from 'react-native-linear-gradient';
 import {TextInput as PaperTextInput} from 'react-native-paper';
 
 import {
@@ -55,10 +58,6 @@ const LoginScreen = (props) => {
     });
   }, []);
 
-  function validateEmail(email) {
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-  }
   const signUpHandler = () => {
     if (
       name &&
@@ -123,10 +122,15 @@ const LoginScreen = (props) => {
   };
 
   return (
-    <ImageBackground
-      style={styles.imgBackground}
-      resizeMode="cover"
-      source={require('../assets/note.jpg')}>
+    //<ImageBackground
+    //style={styles.imgBackground}
+    //resizeMode="cover"
+    //source={require('../assets/note.jpg')}>
+    <LinearGradient
+      colors={['white', COLORS.mainSuperLight]}
+      start={{x: 0, y: 0.5}}
+      locations={[0, 0]}
+      style={styles.linearGradient}>
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         {!signupOpen && !resetOpen ? (
           <View style={styles.loginContainer}>
@@ -389,7 +393,9 @@ const LoginScreen = (props) => {
           </View>
         ) : null}
       </KeyboardAvoidingView>
-    </ImageBackground>
+    </LinearGradient>
+
+    //</ImageBackground>
   );
 };
 
@@ -399,16 +405,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  linearGradient: {
+    width: windowWidth,
+    height: windowHeight,
+  },
   imgBackground: {
     position: 'absolute',
     left: 0,
     top: 0,
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    width: windowWidth,
+    height: windowHeight,
   },
   loginContainer: {
     backgroundColor: COLORS.mainLight,
-    width: windowWidth * 0.7,
+    width: windowWidth < 400 ? windowWidth * 0.7 : 300,
     borderWidth: 0.5,
     borderColor: COLORS.mainDark,
     alignItems: 'center',
@@ -420,7 +430,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.58,
     shadowRadius: 16.0,
-
     elevation: 24,
   },
   text: {

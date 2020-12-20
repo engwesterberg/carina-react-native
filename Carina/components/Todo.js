@@ -27,6 +27,7 @@ import {
   updatePomoEstimate,
   updateTodosList,
   checkInternetConnection,
+  completeTodo,
 } from '../functions';
 import {cancelNotification} from '../NotificationHandler';
 
@@ -322,6 +323,36 @@ const Todo = (props) => {
     );
   };
 
+  const handleTodoState = (todo) => {
+    if (todo.state === 0) {
+      completeTodo(todo.id, props.token)
+        .then((res) => {
+          props.todoListUpdater();
+          setModalVisible(false);
+        })
+        .catch((err) => {
+          if (err.response) {
+            if (err.response.status === 403) {
+              props.signOut();
+            }
+          }
+        });
+    } else if ([1, 2].includes(props.todo.state)) {
+      updateTodoState(todo.id, 0, props.token)
+        .then((res) => {
+          props.todoListUpdater();
+          setModalVisible(false);
+        })
+        .catch((err) => {
+          if (err.response) {
+            if (err.response.status === 403) {
+              props.signOut();
+            }
+          }
+        });
+    }
+  };
+
   //Expanded todo components
   const modalHeader = () => {
     return (
@@ -329,44 +360,7 @@ const Todo = (props) => {
         <View>
           <TouchableOpacity
             onPress={() => {
-              let updatedTodo = props.todo;
-              let newState = updatedTodo.state === 0 ? 1 : 0;
-              updateTodoState(props.todo.id, newState, props.token)
-                .then(() => {
-                  props.todoListUpdater();
-                  setModalVisible(false);
-                })
-                .catch((err) => {
-                  if (err.response) {
-                    if (err.response.status === 403) {
-                      props.signOut();
-                    }
-                  }
-                });
-              if (props.todo.recurring) {
-                let copy = props.todo;
-                if (copy.recurring === 30) {
-                  copy.due_date = moment(copy.due_date).add(1, 'months');
-                } else if (copy.recurring === 365) {
-                  copy.due_date = moment(copy.due_date).add(1, 'years');
-                } else {
-                  copy.due_date = moment(copy.due_date).add(
-                    props.todo.recurring,
-                    'days',
-                  );
-                }
-                copyTodo(props.todo, props.token)
-                  .then(() => {
-                    props.todoListUpdater();
-                  })
-                  .catch((err) => {
-                    if (err.response) {
-                      if (err.response.status === 403) {
-                        props.signOut();
-                      }
-                    }
-                  });
-              }
+              handleTodoState(props.todo);
             }}>
             {props.todo.state !== 2 ? (
               <MaterialCommunityIconsI
@@ -379,24 +373,7 @@ const Todo = (props) => {
                 color={COLORS.mainLight}
               />
             ) : (
-              <Icon
-                name="refresh"
-                size={30}
-                color={COLORS.mainLight}
-                onPress={() => {
-                  let updatedTodo = props.todo;
-                  updatedTodo.state = 0;
-                  updateTodoState(props.todo.id, 0, props.token)
-                    .then(props.todoListUpdater())
-                    .catch((err) => {
-                      if (err.response) {
-                        if (err.response.status === 403) {
-                          props.signOut();
-                        }
-                      }
-                    });
-                }}
-              />
+              <Icon name="refresh" size={30} color={COLORS.mainLight} />
             )}
           </TouchableOpacity>
         </View>
@@ -725,6 +702,7 @@ const Todo = (props) => {
             .then(() => {
               props.removeFromList(props.todo.id);
               cancelNotification(props.todo.id);
+              props.todoListUpdater();
             })
             .catch((err) => {
               if (err.response) {
@@ -738,6 +716,7 @@ const Todo = (props) => {
           deleteTodo(props.todo.id, props.token)
             .then(() => {
               props.removeFromList(props.todo.id);
+              props.todoListUpdater();
               cancelNotification(props.todo.id);
             })
             .catch((err) => {
@@ -768,36 +747,7 @@ const Todo = (props) => {
             <View style={styles.todoCheckboxContainer}>
               <TouchableOpacity
                 onPress={() => {
-                  let updatedTodo = props.todo;
-                  let newState = updatedTodo.state === 0 ? 1 : 0;
-                  updateTodoState(props.todo.id, newState, props.token)
-                    .then(() => {
-                      props.todoListUpdater();
-                    })
-                    .catch((err) => {
-                      if (err.response) {
-                        if (err.response.status === 403) {
-                          props.signOut();
-                          return;
-                        }
-                      }
-                    });
-                  if (props.todo.recurring) {
-                    let copy = props.todo;
-                    if (copy.recurring === 30) {
-                      copy.due_date = moment(copy.due_date).add(1, 'months');
-                    } else if (copy.recurring === 365) {
-                      copy.due_date = moment(copy.due_date).add(1, 'years');
-                    } else {
-                      copy.due_date = moment(copy.due_date).add(
-                        props.todo.recurring,
-                        'days',
-                      );
-                    }
-                    copyTodo(props.todo, props.token).then(() => {
-                      props.todoListUpdater();
-                    });
-                  }
+                  handleTodoState(props.todo);
                 }}>
                 {props.todo.state !== 2 ? (
                   <MaterialCommunityIconsI
@@ -861,7 +811,9 @@ const Todo = (props) => {
               ) : null}
             </View>
             <View style={styles.row2}>
-              {props.todo.due_date !== null ? timeLabel(props.todo) : null}
+              {props.todo.due_date || props.todo.completed
+                ? timeLabel(props.todo)
+                : null}
             </View>
           </View>
           <View style={styles.noteContainer}>

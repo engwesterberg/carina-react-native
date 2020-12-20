@@ -23,6 +23,7 @@ import {
   getSharedWith,
   stopSharingList,
   deleteList,
+  validateEmail,
 } from '../functions';
 
 const Header = (props) => {
@@ -153,8 +154,7 @@ const Header = (props) => {
               setShareWith(text);
             }}
             onBlur={() => {
-              console.warn(shareWith);
-              if (shareWith !== '') {
+              if (validateEmail(shareWith)) {
                 shareList(
                   props.selectedList.id,
                   shareWith,
@@ -176,7 +176,7 @@ const Header = (props) => {
                     setErrorMessage(err.response.data);
                   });
               } else {
-                Toast.show('Email cannot be empty');
+                Toast.show('Invalid email');
               }
             }}
           />
@@ -213,9 +213,9 @@ const Header = (props) => {
   };
   const hamburgerMenu = () => {
     return (
-      <Menu>
+      <Menu style={{marginLeft: 10}}>
         <MenuTrigger>
-          <Icon style={{marginLeft: 10}} name="menu" size={30} color="white" />
+          <Icon name="menu" size={30} color="white" />
         </MenuTrigger>
         <MenuOptions>
           <MenuOption
@@ -277,14 +277,9 @@ const Header = (props) => {
 
   const settingsMenu = () => {
     return (
-      <Menu>
+      <Menu style={{marginRight: 10}}>
         <MenuTrigger>
-          <Icon
-            style={{marginRight: 10}}
-            name="person-circle-sharp"
-            size={25}
-            color="white"
-          />
+          <Icon name="person-circle-sharp" size={25} color="white" />
         </MenuTrigger>
         <MenuOptions>
           <MenuOption

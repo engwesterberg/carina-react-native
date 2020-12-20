@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import {
   deleteTodo,
-  copyTodo,
   getSubTasks,
   addSubTask,
   editSubTask,
@@ -32,13 +31,18 @@ import {
 import {cancelNotification} from '../NotificationHandler';
 
 import Swipeable from 'react-native-swipeable';
-import {Button} from 'react-native-elements';
 import Modal from 'react-native-modal';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIconsI from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
+import {
+  MenuProvider,
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
 import moment from 'moment';
 
 const TOOLBAR_ICON_SIZE = 25;
@@ -53,9 +57,7 @@ const Todo = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  //Repeat Menu
-  const [repeatMenu, setRepeatMenu] = useState(null);
-  const [listMenu, setListMenu] = useState(null);
+
   //For updating todos
   const [newTitle, setNewTitle] = useState(null);
   const [newNote, setNewNote] = useState('');
@@ -71,7 +73,7 @@ const Todo = (props) => {
   const [newSubTask, setNewSubTask] = useState('');
 
   const repeatValues = [
-    {text: 'No Repetition', value: 0},
+    {text: 'No Repetition', value: null},
     {text: 'Every Day', value: 1},
     {text: 'Every 2nd day', value: 2},
     {text: 'Every 3rd day', value: 3},
@@ -98,30 +100,6 @@ const Todo = (props) => {
     if (string) {
       return ' ' + string;
     }
-  };
-
-  const setRepeatMenuRef = (ref) => {
-    setRepeatMenu(ref);
-  };
-
-  const hideRepeatMenu = () => {
-    repeatMenu.hide();
-  };
-
-  const showRepeatMenu = () => {
-    repeatMenu.show();
-  };
-
-  const setListMenuRef = (ref) => {
-    setListMenu(ref);
-  };
-
-  const hideListMenu = () => {
-    listMenu.hide();
-  };
-
-  const showListMenu = () => {
-    listMenu.show();
   };
 
   const onModalClose = () => {
@@ -185,7 +163,6 @@ const Todo = (props) => {
           name="clock-o"
           size={TOOLBAR_ICON_SIZE}
           color={COLORS.mainLight}
-          backgroundColor="red"
           onPress={() => {
             setShowTimePicker(true);
           }}
@@ -218,106 +195,101 @@ const Todo = (props) => {
     );
   };
 
-  const recurringMenu = () => {
+  const recurringMenuNew = () => {
     return (
       <View style={styles.button}>
-        <Menu
-          ref={setRepeatMenuRef}
-          button={
-            <Button
-              icon={
-                <Icon
-                  name="repeat"
-                  size={TOOLBAR_ICON_SIZE}
-                  color={COLORS.mainLight}
-                  onPress={showRepeatMenu}
-                />
-              }
-              buttonStyle={styles.settingsButton}
+        <Menu>
+          <MenuTrigger>
+            <Icon
+              name="repeat"
+              size={TOOLBAR_ICON_SIZE}
+              color={COLORS.mainLight}
             />
-          }>
-          {repeatValues.map((item) => {
-            return (
-              <MenuItem
-                onPress={() => {
-                  hideRepeatMenu();
-                  updateTodoRecurring(props.todo.id, item.value, props.token)
-                    .then((res) => {
-                      setNewRepeat(item.value);
-                    })
-                    .catch((err) => {
-                      if (err.response) {
-                        if (err.response.status === 403) {
-                          props.signOut();
+          </MenuTrigger>
+          <MenuOptions>
+            <MenuOption disabled={true}>
+              <Text style={styles.menuTitle}>Set Repetition</Text>
+            </MenuOption>
+            {repeatValues.map((item) => {
+              return (
+                <MenuOption
+                  style={styles.menuOption}
+                  onSelect={() => {
+                    updateTodoRecurring(props.todo.id, item.value, props.token)
+                      .then((res) => {
+                        setNewRepeat(item.value);
+                      })
+                      .catch((err) => {
+                        if (err.response) {
+                          if (err.response.status === 403) {
+                            props.signOut();
+                          }
                         }
-                      }
-                    });
-                }}>
-                <Text>{item.text}</Text>
-              </MenuItem>
-            );
-          })}
+                      });
+                  }}>
+                  <Text
+                    style={styles.shouldBeBold(
+                      (item.value === props.todo.recurring && !newRepeat) ||
+                        item.value === newRepeat,
+                    )}>
+                    {item.text}
+                  </Text>
+                </MenuOption>
+              );
+            })}
+          </MenuOptions>
         </Menu>
       </View>
     );
   };
 
-  const moveToListMenu = () => {
+  const moveToListMenuNew = () => {
     return (
-      <View style={styles.button} onPress={showListMenu}>
-        <Menu
-          ref={setListMenuRef}
-          button={
-            <Button
-              icon={
-                <MaterialCommunityIconsI
-                  name="folder-move-outline"
-                  size={TOOLBAR_ICON_SIZE}
-                  color={COLORS.mainLight}
-                  onPress={showListMenu}
-                />
-              }
-              buttonStyle={styles.settingsButton}
+      <View style={styles.button}>
+        <Menu>
+          <MenuTrigger>
+            <MaterialCommunityIconsI
+              name="folder-move-outline"
+              size={TOOLBAR_ICON_SIZE}
+              color={COLORS.mainLight}
             />
-          }>
-          <MenuItem
-            onPress={() => {
-              hideListMenu();
-              updateTodosList(props.todo.id, null, props.token).then(() => {
-                props.todoListUpdater();
-                setModalVisible(false);
-              });
-            }}>
-            <Text
-              style={{
-                fontWeight: !props.todo.list_id ? 'bold' : 'normal',
+          </MenuTrigger>
+          <MenuOptions>
+            <MenuOption disabled={true}>
+              <Text style={styles.menuTitle}>Move to list</Text>
+            </MenuOption>
+            <MenuOption
+              style={styles.menuOption}
+              onSelect={() => {
+                updateTodosList(props.todo.id, null, props.token).then(() => {
+                  props.todoListUpdater();
+                  setModalVisible(false);
+                });
               }}>
-              Carina (default)
-            </Text>
-          </MenuItem>
-          <MenuDivider />
-          {props.lists.map((item) => {
-            return (
-              <MenuItem
-                onPress={() => {
-                  hideListMenu();
-                  updateTodosList(props.todo.id, item.id, props.token).then(
-                    () => {
-                      props.todoListUpdater();
-                      setModalVisible(false);
-                    },
-                  );
-                }}>
-                <Text
-                  style={{
-                    fontWeight:
-                      item.id === props.todo.list_id ? 'bold' : 'normal',
+              <Text style={styles.shouldBeBold(!props.todo.list_id)}>
+                Carina (default)
+              </Text>
+            </MenuOption>
+            {props.lists.map((item) => {
+              return (
+                <MenuOption
+                  style={styles.menuOption}
+                  onSelect={() => {
+                    updateTodosList(props.todo.id, item.id, props.token).then(
+                      () => {
+                        props.todoListUpdater();
+                        setModalVisible(false);
+                      },
+                    );
                   }}>
-                  {item.title}
-                </Text>
-              </MenuItem>
-            );
-          })}
+                  <Text
+                    style={styles.shouldBeBold(item.id === props.todo.list_id)}>
+                    {item.title}
+                  </Text>
+                </MenuOption>
+              );
+            })}
+          </MenuOptions>
         </Menu>
       </View>
     );
@@ -404,47 +376,49 @@ const Todo = (props) => {
       </View>
     );
   };
+
+  const pomodoroTools = () => {
+    return (
+      <View style={styles.pomoContainer}>
+        <Icon
+          name="play"
+          size={TOOLBAR_ICON_SIZE}
+          style={styles.button}
+          color={COLORS.mainLight}
+          onPress={() => {
+            props.updatePomoActive(props.todo);
+            setModalVisible(false);
+          }}
+        />
+        <TextInput
+          style={styles.pomosDoneText}
+          value={String(props.todo.pomo_done)}
+          editable={false}
+        />
+        <TextInput style={styles.pomoSeparator} value={'/'} editable={false} />
+        <TextInput
+          style={styles.pomoEstimateText}
+          value={String(newPomoEstimate)}
+          keyboardType="number-pad"
+          onChangeText={(text) => {
+            setNewPomoEstimate(Number(text));
+          }}
+          onEndEditing={() => {
+            updatePomoEstimate(props.todo.id, newPomoEstimate, props.token);
+          }}
+        />
+      </View>
+    );
+  };
+
   const modalToolbar = () => {
     return (
       <View style={styles.expandedTools}>
-        {/*<View style={styles.pomoContainer}>
-          <Icon
-            name="play"
-            size={TOOLBAR_ICON_SIZE}
-            style={styles.button}
-            color={COLORS.mainLight}
-            onPress={() => {
-              props.updatePomoActive(props.todo);
-              setModalVisible(false);
-            }}
-          />
-          <TextInput
-            style={styles.pomosDoneText}
-            value={String(props.todo.pomo_done)}
-            editable={false}
-          />
-          <TextInput
-            style={styles.pomoSeparator}
-            value={'/'}
-            editable={false}
-          />
-          <TextInput
-            style={styles.pomoEstimateText}
-            value={String(newPomoEstimate)}
-            keyboardType="number-pad"
-            onChangeText={(text) => {
-              setNewPomoEstimate(Number(text));
-            }}
-            onEndEditing={() => {
-              updatePomoEstimate(props.todo.id, newPomoEstimate, props.token);
-            }}
-          />
-        </View>*/}
         <View style={styles.todoTools}>
           {datePicker()}
           {(props.todo.due_date || newDate) && timePicker()}
-          {(props.todo.due_date || newDate) && recurringMenu()}
-          {moveToListMenu()}
+          {moveToListMenuNew()}
+          {(props.todo.due_date || newDate) && recurringMenuNew()}
         </View>
       </View>
     );
@@ -618,13 +592,15 @@ const Todo = (props) => {
           onModalClose();
           setModalVisible(false);
         }}>
-        <View style={styles.modalView}>
-          {modalHeader()}
-          {modalDateRow()}
-          {modalToolbar()}
-          {modalSubTaskView()}
-          {modalNoteView()}
-        </View>
+        <MenuProvider skipInstanceCheck>
+          <View style={styles.modalView}>
+            {modalHeader()}
+            {modalDateRow()}
+            {modalToolbar()}
+            {modalSubTaskView()}
+            {modalNoteView()}
+          </View>
+        </MenuProvider>
       </Modal>
     );
   };
@@ -805,7 +781,6 @@ const Todo = (props) => {
                   name="repeat"
                   size={15}
                   color={COLORS.mainLight}
-                  onPress={showRepeatMenu}
                   style={styles.repeatIcon}
                 />
               ) : null}
@@ -1041,6 +1016,19 @@ const styles = StyleSheet.create({
   completedText: {
     color: COLORS.mainLight,
     marginLeft: 30,
+  },
+  menuTitle: {
+    color: 'gray',
+    borderBottomWidth: 1,
+    padding: 5,
+    borderBottomColor: COLORS.mainLight,
+  },
+  menuOption: {
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+  shouldBeBold: (bold) => {
+    return bold ? {fontWeight: 'bold'} : {fontWeight: 'normal'};
   },
 });
 

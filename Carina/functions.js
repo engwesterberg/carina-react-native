@@ -7,11 +7,14 @@ import {carinaParser} from './CarinaParser.js';
 import NetInfo from '@react-native-community/netinfo';
 
 //PROD -----------------------------------------------------------------------------
-//const API_ADDRESS = 'http://139.162.196.99:5000';
+// const API_ADDRESS = 'http://139.162.196.99:5000';
 //-----------------------------------------------------------------------------
 
 //DEV -----------------------------------------------------------------------------
-const API_ADDRESS = 'http://172.16.11.253:5000';
+console.log('bajs: ', __DEV__);
+const API_ADDRESS = __DEV__
+  ? 'http://172.16.11.253:5000'
+  : 'http://139.162.196.99:5000';
 //-----------------------------------------------------------------------------
 
 const getRequestConfig = (token) => {
@@ -150,9 +153,12 @@ export const getUserIdByGoogleId = async (google_id) => {
   return res.data;
 };
 
-export const getTodos = async (user_id, token) => {
+export const getTodos = async (user_id, getDone, token) => {
   let results = await axios
-    .get(`${API_ADDRESS}/api/todos/${user_id}`, getRequestConfig(token))
+    .get(
+      `${API_ADDRESS}/api/todos/${user_id}/${getDone}`,
+      getRequestConfig(token),
+    )
     .then((results) => {
       let todos = results.data[0];
 

@@ -87,7 +87,7 @@ const App = () => {
         storageHelper.get('user_id').then((id) => {
           if (id) {
             setUserId(id);
-            getTodos(id, tok)
+            getTodos(id, showDone, tok)
               .then((res) => {
                 setTodos(res);
                 setOnline(true);
@@ -162,7 +162,7 @@ const App = () => {
     setToken(aToken);
     storageHelper.set('token', aToken);
     storageHelper.set('user_id', String(aId));
-    getTodos(aId, aToken).then((res) => {
+    getTodos(aId, showDone, aToken).then((res) => {
       setTodos(res);
     });
     getLists(aId, aToken).then((res) => {
@@ -171,7 +171,7 @@ const App = () => {
   };
 
   const todoListUpdater = () => {
-    getTodos(userId, token)
+    getTodos(userId, showDone, token)
       .then((res) => {
         setTodos(res);
       })
@@ -294,6 +294,19 @@ const App = () => {
                   <TouchableOpacity
                     style={styles.showDoneView}
                     onPress={() => {
+                      getTodos(userId, !showDone, token)
+                        .then((res) => {
+                          setTodos(res);
+                        })
+                        .catch((err) => {
+                          if (err.response) {
+                            if (err.response.status === 403) {
+                              signOut();
+                              return;
+                            }
+                          }
+                          setOnline(false);
+                        });
                       setShowDone(!showDone);
                     }}>
                     <Text style={styles.showDoneText}>

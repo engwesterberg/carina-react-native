@@ -11,7 +11,7 @@ import Swipeable from 'react-native-swipeable-row';
 import Icon from 'react-native-vector-icons/dist/Ionicons';
 import Toast from 'react-native-simple-toast';
 import {addTodo} from '../functions.js';
-import PlanningModeButton from './PlanningModeButton';
+//import PlanningModeButton from './PlanningModeButton';
 
 const leftContent = <Text />;
 
@@ -49,7 +49,7 @@ class CarinaBar extends Component {
             this.setState({planningModeButton: false});
           }}
           placeholderTextColor={COLORS.mainLight}
-          onSubmitEditing={(text) => {
+          onSubmitEditing={() => {
             if (this.state.query !== '') {
               addTodo(
                 this.props.userId,
@@ -66,15 +66,11 @@ class CarinaBar extends Component {
                   }
                 })
                 .catch((err) => {
-                  if (err.response) {
-                    if (err.response.status === 403) {
-                      this.props.signOut();
-                    }
-                  }
+                  this.props.errorHandler(err);
                 });
               this.setState({query: ''});
             } else {
-              Toast.show('A todos title cannot be empty');
+              Toast.show('A todo title cannot be empty');
             }
           }}
           onChangeText={(text) => {

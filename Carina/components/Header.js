@@ -62,7 +62,7 @@ const Header = (props) => {
         }}>
         <View style={styles.modalView}>
           <View style={styles.modalHeader}>
-            <View style={{flex: 1}}>
+            <View style={styles.flex}>
               <TextInput
                 style={styles.listTitle}
                 defaultValue={props.selectedList.title}
@@ -81,12 +81,7 @@ const Header = (props) => {
                       });
                     })
                     .catch((err) => {
-                      if (err.response) {
-                        if (err.response.status === 403) {
-                          props.signOut();
-                          return;
-                        }
-                      }
+                      props.errorHandler(err);
                       setErrorMessage(err.response.data);
                     });
                 }}
@@ -95,17 +90,13 @@ const Header = (props) => {
             <View>
               <Button
                 icon={<Icon name="trash" size={30} color={COLORS.mainLight} />}
-                buttonStyle={{
-                  height: 35,
-                  backgroundColor: 'white',
-                  alignSelf: 'flex-start',
-                }}
+                buttonStyle={styles.trashButton}
                 onPress={() => {
                   setShowDeleteDialog(true);
                 }}
               />
               <ConfirmDialog
-                title="Confirm Dialog"
+                title="Delete List"
                 message={'Are you sure you want to delete this list?'}
                 visible={showDeleteDialog}
                 onTouchOutside={() => {
@@ -122,12 +113,7 @@ const Header = (props) => {
                         props.selectedListUpdater({id: null, title: 'Carina'});
                       })
                       .catch((err) => {
-                        if (err.response) {
-                          if (err.response.status === 403) {
-                            props.signOut();
-                            return;
-                          }
-                        }
+                        props.errorHandler(err);
                       });
                   },
                 }}
@@ -145,10 +131,10 @@ const Header = (props) => {
             with other people
           </Text>
           <TextInput
-            label="Email Address"
+            label="Email"
             style={styles.bar}
             value={shareWith}
-            placeholder="Email Address"
+            placeholder="Email"
             placeholderTextColor={COLORS.mainLight}
             onChangeText={(text) => {
               setShareWith(text);
@@ -167,13 +153,7 @@ const Header = (props) => {
                     setShareWith('');
                   })
                   .catch((err) => {
-                    if (err.response) {
-                      if (err.response.status === 403) {
-                        props.signOut();
-                        return;
-                      }
-                    }
-                    setErrorMessage(err.response.data);
+                    props.errorHandler(err);
                   });
               } else {
                 Toast.show('Invalid email');
@@ -213,7 +193,7 @@ const Header = (props) => {
   };
   const hamburgerMenu = () => {
     return (
-      <Menu style={{marginLeft: 10}}>
+      <Menu style={styles.marginLeft}>
         <MenuTrigger>
           <Icon name="menu" size={30} color="white" />
         </MenuTrigger>
@@ -277,7 +257,7 @@ const Header = (props) => {
 
   const settingsMenu = () => {
     return (
-      <Menu style={{marginRight: 10}}>
+      <Menu style={styles.marginRight}>
         <MenuTrigger>
           <Icon name="person-circle-sharp" size={25} color="white" />
         </MenuTrigger>
@@ -308,8 +288,9 @@ const Header = (props) => {
         hintTextColor={COLORS.mainLight}
         isDialogVisible={showPrompt}
         title={'New List'}
-        message={'Type the name of the new list'}
-        hintInput={'List Name'}
+        message={'Enter the title of the new list'}
+        hintInput={'List Title'}
+        submitText={'Create List'}
         submitInput={(inputText) => {
           createList(props.userId, inputText, props.token)
             .then((list) => {
@@ -317,11 +298,7 @@ const Header = (props) => {
               props.selectedListUpdater(list);
             })
             .catch((err) => {
-              if (err.response) {
-                if (err.response.status === 403) {
-                  props.signOut();
-                }
-              }
+              props.errorHandler(err);
             });
           setShowPrompt(false);
         }}
@@ -341,11 +318,7 @@ const Header = (props) => {
                   setSharedWithUsers(res);
                 })
                 .catch((err) => {
-                  if (err.response) {
-                    if (err.response.status === 403) {
-                      props.signOut();
-                    }
-                  }
+                  props.errorHandler(err);
                 });
             }
           }}>
@@ -369,6 +342,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.mainLight,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  flex: {
+    flex: 1,
   },
   menu: {
     backgroundColor: COLORS.mainLight,
@@ -433,6 +409,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 1,
     flexWrap: 'wrap',
+  },
+  trashButton: {
+    height: 35,
+    backgroundColor: 'white',
+    alignSelf: 'flex-start',
+  },
+  marginLeft: {
+    marginLeft: 10,
+  },
+  marginRight: {
+    marginRight: 10,
   },
 });
 

@@ -29,7 +29,6 @@ import {
   getLists,
   emptyTrash,
   storageHelper,
-  localDataHandler,
   checkInternetConnection,
 } from './functions';
 
@@ -64,6 +63,14 @@ const App = () => {
     };
   }, []);
 
+  const errorHandler = (err) => {
+    if (err.response) {
+      if (err.response.status === 403) {
+        signOut();
+      }
+    }
+  };
+
   const _handleAppStateChange = (nextAppState) => {
     if (
       appState.current.match(/inactive|background/) &&
@@ -93,15 +100,7 @@ const App = () => {
                 setOnline(true);
               })
               .catch(async (err) => {
-                if (err.response) {
-                  if (err.response.status === 403) {
-                    signOut();
-                    return;
-                  }
-                }
-                let offlineTodos = await localDataHandler.getTodos();
-                setOnline(false);
-                setTodos(offlineTodos);
+                errorHandler(err);
               });
             getLists(id, tok)
               .then((res) => {
@@ -109,15 +108,7 @@ const App = () => {
                 setOnline(true);
               })
               .catch(async (err) => {
-                if (err.response) {
-                  if (err.response.status === 403) {
-                    signOut();
-                    return;
-                  }
-                }
-                let offlineLists = await localDataHandler.getLists();
-                setLists(offlineLists);
-                setOnline(false);
+                errorHandler(err);
               });
           } else {
             signOut();
@@ -127,19 +118,19 @@ const App = () => {
     });
   };
 
-  const pomoBreakUpdater = () => {
-    setPomoBreak(!pomoBreak);
-  };
+  //const pomoBreakUpdater = () => {
+    //setPomoBreak(!pomoBreak);
+  //};
 
-  const setDevelopmentUserState = () => {
-    setUserId(1);
-    getTodos(1).then((res) => {
-      setTodos(res);
-    });
-    getLists(1).then((res) => {
-      setLists(res);
-    });
-  };
+  //const setDevelopmentUserState = () => {
+    //setUserId(1);
+    //getTodos(1).then((res) => {
+      //setTodos(res);
+    //});
+    //getLists(1).then((res) => {
+      //setLists(res);
+    //});
+  //};
 
   const signOut = (userSignedOut) => {
     if (!userSignedOut) {
@@ -176,13 +167,7 @@ const App = () => {
         setTodos(res);
       })
       .catch((err) => {
-        if (err.response) {
-          if (err.response.status === 403) {
-            signOut();
-            return;
-          }
-        }
-        setOnline(false);
+        errorHandler(err);
       });
   };
   const listUpdater = () => {
@@ -192,13 +177,7 @@ const App = () => {
         todoListUpdater();
       })
       .catch((err) => {
-        if (err.response) {
-          if (err.response.status === 403) {
-            signOut();
-            return;
-          }
-        }
-        setOnline(false);
+        errorHandler(err);
       });
   };
 
@@ -210,7 +189,7 @@ const App = () => {
     setPomoActive(todo);
   };
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = useCallback(() => {
     fetchLocalStorageAndData();
     setRefreshing(true);
     wait(2000).then(() => {
@@ -242,6 +221,7 @@ const App = () => {
               }}
               signOut={signOut}
               online={online}
+              errorHandler={errorHandler}
             />
             {selectedList.id !== DELETED_LIST_ID && online ? (
               <CarinaBar
@@ -250,7 +230,7 @@ const App = () => {
                 todoListUpdater={todoListUpdater}
                 listId={selectedList ? selectedList.id : null}
                 online={online}
-                signOut={signOut}
+                errorHandler={errorHandler}
               />
             ) : null}
             {!online ? (
@@ -288,7 +268,7 @@ const App = () => {
                   updatePomoActive={updatePomoActive}
                   lists={lists}
                   online={online}
-                  signOut={signOut}
+                  errorHandler={errorHandler}
                 />
                 {selectedList.id !== DELETED_LIST_ID && (
                   <TouchableOpacity
@@ -299,13 +279,7 @@ const App = () => {
                           setTodos(res);
                         })
                         .catch((err) => {
-                          if (err.response) {
-                            if (err.response.status === 403) {
-                              signOut();
-                              return;
-                            }
-                          }
-                          setOnline(false);
+                          errorHandler(err);
                         });
                       setShowDone(!showDone);
                     }}>
@@ -328,7 +302,7 @@ const App = () => {
                     listId={selectedList ? selectedList.id : null}
                     lists={lists}
                     online={online}
-                    signOut={signOut}
+                    errorHandler={errorHandler}
                   />
                 )}
                 {selectedList.id === DELETED_LIST_ID && (
@@ -341,7 +315,7 @@ const App = () => {
                     lists={lists}
                     todoListUpdater={todoListUpdater}
                     online={online}
-                    signOut={signOut}
+                    errorHandler={errorHandler}
                     childAtTop={true}>
                     {todos.filter((obj) => obj.state === DELETED).length > 0 ? (
                       <View style={styles.listSpecificButton}>
@@ -389,12 +363,7 @@ const App = () => {
                           todoListUpdater();
                         })
                         .catch((err) => {
-                          if (err.response) {
-                            if (err.response.status === 403) {
-                              signOut();
-                              return;
-                            }
-                          }
+                          errorHandler(err);
                         });
                     },
                   }}

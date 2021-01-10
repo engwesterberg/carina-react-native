@@ -1,4 +1,3 @@
-/* eslint react-native/no-inline-styles: 0 */
 import {COLORS} from '../colors.js';
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
@@ -41,7 +40,7 @@ const TodoList = (props) => {
               lists={props.lists}
               token={props.token}
               online={props.online}
-              signOut={props.signOut}
+              errorHandler={props.errorHandler}
             />
           </View>
         );

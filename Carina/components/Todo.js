@@ -6,10 +6,9 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
-  TouchableOpacity,
   TextInput,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import {
   deleteTodo,
@@ -27,6 +26,7 @@ import {
   updateTodosList,
   checkInternetConnection,
   completeTodo,
+  getDaysSince,
 } from '../functions';
 import {cancelNotification} from '../NotificationHandler';
 
@@ -223,11 +223,7 @@ const Todo = (props) => {
                         setNewRepeat(item.value);
                       })
                       .catch((err) => {
-                        if (err.response) {
-                          if (err.response.status === 403) {
-                            props.signOut();
-                          }
-                        }
+                        props.errorHandler(err);
                       });
                   }}>
                   <Text
@@ -306,11 +302,7 @@ const Todo = (props) => {
           setModalVisible(false);
         })
         .catch((err) => {
-          if (err.response) {
-            if (err.response.status === 403) {
-              props.signOut();
-            }
-          }
+          props.errorHandler(err);
         });
     } else if ([1, 2].includes(props.todo.state)) {
       updateTodoState(todo.id, 0, props.token)
@@ -319,11 +311,7 @@ const Todo = (props) => {
           setModalVisible(false);
         })
         .catch((err) => {
-          if (err.response) {
-            if (err.response.status === 403) {
-              props.signOut();
-            }
-          }
+          props.errorHandler(err);
         });
     }
   };
@@ -446,11 +434,7 @@ const Todo = (props) => {
                   });
                 })
                 .catch((err) => {
-                  if (err.response) {
-                    if (err.response.status === 403) {
-                      props.signOut();
-                    }
-                  }
+                  props.errorHandler(err);
                 });
               setNewSubTask('');
             }
@@ -483,11 +467,7 @@ const Todo = (props) => {
                             );
                           })
                           .catch((err) => {
-                            if (err.response) {
-                              if (err.response.status === 403) {
-                                props.signOut();
-                              }
-                            }
+                            props.errorHandler(err);
                           });
                       }}>
                       <MaterialCommunityIconsI
@@ -516,11 +496,7 @@ const Todo = (props) => {
                             );
                           })
                           .catch((err) => {
-                            if (err.response) {
-                              if (err.response.status === 403) {
-                                props.signOut();
-                              }
-                            }
+                            props.errorHandler(err);
                           });
                       }}
                       style={{
@@ -544,11 +520,7 @@ const Todo = (props) => {
                             );
                           })
                           .catch((err) => {
-                            if (err.response) {
-                              if (err.response.status === 403) {
-                                props.signOut();
-                              }
-                            }
+                            props.errorHandler(err);
                           });
                       }}
                     />
@@ -684,11 +656,7 @@ const Todo = (props) => {
               props.todoListUpdater();
             })
             .catch((err) => {
-              if (err.response) {
-                if (err.response.status === 403) {
-                  props.signOut();
-                }
-              }
+              props.errorHandler(err);
             });
         }}
         onLeftActionRelease={() => {
@@ -699,11 +667,7 @@ const Todo = (props) => {
               cancelNotification(props.todo.id);
             })
             .catch((err) => {
-              if (err.response) {
-                if (err.response.status === 403) {
-                  props.signOut();
-                }
-              }
+              props.errorHandler(err);
             });
         }}>
         <TouchableOpacity
@@ -717,7 +681,7 @@ const Todo = (props) => {
                   setSubTasks(res);
                 })
                 .catch((err) => {
-                  console.error(err);
+                  props.errorHandler(err);
                 });
             } else {
             }
@@ -749,12 +713,7 @@ const Todo = (props) => {
                       updateTodoState(props.todo.id, 0, props.token)
                         .then(props.todoListUpdater())
                         .catch((err) => {
-                          if (err.response) {
-                            if (err.response.status === 403) {
-                              props.signOut();
-                              return;
-                            }
-                          }
+                          props.errorHandler(err);
                         });
                     }}
                   />
@@ -789,9 +748,14 @@ const Todo = (props) => {
               ) : null}
             </View>
             <View style={styles.row2}>
-              {props.todo.due_date || props.todo.completed
+              {props.todo.due_date && !props.todo.completed
                 ? timeLabel(props.todo)
                 : null}
+              {props.todo.completed ? (
+                <Text style={styles.completedText}>
+                  {getDaysSince(props.todo.completed)}
+                </Text>
+              ) : null}
             </View>
           </View>
           <View style={styles.noteContainer}>
@@ -1017,8 +981,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   completedText: {
-    color: COLORS.mainLight,
-    marginLeft: 30,
+    color: COLORS.lightGray,
   },
   menuTitle: {
     color: 'gray',

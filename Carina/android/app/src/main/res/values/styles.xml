@@ -9,7 +9,7 @@
     </style>
     <style name="Dialog.Theme" parent="Theme.AppCompat.Light.Dialog">
       <item name="colorAccent">#D993FF</item>
-      <item name="android:textColorPrimary">#0000FF</item>
+      <item name="android:textColorPrimary">#b377e7</item>
     </style>
 
 </resources>

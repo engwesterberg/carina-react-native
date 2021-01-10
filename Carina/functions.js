@@ -7,15 +7,11 @@ import {carinaParser} from './CarinaParser.js';
 import NetInfo from '@react-native-community/netinfo';
 
 //PROD -----------------------------------------------------------------------------
-// const API_ADDRESS = 'http://139.162.196.99:5000';
+//const API_ADDRESS = 'http://139.162.196.99:5000';
 //-----------------------------------------------------------------------------
 
-//DEV -----------------------------------------------------------------------------
-console.log('bajs: ', __DEV__);
-const API_ADDRESS = __DEV__
-  ? 'http://172.16.11.253:5000'
-  : 'http://139.162.196.99:5000';
-//-----------------------------------------------------------------------------
+//dev -----------------------------------------------------------------------------
+const API_ADDRESS = 'http://172.16.11.253:5000';
 
 const getRequestConfig = (token) => {
   return {
@@ -28,6 +24,18 @@ const getRequestConfig = (token) => {
 export const validateEmail = (email) => {
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
+};
+
+export const getDaysSince = (date) => {
+  let dayDiff = moment().diff(date, 'days');
+  switch (dayDiff) {
+    case 0:
+      return 'Today';
+    case 1:
+      return 'Yesterday';
+    default:
+      return `${dayDiff} days ago`;
+  }
 };
 
 export const checkInternetConnection = async () => {

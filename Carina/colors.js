@@ -1,7 +1,7 @@
 export const COLORS = {
   black: '#000000',
   gray: '#323232',
-  //  lightGray: '#939494',
+  lightGray: '#939494',
   mainSuperLight: '#F5EEF8',
   mainLighter: '#D993FF',
   mainLight: '#b377e7',

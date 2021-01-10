@@ -5,7 +5,6 @@ import {COLORS} from '../colors.js';
 const PlanningModeButton = ({onClick, title, attribute}) => (
   <TouchableOpacity
     onPress={() => {
-      console.log('bajs');
       onClick(attribute);
     }}
     style={styles.planningModContainer}>

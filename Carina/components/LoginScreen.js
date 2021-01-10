@@ -13,7 +13,6 @@ import {
 } from '../functions.js';
 
 import LinearGradient from 'react-native-linear-gradient';
-import {TextInput as PaperTextInput} from 'react-native-paper';
 
 import {
   View,
@@ -69,7 +68,7 @@ const LoginScreen = (props) => {
     ) {
       if (validateEmail(email)) {
         signUp(null, email, name, secret)
-          .then((res) => {
+          .then(() => {
             setSignupSuccess(true);
             setErrorMessage(null);
           })
@@ -97,7 +96,7 @@ const LoginScreen = (props) => {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       let user = userInfo.user;
-      addGoogleUser(user.id, user.email, user.name).then((result) => {
+      addGoogleUser(user.id, user.email, user.name).then(() => {
         console.log('login by google');
         getUserIdByGoogleId(user.id).then((res) => {
           console.log('asså: ', res);
@@ -108,17 +107,15 @@ const LoginScreen = (props) => {
         });
       });
     } catch (error) {
-      console.log({error});
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
       } else if (error.code === statusCodes.IN_PROGRESS) {
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-      } else {
       }
     }
   };
 
   const hr = () => {
-    return <View style={{backgroundColor: 'white', width: '90%', height: 1}} />;
+    return <View style={styles.hr} />;
   };
 
   return (
@@ -179,7 +176,6 @@ const LoginScreen = (props) => {
                   .then((res) => {
                     let userInfo = res.userInfo[0][0];
                     let token = res.token;
-                    console.log('token:', token);
                     props.signInHandler(userInfo.id, token);
                   })
                   .catch((e) => {
@@ -189,7 +185,7 @@ const LoginScreen = (props) => {
             />
             {hr()}
             <GoogleSigninButton
-              style={{width: 120, height: 48, marginBottom: 10, marginTop: 10}}
+              style={styles.googleButton}
               size={GoogleSigninButton.Size.Standard}
               color={GoogleSigninButton.Color.Light}
               onPress={googleSignIn}
@@ -277,7 +273,7 @@ const LoginScreen = (props) => {
           <View style={styles.loginContainer}>
             <Text style={styles.titleSmaller}> Reset Password </Text>
             {!confirmationSent ? (
-              <View style={{width: '100%', alignItems: 'center'}}>
+              <View style={styles.fullWidthAlignCenter}>
                 <Text style={styles.infoText}>
                   A confirmation code will be sent{'\n'} to your email
                 </Text>
@@ -309,7 +305,7 @@ const LoginScreen = (props) => {
                 </View>
               </View>
             ) : (
-              <View style={{width: '100%', alignItems: 'center'}}>
+              <View style={styles.fullWidthAlignCenter}>
                 <Text style={styles.infoText}>
                   Enter the confirmation code sent to you by email
                 </Text>
@@ -394,7 +390,6 @@ const LoginScreen = (props) => {
         ) : null}
       </KeyboardAvoidingView>
     </LinearGradient>
-
     //</ImageBackground>
   );
 };
@@ -482,6 +477,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderColor: COLORS.mainLight,
   },
+  hr: {
+    backgroundColor: 'white',
+    width: '90%',
+    height: 1,
+  },
+  googleButton: {
+    width: 120,
+    height: 48,
+    marginBottom: 10,
+    marginTop: 10,
+  },
+  fullWidthAlignCenter: {
+width: '100%', alignItems: 'center'
+  }
 });
 
 export default LoginScreen;

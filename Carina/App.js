@@ -94,7 +94,7 @@ const App = () => {
         storageHelper.get('user_id').then((id) => {
           if (id) {
             setUserId(id);
-            getTodos(id, showDone, tok)
+            getTodos(showDone, tok)
               .then((res) => {
                 setTodos(res);
                 setOnline(true);
@@ -102,7 +102,7 @@ const App = () => {
               .catch(async (err) => {
                 errorHandler(err);
               });
-            getLists(id, tok)
+            getLists(tok)
               .then((res) => {
                 setLists(res);
                 setOnline(true);
@@ -153,16 +153,16 @@ const App = () => {
     setToken(aToken);
     storageHelper.set('token', aToken);
     storageHelper.set('user_id', String(aId));
-    getTodos(aId, showDone, aToken).then((res) => {
+    getTodos(showDone, aToken).then((res) => {
       setTodos(res);
     });
-    getLists(aId, aToken).then((res) => {
+    getLists(aToken).then((res) => {
       setLists(res);
     });
   };
 
   const todoListUpdater = () => {
-    getTodos(userId, showDone, token)
+    getTodos(showDone, token)
       .then((res) => {
         setTodos(res);
       })
@@ -171,7 +171,7 @@ const App = () => {
       });
   };
   const listUpdater = () => {
-    getLists(userId, token)
+    getLists(token)
       .then((res) => {
         setLists(res);
         todoListUpdater();
@@ -274,7 +274,7 @@ const App = () => {
                   <TouchableOpacity
                     style={styles.showDoneView}
                     onPress={() => {
-                      getTodos(userId, !showDone, token)
+                      getTodos(!showDone, token)
                         .then((res) => {
                           setTodos(res);
                         })
@@ -358,7 +358,7 @@ const App = () => {
                     title: 'YES',
                     onPress: () => {
                       setShowTrashDialog(false);
-                      emptyTrash(userId, token)
+                      emptyTrash(token)
                         .then(() => {
                           todoListUpdater();
                         })

@@ -14,6 +14,8 @@ target 'Carina' do
 
   pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
 
+  pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+
   target 'CarinaTests' do
     inherit! :complete
     # Pods for testing

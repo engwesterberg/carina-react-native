@@ -297,7 +297,7 @@ const Todo = (props) => {
   const handleTodoState = (todo) => {
     if (todo.state === 0) {
       completeTodo(todo.id, props.token)
-        .then((res) => {
+        .then(() => {
           props.todoListUpdater();
           setModalVisible(false);
         })
@@ -306,7 +306,7 @@ const Todo = (props) => {
         });
     } else if ([1, 2].includes(props.todo.state)) {
       updateTodoState(todo.id, 0, props.token)
-        .then((res) => {
+        .then(() => {
           props.todoListUpdater();
           setModalVisible(false);
         })
@@ -320,7 +320,7 @@ const Todo = (props) => {
   const modalHeader = () => {
     return (
       <View style={styles.modalHeader}>
-        <View>
+        <View style={{width: 30}}>
           <TouchableOpacity
             onPress={() => {
               handleTodoState(props.todo);
@@ -334,6 +334,7 @@ const Todo = (props) => {
                     : 'checkbox-marked-circle-outline'
                 }
                 color={COLORS.mainLight}
+                style={{marginTop: 5}}
               />
             ) : (
               <Icon name="refresh" size={30} color={COLORS.mainLight} />
@@ -875,8 +876,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flex: 1,
   },
-  modalHeader: {flexDirection: 'row', alignItems: 'center', paddingLeft: 10},
-
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 10,
+    backgroundColor: 'red',
+  },
+  todoTitle: {
+    marginLeft: MODAL_LEFT_MARGIN,
+    marginRight: 25,
+    flex: 1,
+    fontSize: 40,
+    padding: 0,
+    color: COLORS.mainLight,
+    fontFamily: 'Roboto',
+    backgroundColor: 'yellow',
+  },
   dateRowView: {justifyContent: 'center', paddingLeft: 10},
   expandedTools: {
     height: 40,
@@ -889,16 +904,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.8,
     borderTopColor: COLORS.mainLight,
     backgroundColor: 'white',
-  },
-  todoTitle: {
-    marginLeft: MODAL_LEFT_MARGIN,
-    flex: 1,
-    marginRight: 25,
-    padding: 0,
-    fontSize: 40,
-    textAlignVertical: 'center',
-    color: COLORS.mainLight,
-    fontFamily: 'Roboto',
   },
   repeatPicker: {
     flex: 1,

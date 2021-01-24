@@ -21,6 +21,7 @@ import {
   Dimensions,
   ImageBackground,
   KeyboardAvoidingView,
+  ScrollView,
   TextInput,
 } from 'react-native';
 import {
@@ -29,9 +30,13 @@ import {
   statusCodes,
 } from '@react-native-community/google-signin';
 import Toast from 'react-native-simple-toast';
+import {Checkbox} from 'react-native-paper';
+import Modal from 'react-native-modal';
+import HTML from 'react-native-render-html';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
+import {htmlContent} from '../eula/license';
 
 const LoginScreen = (props) => {
   const [name, setName] = useState('');
@@ -39,6 +44,7 @@ const LoginScreen = (props) => {
   const [secret, setSecret] = useState('');
   const [repeatSecret, setRepeatSecret] = useState('');
   const [confirmationCode, setConfirmationCode] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // For displaying visual elements
   const [signupOpen, setSignupOpen] = useState(false);
@@ -46,6 +52,7 @@ const LoginScreen = (props) => {
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -57,14 +64,20 @@ const LoginScreen = (props) => {
     });
   }, []);
 
+  const showEula = () => {
+    console.log('GO');
+    setModalVisible(true);
+  };
+
   const signUpHandler = () => {
     if (
-      name &&
-      email &&
-      secret &&
-      repeatSecret &&
-      secret === repeatSecret &&
-      secret.length >= 8
+      (name &&
+        email &&
+        secret &&
+        repeatSecret &&
+        secret === repeatSecret &&
+        secret.length >= 8,
+      termsAccepted)
     ) {
       if (validateEmail(email)) {
         signUp(null, email, name, secret)
@@ -86,8 +99,10 @@ const LoginScreen = (props) => {
       Toast.show('Please enter your email');
     } else if (!secret) {
       Toast.show('Please enter your password');
-    } else if (secret.length >= 8) {
+    } else if (secret.length < 8) {
       Toast.show('Password needs to be at least 8 characters long');
+    } else if (!termsAccepted) {
+      Toast.show('You have to accepts the terms of agreement');
     }
   };
 
@@ -231,12 +246,64 @@ const LoginScreen = (props) => {
               placeholder="Repeat Password"
               placeholderTextColor="black"
             />
+            <View style={styles.displayRow}>
+              <Modal
+                useNativeDriver={true}
+                style={styles.modal}
+                isVisible={modalVisible}
+                coverScreen={true}
+                backdropOpacity={0.8}
+                onBackButtonPress={() => {
+                  setModalVisible(false);
+                }}
+                onBackdropPress={() => {
+                  setModalVisible(false);
+                }}>
+                <View style={styles.modalView}>
+                  <ScrollView style={{flex: 1, padding: 5}}>
+                    <HTML
+                      source={{html: htmlContent}}
+                      classesStyles={{
+                        company_name: {
+                          fontWeight: 'bold',
+                          color: 'black',
+                        },
+                        app_name: {
+                          color: COLORS.mainLight,
+                        },
+                      }}
+                    />
+                    <AppButton
+                      title="Close"
+                      onPress={() => {
+                        setModalVisible(false);
+                      }}
+                    />
+                  </ScrollView>
+                </View>
+              </Modal>
+              <View />
+              <Checkbox
+                status={termsAccepted ? 'checked' : 'unchecked'}
+                onPress={() => {
+                  setTermsAccepted(!termsAccepted);
+                }}
+                uncheckedColor="white"
+                color="white"
+                style={styles.checkBox}
+              />
+              <Text style={{color: 'white'}}>
+                I agree to the{' '}
+                <Text onPress={showEula} style={styles.link}>
+                  terms
+                </Text>{' '}
+                of using Carina
+              </Text>
+            </View>
             {signupSuccess && (
               <View>
                 <Text style={styles.infoText}>Signup Successfull!</Text>
-                <Text style={styles.signupSuccessText}>
-                  Welcome to Carina {name}
-                </Text>
+                <Text style={styles.infoText}>Welcome to Carina {name}</Text>
               </View>
             )}
             {errorMessage && (
@@ -426,6 +493,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.58,
     shadowRadius: 16.0,
     elevation: 24,
+    padding: 20,
   },
   text: {
     fontSize: 44,
@@ -447,6 +515,7 @@ const styles = StyleSheet.create({
   },
   displayRow: {
     flexDirection: 'row',
+    alignItems: 'center',
   },
   textButton: {
     color: 'white',
@@ -454,13 +523,13 @@ const styles = StyleSheet.create({
     marginRight: 20,
     fontFamily: 'Roboto',
   },
-  input: {width: '90%', marginLeft: 5, marginBottom: 10},
+  input: {width: '90%', marginBottom: 10},
   infoText: {
     color: 'white',
-    marginBottom: 5,
     textAlign: 'center',
     alignSelf: 'center',
     fontFamily: 'Roboto',
+    marginBottom: 5,
   },
   bar: {
     alignSelf: 'center',
@@ -468,7 +537,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: COLORS.mainSuperLight,
     height: 40,
-    width: '90%',
+    width: '100%',
     paddingLeft: 10,
     borderBottomWidth: 0.2,
     borderBottomColor: COLORS.mainLight,
@@ -485,12 +554,27 @@ const styles = StyleSheet.create({
   googleButton: {
     width: 120,
     height: 48,
-    marginBottom: 10,
-    marginTop: 10,
+    marginTop: 20,
   },
   fullWidthAlignCenter: {
-width: '100%', alignItems: 'center'
-  }
+    width: '100%',
+    alignItems: 'center',
+  },
+  link: {
+    color: COLORS.blue,
+  },
+  checkBox: {
+    color: COLORS.mainSuperLight,
+  },
+  modal: {
+    backgroundColor: 'white',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    flex: 1,
+    paddingRight: 30,
+    paddingLeft: 30,
+  },
 });
 
 export default LoginScreen;

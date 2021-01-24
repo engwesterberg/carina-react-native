@@ -161,12 +161,9 @@ export const getUserIdByGoogleId = async (google_id) => {
   return res.data;
 };
 
-export const getTodos = async (user_id, getDone, token) => {
+export const getTodos = async (getDone, token) => {
   let results = await axios
-    .get(
-      `${API_ADDRESS}/api/todos/${user_id}/${getDone}`,
-      getRequestConfig(token),
-    )
+    .get(`${API_ADDRESS}/api/todos/${getDone}`, getRequestConfig(token))
     .then((results) => {
       let todos = results.data[0];
 
@@ -191,9 +188,9 @@ export const getSubTasks = async (todo_id, token) => {
   return results;
 };
 
-export const getLists = async (user_id, token) => {
+export const getLists = async (token) => {
   let results = await axios
-    .get(`${API_ADDRESS}/api/list/${user_id}`, getRequestConfig(token))
+    .get(`${API_ADDRESS}/api/list/`, getRequestConfig(token))
     .then((res) => {
       let lists = res.data[0];
       let jsonString = JSON.stringify({data: lists});
@@ -208,35 +205,37 @@ export const getLists = async (user_id, token) => {
   return results;
 };
 
-export const incPomo = async (user_id, todo_id) => {
+export const incPomo = async (todo_id, token) => {
   let results = await axios
-    .put(`${API_ADDRESS}/api/incpomo/`, {
-      user_id: user_id,
-      todo_id: todo_id,
-    })
+    .put(
+      `${API_ADDRESS}/api/incpomo/`,
+      {
+        todo_id: todo_id,
+      },
+      getRequestConfig(token),
+    )
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
   return results[0];
 };
 
-export const getPomosToday = async (user_id) => {
+export const getPomosToday = async (token) => {
   let results = await axios
-    .put(`${API_ADDRESS}/api/pomotoday/${user_id}`)
+    .put(`${API_ADDRESS}/api/pomotoday/`, getRequestConfig(token))
     .then((res) => res.data)
     .catch((e) => console.error(e));
 
   return results[0];
 };
 
-export const addTodo = async (user_id, query, list_id, token) => {
+export const addTodo = async (query, list_id, token) => {
   let parsed = carinaParser(query);
   console.log('bajs: ', parsed);
   let results = await axios
     .post(
       `${API_ADDRESS}/api/todo`,
       {
-        user_id: user_id,
         list_id: list_id,
         title: parsed.newQuery,
         note: null,
@@ -365,9 +364,9 @@ export const deleteTodo = async (todo_id, token) => {
   return results;
 };
 
-export const emptyTrash = async (user_id, token) => {
+export const emptyTrash = async (token) => {
   let results = await axios
-    .delete(`${API_ADDRESS}/api/emptytrash/${user_id}`, getRequestConfig(token))
+    .delete(`${API_ADDRESS}/api/emptytrash/`, getRequestConfig(token))
     .then((res) => res.data[0])
     .catch((e) => {
       console.error(e);
@@ -377,12 +376,11 @@ export const emptyTrash = async (user_id, token) => {
   return results;
 };
 
-export const createList = async (user_id, listName, token) => {
+export const createList = async (listName, token) => {
   let results = await axios
     .post(
       `${API_ADDRESS}/api/list/`,
       {
-        user_id: user_id,
         title: listName,
       },
       getRequestConfig(token),

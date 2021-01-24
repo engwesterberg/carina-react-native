@@ -292,7 +292,7 @@ const Header = (props) => {
         hintInput={'List Title'}
         submitText={'Create List'}
         submitInput={(inputText) => {
-          createList(props.userId, inputText, props.token)
+          createList(inputText, props.token)
             .then((list) => {
               props.listUpdater();
               props.selectedListUpdater(list);

@@ -52,7 +52,6 @@ class CarinaBar extends Component {
           onSubmitEditing={() => {
             if (this.state.query !== '') {
               addTodo(
-                this.props.userId,
                 this.state.planningMode
                   ? this.state.query + ' ' + this.state.planningAttributes
                   : this.state.query,
